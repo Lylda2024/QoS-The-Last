@@ -1,0 +1,79 @@
+entity TypeUtilisateur {
+  nom String,
+  description String,
+  niveau Integer,
+  permissions String
+}
+
+entity Utilisateur {
+  nom String,
+  prenom String,
+  email String,
+  motDePasse String
+}
+
+entity Role {
+  nom String,
+  description String
+}
+
+entity Site {
+  nomSite String,
+  codeOCI String,
+  longitude Float,
+  latitude Float,
+  gestionnaire String,
+  proprietaire String,
+  equipementier String,
+  typeSite String,
+  modeAntenne String,
+  statut String,
+  couche String,
+  enService Boolean,
+  technologie String,
+  dateMiseEnService LocalDate,
+  dateMes2G LocalDate,
+  dateMes3G LocalDate
+}
+
+entity Degradation {
+  numero String,
+  localite String,
+  contactTemoin String,
+  typeAnomalie String,
+  priorite String,
+  problem String,
+  porteur String,
+  actionsEffectuees String
+}
+
+entity Historique {
+  utilisateur String,
+  section String,
+  horodatage Instant
+}
+
+entity Notification {
+  type String,
+  message String,
+  dateEnvoi Instant,
+  statutLecture Boolean
+}
+
+relationship ManyToOne {
+  Utilisateur{typeUtilisateur} to TypeUtilisateur,
+  Degradation{site} to Site,
+  Degradation{utilisateur} to Utilisateur
+}
+
+relationship ManyToMany {
+  Utilisateur{role} to Role{utilisateur}
+}
+
+relationship OneToMany {
+  Site{degradations} to Degradation{site},
+  Degradation{historiques} to Historique{degradation},
+  Degradation{notifications} to Notification{degradation}
+}
+
+paginate Site, Utilisateur, Role, Degradation, Notification, Historique with pagination
