@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (notification(); as notificationRef) {
+      <div>
+        <h2 data-cy="notificationDetailsHeading"><span jhiTranslate="codeStageApp.notification.detail.title">Notification</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ notificationRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.notification.type">Type</span></dt>
+          <dd>
+            <span>{{ notificationRef.type }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.notification.message">Message</span></dt>
+          <dd>
+            <span>{{ notificationRef.message }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.notification.dateEnvoi">Date Envoi</span></dt>
+          <dd>
+            <span>{{ notificationRef.dateEnvoi | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.notification.statutLecture">Statut Lecture</span></dt>
+          <dd>
+            <span>{{ notificationRef.statutLecture }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.notification.degradation">Degradation</span></dt>
+          <dd>
+            @if (notification()!.degradation) {
+              <div>
+                <a [routerLink]="['/degradation', notification()!.degradation?.id, 'view']">{{ notificationRef.degradation?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/notification', notificationRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

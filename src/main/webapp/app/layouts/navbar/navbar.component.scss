@@ -1,48 +1,103 @@
-@import 'bootstrap/scss/functions';
-@import 'bootswatch/dist/cosmo/variables';
-@import 'bootstrap/scss/variables';
-
-/* ==========================================================================
-Navbar
-========================================================================== */
-
-.navbar-version {
-  font-size: 0.65em;
-  color: $navbar-dark-color;
-}
-
-.profile-image {
-  height: 1.75em;
-  width: 1.75em;
-}
-
+/* Style général du header */
 .navbar {
-  padding: 0.2rem 1rem;
-  .dropdown-item.active,
-  .dropdown-item.active:focus,
-  .dropdown-item.active:hover {
-    background-color: $dark;
-  }
-
-  a.nav-link {
-    font-weight: 400;
-  }
-
-  .navbar-toggler {
-    &:hover {
-      color: $navbar-dark-hover-color;
-    }
-  }
+  background-color: #fffaf6a3 !important; /* orange clair semi-transparent */
+  color: #ff6600;
+  padding: 0.75rem 1rem;
 }
 
-/* ==========================================================================
-Logo styles
-========================================================================== */
-.logo-img {
-  height: 45px;
-  width: 45px;
-  display: inline-block;
-  vertical-align: middle;
-  background: url('/content/images/logo-jhipster.png') no-repeat center center;
-  background-size: contain;
+/* Conteneur interne */
+.navbar .container-fluid {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo ou brand */
+.navbar-brand.logo {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin-right: 0.75rem;
+}
+
+/* Icônes de menu + liens */
+.navbar-nav .nav-link {
+  background-color: white;
+  color: #ff6600 !important;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  transition: background-color 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  background-color: #f2f2f2;
+}
+
+/* Lien de déconnexion */
+.navbar-nav .nav-item:last-child .nav-link {
+  background-color: #000;
+  color: white !important;
+}
+
+.navbar-nav .nav-item:last-child .nav-link:hover {
+  background-color: #333;
+}
+
+/* Bouton de toggler mobile */
+.navbar-toggler {
+  background-color: white;
+  color: #ff6600;
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem 0.75rem;
+}
+
+.navbar-toggler:hover {
+  background-color: #f2f2f2;
+}
+
+/* Badge de notification */
+.badge {
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 0.2em 0.5em;
+  font-size: 0.8em;
+  margin-left: 4px;
+}
+
+/* Notifications (dropdown custom) */
+.notification-container .dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: white;
+  border: 1px solid #ccc;
+  width: 300px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 999;
+  padding: 0.5rem;
+}
+
+.notification-container .dropdown-item {
+  padding: 0.5rem;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.notification-container .text-info {
+  color: #0d6efd;
+}
+
+.notification-container .text-warning {
+  color: #ffc107;
+}
+
+.notification-container .text-danger {
+  color: #dc3545;
 }

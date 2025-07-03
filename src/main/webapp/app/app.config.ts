@@ -24,6 +24,10 @@ import routes from './app.routes';
 import { NgbDateDayjsAdapter } from './config/datepicker-adapter';
 import { AppPageTitleStrategy } from './app-page-title-strategy';
 
+// ✅ FontAwesome imports
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+
 const routerFeatures: RouterFeatures[] = [
   withComponentInputBinding(),
   withNavigationErrorHandler((e: NavigationError) => {
@@ -39,6 +43,7 @@ const routerFeatures: RouterFeatures[] = [
     }
   }),
 ];
+
 if (environment.DEBUG_INFO_ENABLED) {
   routerFeatures.push(withDebugTracing());
 }
@@ -56,6 +61,17 @@ export const appConfig: ApplicationConfig = {
     { provide: NgbDateAdapter, useClass: NgbDateDayjsAdapter },
     httpInterceptorProviders,
     { provide: TitleStrategy, useClass: AppPageTitleStrategy },
+
+    // ✅ FontAwesome support
+    importProvidersFrom(FontAwesomeModule),
+    {
+      provide: 'fa-icon-init',
+      useFactory: (library: FaIconLibrary) => () => {
+        library.addIcons(faMapMarkerAlt);
+      },
+      deps: [FaIconLibrary],
+    },
+
     // jhipster-needle-angular-add-module JHipster will add new module here
   ],
 };

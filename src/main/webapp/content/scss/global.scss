@@ -1,54 +1,87 @@
+/* ========== Variables personnalisées - déclarées en premier ========== */
+$primary: #ff7900;
+$background: #ffffff;
+$text-color: #000000;
+$text-secondary: #444444;
+$light-gray: #fafafa;
+
+/* ========== Import Bootstrap et Bootswatch ========== */
 @import 'bootstrap-variables';
 @import 'bootstrap/scss/functions';
 @import 'bootswatch/dist/cosmo/variables';
 @import 'bootstrap/scss/variables';
 
-/* ==============================================================
-Bootstrap tweaks
-===============================================================*/
+/* ========== Boutons Bootstrap personnalisés ========== */
+.btn-primary {
+  background-color: $primary;
+  border-color: $primary;
+  color: white;
 
+  &:hover,
+  &:focus,
+  &:active,
+  &.active {
+    background-color: darken($primary, 10%);
+    border-color: darken($primary, 10%);
+    color: white;
+  }
+
+  &:disabled,
+  &[disabled] {
+    background-color: lighten($primary, 30%);
+    border-color: lighten($primary, 30%);
+    color: #eee;
+  }
+}
+
+/* ========== Styles globaux et overrides ========== */
 body,
 h1,
 h2,
 h3,
 h4 {
   font-weight: 300;
+  color: $text-color;
+  background-color: $background;
+}
+
+a {
+  color: $primary;
+  &:hover {
+    cursor: pointer;
+    color: darken($primary, 10%);
+  }
 }
 
 a:hover {
-  /* make sure browsers use the pointer cursor for anchors, even with no href */
   cursor: pointer;
 }
 
 .dropdown-item:hover {
-  color: $dropdown-link-hover-color;
+  color: $primary;
+  background-color: $light-gray;
 }
 
-/* ==========================================================================
-Browser Upgrade Prompt
-========================================================================== */
 .browserupgrade {
   margin: 0.2em 0;
-  background: #ccc;
-  color: #000;
+  background: $light-gray;
+  color: $text-color;
   padding: 0.2em 0;
 }
-
-/* ==========================================================================
-Generic styles
-========================================================================== */
-
-/* other generic styles */
 
 .jh-card {
   padding: 1.5%;
   margin-top: 20px;
   border: none;
+  background-color: $background;
+  color: $text-color;
+  box-shadow: 0 2px 4px rgba($primary, 0.15);
 }
 
 .error {
-  color: white;
-  background-color: red;
+  color: $background;
+  background-color: $primary;
+  font-weight: bold;
 }
 
 .pad {
@@ -65,20 +98,30 @@ Generic styles
 
 .break {
   white-space: normal;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .form-control {
-  background-color: #fff;
+  background-color: $background;
+  color: $text-color;
+  border: 1px solid lighten($primary, 40%);
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 5px rgba($primary, 0.5);
+    outline: none;
+  }
 }
 
 .readonly {
-  background-color: #eee;
+  background-color: lighten($light-gray, 10%);
   opacity: 1;
+  color: $text-secondary;
 }
 
 .footer {
-  border-top: 1px solid rgba(0, 0, 0, 0.125);
+  border-top: 1px solid lighten($primary, 70%);
+  background-color: $light-gray;
+  color: $text-secondary;
 }
 
 .hand,
@@ -86,12 +129,13 @@ Generic styles
   cursor: pointer;
 }
 
-/* ==========================================================================
-Custom alerts for notification
-========================================================================== */
 .alerts {
   .alert {
     text-overflow: ellipsis;
+    color: $text-color;
+    background-color: lighten($primary, 50%);
+    border-color: $primary;
+
     pre {
       background: none;
       border: none;
@@ -128,22 +172,17 @@ Custom alerts for notification
   }
 }
 
-/* ==========================================================================
-entity list page css
-========================================================================== */
-
 .table-entities thead th .d-flex > * {
   margin: auto 0;
+  color: $text-color;
 }
 
-/* ==========================================================================
-entity detail page css
-========================================================================== */
 .row-md.jh-entity-details {
   display: grid;
   grid-template-columns: auto 1fr;
   column-gap: 10px;
   line-height: 1.5;
+  color: $text-color;
 }
 
 @media screen and (min-width: 768px) {
@@ -156,23 +195,26 @@ entity detail page css
       text-overflow: ellipsis;
       white-space: nowrap;
       padding: 0.5em 0;
+      color: $text-secondary;
     }
     dd {
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid lighten($primary, 70%);
       padding: 0.5em 0;
       margin-left: 0;
+      color: $text-color;
     }
   }
 }
 
-/* ==========================================================================
-ui bootstrap tweaks
-========================================================================== */
 .nav,
 .pagination,
 .carousel,
 .panel-title a {
   cursor: pointer;
+  color: $primary;
+  &:hover {
+    color: darken($primary, 15%);
+  }
 }
 
 .thread-dump-modal-lock {
@@ -180,31 +222,44 @@ ui bootstrap tweaks
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: $text-color;
 }
 
 .dropdown-menu {
   padding-left: 0;
+  background-color: $background;
+  color: $text-color;
+  border: 1px solid lighten($primary, 60%);
 }
 
-/* ==========================================================================
-angular-cli removes postcss-rtl processed inline css, processed rules must be added here instead
-========================================================================== */
-/* page-ribbon.component.scss */
 .ribbon {
   left: -3.5em;
-  -moz-transform: rotate(-45deg);
-  -ms-transform: rotate(-45deg);
-  -o-transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
   transform: rotate(-45deg);
+  background-color: $primary;
+  color: $background;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.5em 1em;
 }
 
-/* navbar.component.scss */
 .navbar {
+  background-color: $primary;
+  color: $background;
+
   ul.navbar-nav {
     .nav-item {
       margin-left: 0.5em;
+      a {
+        color: $background;
+        &:hover {
+          color: lighten($background, 30%);
+        }
+      }
     }
   }
 }
+router-outlet + * {
+  height: 100%;
+}
+
 /* jhipster-needle-scss-add-main JHipster will add new css style */

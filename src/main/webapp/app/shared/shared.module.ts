@@ -1,3 +1,6 @@
+import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -25,4 +28,8 @@ import { AlertErrorComponent } from './alert/alert-error.component';
     TranslateDirective,
   ],
 })
-export default class SharedModule {}
+export default class SharedModule {
+  constructor(private faIconLibrary: FaIconLibrary) {
+    this.faIconLibrary.addIconPacks(fas); // ✅ Enregistre toutes les icônes solid
+  }
+}

@@ -62,7 +62,6 @@ entity Notification {
 
 relationship ManyToOne {
   Utilisateur{typeUtilisateur} to TypeUtilisateur,
-  Degradation{site} to Site,
   Degradation{utilisateur} to Utilisateur
 }
 
@@ -76,4 +75,9 @@ relationship OneToMany {
   Degradation{notifications} to Notification{degradation}
 }
 
-paginate Site, Utilisateur, Role, Degradation, Notification, Historique with pagination
+paginate Site with pagination
+paginate Utilisateur with pagination
+paginate Role with pagination
+paginate Degradation with pagination
+paginate Notification with pagination
+paginate Historique with pagination

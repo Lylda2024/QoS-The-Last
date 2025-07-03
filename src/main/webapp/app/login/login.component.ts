@@ -10,6 +10,7 @@ import { AccountService } from 'app/core/auth/account.service';
   selector: 'jhi-login',
   imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
 })
 export default class LoginComponent implements OnInit, AfterViewInit {
   username = viewChild.required<ElementRef>('username');
@@ -19,7 +20,7 @@ export default class LoginComponent implements OnInit, AfterViewInit {
   loginForm = new FormGroup({
     username: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     password: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    rememberMe: new FormControl(false, { nonNullable: true, validators: [Validators.required] }),
+    rememberMe: new FormControl(false, { nonNullable: true }),
   });
 
   private readonly accountService = inject(AccountService);
@@ -27,7 +28,6 @@ export default class LoginComponent implements OnInit, AfterViewInit {
   private readonly router = inject(Router);
 
   ngOnInit(): void {
-    // if already authenticated then navigate to home page
     this.accountService.identity().subscribe(() => {
       if (this.accountService.isAuthenticated()) {
         this.router.navigate(['']);
@@ -43,10 +43,7 @@ export default class LoginComponent implements OnInit, AfterViewInit {
     this.loginService.login(this.loginForm.getRawValue()).subscribe({
       next: () => {
         this.authenticationError.set(false);
-        if (!this.router.getCurrentNavigation()) {
-          // There were no routing during login (eg from navigationToStoredUrl)
-          this.router.navigate(['']);
-        }
+        this.router.navigate(['/home']);
       },
       error: () => this.authenticationError.set(true),
     });

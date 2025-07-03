@@ -1,0 +1,37 @@
+{
+  "annotations": {
+    "changelogDate": "20250620135447"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "type",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "message",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "dateEnvoi",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "statutLecture",
+      "fieldType": "Boolean"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Notification",
+  "relationships": [
+    {
+      "otherEntityName": "degradation",
+      "relationshipName": "degradation",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

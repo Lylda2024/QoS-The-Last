@@ -1,0 +1,94 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (site(); as siteRef) {
+      <div>
+        <h2 data-cy="siteDetailsHeading"><span jhiTranslate="codeStageApp.site.detail.title">Site</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ siteRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.nomSite">Nom Site</span></dt>
+          <dd>
+            <span>{{ siteRef.nomSite }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.codeOCI">Code OCI</span></dt>
+          <dd>
+            <span>{{ siteRef.codeOCI }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.longitude">Longitude</span></dt>
+          <dd>
+            <span>{{ siteRef.longitude }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.latitude">Latitude</span></dt>
+          <dd>
+            <span>{{ siteRef.latitude }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.gestionnaire">Gestionnaire</span></dt>
+          <dd>
+            <span>{{ siteRef.gestionnaire }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.proprietaire">Proprietaire</span></dt>
+          <dd>
+            <span>{{ siteRef.proprietaire }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.equipementier">Equipementier</span></dt>
+          <dd>
+            <span>{{ siteRef.equipementier }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.typeSite">Type Site</span></dt>
+          <dd>
+            <span>{{ siteRef.typeSite }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.modeAntenne">Mode Antenne</span></dt>
+          <dd>
+            <span>{{ siteRef.modeAntenne }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.statut">Statut</span></dt>
+          <dd>
+            <span>{{ siteRef.statut }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.couche">Couche</span></dt>
+          <dd>
+            <span>{{ siteRef.couche }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.enService">En Service</span></dt>
+          <dd>
+            <span>{{ siteRef.enService }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.technologie">Technologie</span></dt>
+          <dd>
+            <span>{{ siteRef.technologie }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.dateMiseEnService">Date Mise En Service</span></dt>
+          <dd>
+            <span>{{ siteRef.dateMiseEnService | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.dateMes2G">Date Mes 2 G</span></dt>
+          <dd>
+            <span>{{ siteRef.dateMes2G | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.site.dateMes3G">Date Mes 3 G</span></dt>
+          <dd>
+            <span>{{ siteRef.dateMes3G | formatMediumDate }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/site', siteRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

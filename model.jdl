@@ -1,0 +1,79 @@
+/**
+ * Modèle de données conforme au diagramme UML
+ */
+
+entity TypeUtilisateur {
+  nom String required,
+  description String,
+  niveau Integer,
+  permissions String
+}
+
+entity Utilisateur {
+  nom String required,
+  prenom String required,
+  email String required,
+  motDePasse String required
+}
+
+relationship ManyToOne {
+  Utilisateur{typeUtilisateur} to TypeUtilisateur
+}
+
+entity Role {
+  nom String required,
+  description String
+}
+
+relationship ManyToMany {
+  Utilisateur{roles} to Role{utilisateurs}
+}
+
+entity Site {
+  nomSite String required,
+  codeOCI String,
+  longitude Float required,
+  latitude Float required,
+  statut String,
+  technologie String,
+  enService Boolean
+}
+
+entity Degradation {
+  numero String required,
+  localite String required,
+  contactTemoin String required,
+  typeAnomalie String required,
+  priorite String required,
+  problem String required,
+  porteur String required,
+  actionsEffectuees String
+}
+
+relationship ManyToOne {
+  Degradation{utilisateur} to Utilisateur,
+  Degradation{site} to Site
+}
+
+entity Historique {
+  utilisateur String,
+  section String,
+  horodatage Instant required
+}
+
+entity Notification {
+  type String,
+  message String,
+  dateEnvoi Instant,
+  statutLecture Boolean
+}
+
+relationship ManyToOne {
+  Historique{degradation} to Degradation,
+  Notification{degradation} to Degradation
+}
+
+dto * with mapstruct
+paginate Degradation, Site with pagination
+service all with serviceClass
+filter *

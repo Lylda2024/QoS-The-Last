@@ -8,7 +8,13 @@
       "entities": {
         "main": "Entités",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
-        "adminAuthority": "Authority"
+        "typeUtilisateur": "Type Utilisateur",
+        "utilisateur": "Utilisateur",
+        "role": "Role",
+        "site": "Site",
+        "degradation": "Degradation",
+        "historique": "Historique",
+        "notification": "Notification"
       },
       "account": {
         "main": "Compte",

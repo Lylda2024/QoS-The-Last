@@ -1,0 +1,28 @@
+@if (degradation) {
+  <form name="deleteForm" (ngSubmit)="confirmDelete(degradation.id!)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="degradationDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirmation de suppression</h4>
+    </div>
+
+    <div class="modal-body">
+      <jhi-alert-error />
+      <p
+        id="jhi-delete-degradation-heading"
+        jhiTranslate="codeStageApp.degradation.delete.question"
+        [translateValues]="{ id: degradation.id }"
+      >
+        Êtes-vous certain de vouloir supprimer le Degradation {{ degradation.id }} ?
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+      </button>
+
+      <button id="jhi-confirm-delete-degradation" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+        <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="entity.action.delete">Supprimer</span>
+      </button>
+    </div>
+  </form>
+}

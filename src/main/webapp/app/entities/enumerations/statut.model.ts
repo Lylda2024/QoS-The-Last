@@ -1,0 +1,6 @@
+export enum Statut {
+  DETECTEE = 'DETECTEE',
+  EN_COURS = 'EN_COURS',
+  RESOLUE = 'RESOLUE',
+  CLOTUREE = 'CLOTUREE',
+}

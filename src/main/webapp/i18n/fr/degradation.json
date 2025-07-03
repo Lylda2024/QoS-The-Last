@@ -1,0 +1,35 @@
+{
+  "codeStageApp": {
+    "degradation": {
+      "home": {
+        "title": "Degradations",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Degradation",
+        "createOrEditLabel": "Créer ou éditer un Degradation",
+        "notFound": "Aucun Degradation trouvé"
+      },
+      "created": "Un nouveau Degradation a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Degradation avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Degradation avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Degradation {{ id }} ?"
+      },
+      "detail": {
+        "title": "Degradation"
+      },
+      "id": "ID",
+      "numero": "Numero",
+      "localite": "Localite",
+      "contactTemoin": "Contact Temoin",
+      "typeAnomalie": "Type Anomalie",
+      "priorite": "Priorite",
+      "problem": "Problem",
+      "porteur": "Porteur",
+      "actionsEffectuees": "Actions Effectuees",
+      "historiques": "Historiques",
+      "notifications": "Notifications",
+      "utilisateur": "Utilisateur",
+      "site": "Site"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (typeUtilisateur(); as typeUtilisateurRef) {
+      <div>
+        <h2 data-cy="typeUtilisateurDetailsHeading">
+          <span jhiTranslate="codeStageApp.typeUtilisateur.detail.title">Type Utilisateur</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ typeUtilisateurRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.typeUtilisateur.nom">Nom</span></dt>
+          <dd>
+            <span>{{ typeUtilisateurRef.nom }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.typeUtilisateur.description">Description</span></dt>
+          <dd>
+            <span>{{ typeUtilisateurRef.description }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.typeUtilisateur.niveau">Niveau</span></dt>
+          <dd>
+            <span>{{ typeUtilisateurRef.niveau }}</span>
+          </dd>
+          <dt><span jhiTranslate="codeStageApp.typeUtilisateur.permissions">Permissions</span></dt>
+          <dd>
+            <span>{{ typeUtilisateurRef.permissions }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/type-utilisateur', typeUtilisateurRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

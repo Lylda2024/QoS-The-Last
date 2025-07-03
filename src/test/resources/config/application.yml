@@ -64,7 +64,6 @@ jhipster:
     from: codeStage@localhost.com
     base-url: http://127.0.0.1:8080
   logging:
-    # To test json console appender
     use-json-format: false
     logstash:
       enabled: false
@@ -72,11 +71,17 @@ jhipster:
       port: 5000
       ring-buffer-size: 512
   security:
+    content-security-policy: >-
+      default-src 'self';
+      script-src 'self';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org;
+      font-src 'self';
+      connect-src 'self';
+      frame-src 'self';
     authentication:
       jwt:
-        # This token must be encoded using Base64 (you can type `echo 'secret-key'|base64` on your command line)
         base64-secret: ODA2OGQ2MjJjYzFhNzc0YzYzYjNhZTU3NDc2ZmQwNDIxZmVjNjkzOTA2YjdlZWIyM2RlMTJiNmE2MzYyMWE3NzViZWViNjIxNTcxZDMwMDVkMDZiM2QyNTljYmI1ZDZmYjlmMmEwMmUzZDI5Zjk0MmVlODIxYjFlZGU3NDg3MzM=
-        # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 86400
 
@@ -94,3 +99,8 @@ management:
   health:
     mail:
       enabled: false
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

@@ -1,0 +1,99 @@
+<div>
+  <h2 id="page-heading" data-cy="DegradationHeading">
+    <span jhiTranslate="codeStageApp.degradation.home.title">Degradations</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="loading">
+        <fa-icon icon="sync" [animation]="loading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="codeStageApp.degradation.home.refreshListLabel">Actualiser la liste</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-degradation"
+        [routerLink]="['/degradation/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="codeStageApp.degradation.home.createLabel">Créer un nouveau Degradation</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+  <jhi-alert></jhi-alert>
+
+  <div *ngIf="degradations.length === 0; else tableBlock" class="alert alert-warning" id="no-result">
+    <span jhiTranslate="codeStageApp.degradation.home.notFound">Aucun Degradation trouvé</span>
+  </div>
+
+  <ng-template #tableBlock>
+    <div style="overflow-x: auto; width: 100%">
+      <div class="table-responsive">
+        <table class="table table-striped" aria-describedby="page-heading">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Numéro</th>
+              <th>Localité</th>
+              <th>Contact</th>
+              <th>Type</th>
+              <th>Priorité</th>
+              <th>Problème</th>
+              <th>Porteur</th>
+              <th>Actions</th>
+              <th>Utilisateur</th>
+              <th>Site</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let degradation of degradations; trackBy: trackId" data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/degradation', degradation.id, 'view']">{{ degradation.id }}</a>
+              </td>
+              <td>{{ degradation.numero }}</td>
+              <td>{{ degradation.localite }}</td>
+              <td>{{ degradation.contactTemoin }}</td>
+              <td>{{ degradation.typeAnomalie }}</td>
+              <td>{{ degradation.priorite }}</td>
+              <td>{{ degradation.problem }}</td>
+              <td>{{ degradation.porteur }}</td>
+              <td>{{ degradation.actionsEffectuees }}</td>
+              <td>
+                <a *ngIf="degradation.utilisateur" [routerLink]="['/utilisateur', degradation.utilisateur.id, 'view']">
+                  {{ degradation.utilisateur.id }}
+                </a>
+              </td>
+              <td>
+                <a *ngIf="degradation.site" [routerLink]="['/site', degradation.site.id, 'view']">
+                  {{ degradation.site.id }}
+                </a>
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/degradation', degradation.id, 'view']" class="btn btn-info btn-sm" title="Voir">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+                  </a>
+                  <a [routerLink]="['/degradation', degradation.id, 'edit']" class="btn btn-primary btn-sm" title="Editer">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+                  </a>
+                  <button type="button" (click)="delete(degradation)" class="btn btn-danger btn-sm" title="Supprimer">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+                  </button>
+                  <button type="button" (click)="showOnMap(degradation)" class="btn btn-secondary btn-sm" title="Afficher sur la carte">
+                    <fa-icon icon="map-marker-alt"></fa-icon>
+                    <span class="d-none d-md-inline">Carte</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-template>
+</div>

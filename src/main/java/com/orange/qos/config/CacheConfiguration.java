@@ -50,6 +50,18 @@ public class CacheConfiguration {
             createCache(cm, com.orange.qos.domain.User.class.getName());
             createCache(cm, com.orange.qos.domain.Authority.class.getName());
             createCache(cm, com.orange.qos.domain.User.class.getName() + ".authorities");
+            createCache(cm, com.orange.qos.domain.TypeUtilisateur.class.getName());
+            createCache(cm, com.orange.qos.domain.Utilisateur.class.getName());
+            createCache(cm, com.orange.qos.domain.Utilisateur.class.getName() + ".roles");
+            createCache(cm, com.orange.qos.domain.Role.class.getName());
+            createCache(cm, com.orange.qos.domain.Role.class.getName() + ".utilisateurs");
+            createCache(cm, com.orange.qos.domain.Site.class.getName());
+            createCache(cm, com.orange.qos.domain.Site.class.getName() + ".degradations");
+            createCache(cm, com.orange.qos.domain.Degradation.class.getName());
+            createCache(cm, com.orange.qos.domain.Degradation.class.getName() + ".historiques");
+            createCache(cm, com.orange.qos.domain.Degradation.class.getName() + ".notifications");
+            createCache(cm, com.orange.qos.domain.Historique.class.getName());
+            createCache(cm, com.orange.qos.domain.Notification.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

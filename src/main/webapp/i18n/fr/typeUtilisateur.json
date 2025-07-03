@@ -1,0 +1,27 @@
+{
+  "codeStageApp": {
+    "typeUtilisateur": {
+      "home": {
+        "title": "TypeUtilisateurs",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Type Utilisateur",
+        "createOrEditLabel": "Créer ou éditer un Type Utilisateur",
+        "notFound": "Aucun Type Utilisateur trouvé"
+      },
+      "created": "Un nouveau Type Utilisateur a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Type Utilisateur avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Type Utilisateur avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Type Utilisateur {{ id }} ?"
+      },
+      "detail": {
+        "title": "Type Utilisateur"
+      },
+      "id": "ID",
+      "nom": "Nom",
+      "description": "Description",
+      "niveau": "Niveau",
+      "permissions": "Permissions"
+    }
+  }
+}

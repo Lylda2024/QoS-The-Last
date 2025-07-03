@@ -1,0 +1,116 @@
+<div>
+  <h2 id="page-heading" data-cy="TypeUtilisateurHeading">
+    <span jhiTranslate="codeStageApp.typeUtilisateur.home.title">TypeUtilisateurs</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="codeStageApp.typeUtilisateur.home.refreshListLabel">Actualiser la liste</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-type-utilisateur"
+        [routerLink]="['/type-utilisateur/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="codeStageApp.typeUtilisateur.home.createLabel">Créer un nouveau Type Utilisateur</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (typeUtilisateurs().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="codeStageApp.typeUtilisateur.home.notFound">Aucun Type Utilisateur trouvé</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nom">
+              <div class="d-flex">
+                <span jhiTranslate="codeStageApp.typeUtilisateur.nom">Nom</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="description">
+              <div class="d-flex">
+                <span jhiTranslate="codeStageApp.typeUtilisateur.description">Description</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="niveau">
+              <div class="d-flex">
+                <span jhiTranslate="codeStageApp.typeUtilisateur.niveau">Niveau</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="permissions">
+              <div class="d-flex">
+                <span jhiTranslate="codeStageApp.typeUtilisateur.permissions">Permissions</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (typeUtilisateur of typeUtilisateurs(); track trackId(typeUtilisateur)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/type-utilisateur', typeUtilisateur.id, 'view']">{{ typeUtilisateur.id }}</a>
+              </td>
+              <td>{{ typeUtilisateur.nom }}</td>
+              <td>{{ typeUtilisateur.description }}</td>
+              <td>{{ typeUtilisateur.niveau }}</td>
+              <td>{{ typeUtilisateur.permissions }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/type-utilisateur', typeUtilisateur.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/type-utilisateur', typeUtilisateur.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(typeUtilisateur)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

@@ -1,0 +1,32 @@
+{
+  "annotations": {
+    "changelogDate": "20250620135441"
+  },
+  "applications": "*",
+  "documentation": "Modèle de données conforme au diagramme UML",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nom",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "niveau",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "permissions",
+      "fieldType": "String"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "TypeUtilisateur",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}
