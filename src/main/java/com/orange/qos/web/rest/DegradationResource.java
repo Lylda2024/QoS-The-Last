@@ -6,8 +6,6 @@ import com.orange.qos.service.DegradationService;
 import com.orange.qos.service.criteria.DegradationCriteria;
 import com.orange.qos.service.dto.DegradationDTO;
 import com.orange.qos.web.rest.errors.BadRequestAlertException;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -64,7 +62,7 @@ public class DegradationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<DegradationDTO> createDegradation(@Valid @RequestBody DegradationDTO degradationDTO) throws URISyntaxException {
+    public ResponseEntity<DegradationDTO> createDegradation(@RequestBody DegradationDTO degradationDTO) throws URISyntaxException {
         LOG.debug("REST request to save Degradation : {}", degradationDTO);
         if (degradationDTO.getId() != null) {
             throw new BadRequestAlertException("A new degradation cannot already have an ID", ENTITY_NAME, "idexists");
@@ -88,7 +86,7 @@ public class DegradationResource {
     @PutMapping("/{id}")
     public ResponseEntity<DegradationDTO> updateDegradation(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody DegradationDTO degradationDTO
+        @RequestBody DegradationDTO degradationDTO
     ) throws URISyntaxException {
         LOG.debug("REST request to update Degradation : {}, {}", id, degradationDTO);
         if (degradationDTO.getId() == null) {
@@ -122,7 +120,7 @@ public class DegradationResource {
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<DegradationDTO> partialUpdateDegradation(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody DegradationDTO degradationDTO
+        @RequestBody DegradationDTO degradationDTO
     ) throws URISyntaxException {
         LOG.debug("REST request to partial update Degradation partially : {}, {}", id, degradationDTO);
         if (degradationDTO.getId() == null) {

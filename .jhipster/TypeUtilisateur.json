@@ -3,7 +3,7 @@
     "changelogDate": "20250620135441"
   },
   "applications": "*",
-  "documentation": "Modèle de données conforme au diagramme UML",
+  "documentation": "Modèle de données conforme au diagramme UML corrigé",
   "dto": "mapstruct",
   "fields": [
     {

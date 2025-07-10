@@ -12,7 +12,7 @@ import { ISite, NewSite } from '../site.model';
 
 export type PartialUpdateSite = Partial<ISite> & Pick<ISite, 'id'>;
 
-type RestOf<T extends ISite | NewSite> = Omit<T, 'dateMiseEnService' | 'dateMes2G' | 'dateMes3G'> & {
+type RestOf<T extends ISite | NewSite | PartialUpdateSite> = Omit<T, 'dateMiseEnService' | 'dateMes2G' | 'dateMes3G'> & {
   dateMiseEnService?: string | null;
   dateMes2G?: string | null;
   dateMes3G?: string | null;
@@ -68,12 +68,6 @@ export class SiteService {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
-  getSitesAvecDegradationsEnCours(): Observable<ISite[]> {
-    return this.http
-      .get<RestSite[]>(`${this.resourceUrl}/avec-degradations-en-cours`)
-      .pipe(map(restSites => restSites.map(site => this.convertDateFromServer(site))));
-  }
-
   getSiteIdentifier(site: Pick<ISite, 'id'>): number {
     return site.id;
   }
@@ -105,9 +99,9 @@ export class SiteService {
   protected convertDateFromClient<T extends ISite | NewSite | PartialUpdateSite>(site: T): RestOf<T> {
     return {
       ...site,
-      dateMiseEnService: site.dateMiseEnService?.format(DATE_FORMAT) ?? null,
-      dateMes2G: site.dateMes2G?.format(DATE_FORMAT) ?? null,
-      dateMes3G: site.dateMes3G?.format(DATE_FORMAT) ?? null,
+      dateMiseEnService: site.dateMiseEnService ? dayjs(site.dateMiseEnService).format(DATE_FORMAT) : null,
+      dateMes2G: site.dateMes2G ? dayjs(site.dateMes2G).format(DATE_FORMAT) : null,
+      dateMes3G: site.dateMes3G ? dayjs(site.dateMes3G).format(DATE_FORMAT) : null,
     };
   }
 
@@ -130,5 +124,11 @@ export class SiteService {
     return res.clone({
       body: res.body ? res.body.map(item => this.convertDateFromServer(item)) : null,
     });
+  }
+  getAllWithoutPagination(): Observable<ISite[]> {
+    return this.http.get<ISite[]>(this.resourceUrl + '/all');
+  }
+  createMany(sites: ISite[]): Observable<ISite[]> {
+    return this.http.post<ISite[]>(this.resourceUrl + '/bulk', sites);
   }
 }

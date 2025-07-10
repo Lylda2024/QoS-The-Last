@@ -1,56 +1,51 @@
+/**
+ * Modèle complet pour l'application QoS
+ */
+
 entity TypeUtilisateur {
-  nom String,
+  nom String required,
   description String,
   niveau Integer,
   permissions String
 }
 
 entity Utilisateur {
-  nom String,
-  prenom String,
-  email String,
-  motDePasse String
+  nom String required,
+  prenom String required,
+  email String required,
+  motDePasse String required
 }
 
 entity Role {
-  nom String,
+  nom String required,
   description String
 }
 
 entity Site {
-  nomSite String,
+  nomSite String required,
   codeOCI String,
-  longitude Float,
-  latitude Float,
-  gestionnaire String,
-  proprietaire String,
-  equipementier String,
-  typeSite String,
-  modeAntenne String,
+  longitude Float required,
+  latitude Float required,
   statut String,
-  couche String,
-  enService Boolean,
   technologie String,
-  dateMiseEnService LocalDate,
-  dateMes2G LocalDate,
-  dateMes3G LocalDate
+  enService Boolean
 }
 
 entity Degradation {
-  numero String,
-  localite String,
-  contactTemoin String,
-  typeAnomalie String,
-  priorite String,
-  problem String,
-  porteur String,
+  numero String required,
+  localite String required,
+  contactTemoin String required,
+  typeAnomalie String required,
+  priorite String required,
+  problem String required,
+  porteur String required,
   actionsEffectuees String
 }
 
 entity Historique {
   utilisateur String,
   section String,
-  horodatage Instant
+  horodatage Instant required
 }
 
 entity Notification {
@@ -60,24 +55,27 @@ entity Notification {
   statutLecture Boolean
 }
 
+entity DelaiIntervention {
+  dateDebut Instant required,
+  dateLimite Instant required,
+  commentaire String
+}
+
 relationship ManyToOne {
   Utilisateur{typeUtilisateur} to TypeUtilisateur,
-  Degradation{utilisateur} to Utilisateur
+  Degradation{utilisateur} to Utilisateur,
+  Degradation{site} to Site,
+  Historique{degradation} to Degradation,
+  Notification{degradation} to Degradation,
+  DelaiIntervention{degradation} to Degradation,
+  DelaiIntervention{utilisateur} to Utilisateur
 }
 
 relationship ManyToMany {
-  Utilisateur{role} to Role{utilisateur}
+  Utilisateur{roles} to Role{utilisateurs}
 }
 
-relationship OneToMany {
-  Site{degradations} to Degradation{site},
-  Degradation{historiques} to Historique{degradation},
-  Degradation{notifications} to Notification{degradation}
-}
-
-paginate Site with pagination
-paginate Utilisateur with pagination
-paginate Role with pagination
-paginate Degradation with pagination
-paginate Notification with pagination
-paginate Historique with pagination
+dto * with mapstruct
+service all with serviceClass
+pagination all with pagination
+filter *

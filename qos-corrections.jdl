@@ -1,7 +1,3 @@
-/**
- * Modèle de données conforme au diagramme UML
- */
-
 entity TypeUtilisateur {
   nom String required,
   description String,
@@ -9,24 +5,16 @@ entity TypeUtilisateur {
   permissions String
 }
 
-entity Utilisateur {
-  nom String required,
-  prenom String required,
-  email String required,
-  motDePasse String required
-}
-
-relationship ManyToOne {
-  Utilisateur{typeUtilisateur} to TypeUtilisateur
-}
-
 entity Role {
   nom String required,
   description String
 }
 
-relationship ManyToMany {
-  Utilisateur{roles} to Role{utilisateurs}
+entity Utilisateur {
+  nom String required,
+  prenom String required,
+  email String required,
+  motDePasse String required
 }
 
 entity Site {
@@ -40,19 +28,28 @@ entity Site {
 }
 
 entity Degradation {
-  numero String required,
   localite String required,
   contactTemoin String required,
   typeAnomalie String required,
   priorite String required,
-  problem String required,
   porteur String required,
-  actionsEffectuees String
+  actionsEffectuees String,
+  description String,
+  dateSignalement Instant,
+  statut String
 }
 
-relationship ManyToOne {
-  Degradation{utilisateur} to Utilisateur,
-  Degradation{site} to Site
+entity DelaiIntervention {
+  dateDebut Instant required,
+  dateLimite Instant required,
+  commentaire String,
+  statut StatutIntervention
+}
+
+enum StatutIntervention {
+  EN_COURS,
+  TRANSFERE,
+  TERMINE
 }
 
 entity Historique {
@@ -69,11 +66,20 @@ entity Notification {
 }
 
 relationship ManyToOne {
+  Utilisateur{typeUtilisateur} to TypeUtilisateur,
+  Degradation{utilisateur} to Utilisateur,
+  Degradation{site} to Site,
   Historique{degradation} to Degradation,
-  Notification{degradation} to Degradation
+  Notification{degradation} to Degradation,
+  DelaiIntervention{degradation} to Degradation,
+  DelaiIntervention{acteur(login)} to Utilisateur
+}
+
+relationship ManyToMany {
+  Utilisateur{roles} to Role{utilisateurs}
 }
 
 dto * with mapstruct
-paginate Degradation, Site with pagination
 service all with serviceClass
-filter *
+paginate all with pagination
+filter all

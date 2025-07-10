@@ -34,15 +34,15 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Numéro</th>
+              <!-- <th>Numéro</th> supprimé -->
               <th>Localité</th>
               <th>Contact</th>
               <th>Type</th>
               <th>Priorité</th>
-              <th>Problème</th>
+              <!-- <th>Problème</th> supprimé -->
               <th>Porteur</th>
               <th>Actions</th>
-              <th>Utilisateur</th>
+              <!-- <th>Utilisateur</th> supprimé -->
               <th>Site</th>
               <th class="text-end">Actions</th>
             </tr>
@@ -52,19 +52,19 @@
               <td>
                 <a [routerLink]="['/degradation', degradation.id, 'view']">{{ degradation.id }}</a>
               </td>
-              <td>{{ degradation.numero }}</td>
+              <!-- <td>{{ degradation.numero }}</td> supprimé -->
               <td>{{ degradation.localite }}</td>
               <td>{{ degradation.contactTemoin }}</td>
               <td>{{ degradation.typeAnomalie }}</td>
               <td>{{ degradation.priorite }}</td>
-              <td>{{ degradation.problem }}</td>
+              <!-- <td>{{ degradation.problem }}</td> supprimé -->
               <td>{{ degradation.porteur }}</td>
               <td>{{ degradation.actionsEffectuees }}</td>
-              <td>
-                <a *ngIf="degradation.utilisateur" [routerLink]="['/utilisateur', degradation.utilisateur.id, 'view']">
-                  {{ degradation.utilisateur.id }}
-                </a>
-              </td>
+              <!-- <td>
+              <a *ngIf="degradation.utilisateur" [routerLink]="['/utilisateur', degradation.utilisateur.id, 'view']">
+                {{ degradation.utilisateur.id }}
+              </a>
+            </td> supprimé -->
               <td>
                 <a *ngIf="degradation.site" [routerLink]="['/site', degradation.site.id, 'view']">
                   {{ degradation.site.id }}

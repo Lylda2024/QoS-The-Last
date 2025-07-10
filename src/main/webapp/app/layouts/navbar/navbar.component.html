@@ -16,7 +16,7 @@
           </a>
         </li>
 
-        <!-- Nouvel Incident (JHipster) -->
+        <!-- Nouvel Incident -->
         <li class="nav-item" routerLinkActive="active">
           <a class="nav-link" routerLink="/degradation" (click)="collapseNavbar()">
             <fa-icon icon="th-list"></fa-icon>
@@ -37,6 +37,35 @@
           <a class="nav-link" routerLink="/notification" (click)="collapseNavbar()">
             <fa-icon icon="bell"></fa-icon>
             <span>Notifications</span>
+          </a>
+        </li>
+
+        <!-- Liens réservés à l'administrateur -->
+        <li class="nav-item" *ngIf="isAdmin()" routerLinkActive="active">
+          <a class="nav-link" routerLink="/utilisateur" (click)="collapseNavbar()">
+            <fa-icon icon="users-cog"></fa-icon>
+            <span>Utilisateurs</span>
+          </a>
+        </li>
+
+        <li class="nav-item" *ngIf="isAdmin()" routerLinkActive="active">
+          <a class="nav-link" routerLink="/type-utilisateur" (click)="collapseNavbar()">
+            <fa-icon icon="user-shield"></fa-icon>
+            <span>Types d’utilisateurs</span>
+          </a>
+        </li>
+
+        <li class="nav-item" *ngIf="isAdmin()" routerLinkActive="active">
+          <a class="nav-link" routerLink="/role" (click)="collapseNavbar()">
+            <fa-icon icon="user-tag"></fa-icon>
+            <span>Rôles</span>
+          </a>
+        </li>
+
+        <li class="nav-item" *ngIf="isAdmin()" routerLinkActive="active">
+          <a class="nav-link" routerLink="/site" (click)="collapseNavbar()">
+            <fa-icon icon="server"></fa-icon>
+            <span>Sites</span>
           </a>
         </li>
 

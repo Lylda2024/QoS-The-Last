@@ -1,7 +1,7 @@
 package com.orange.qos.service.dto;
 
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -12,32 +12,11 @@ public class DegradationDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
-    private String numero;
+    private String description;
 
-    @NotNull
-    private String localite;
+    private Instant dateSignalement;
 
-    @NotNull
-    private String contactTemoin;
-
-    @NotNull
-    private String typeAnomalie;
-
-    @NotNull
-    private String priorite;
-
-    @NotNull
-    private String problem;
-
-    @NotNull
-    private String porteur;
-
-    private String actionsEffectuees;
-
-    private UtilisateurDTO utilisateur;
-
-    private SiteDTO site;
+    private String statut;
 
     public Long getId() {
         return id;
@@ -47,84 +26,28 @@ public class DegradationDTO implements Serializable {
         this.id = id;
     }
 
-    public String getNumero() {
-        return numero;
+    public String getDescription() {
+        return description;
     }
 
-    public void setNumero(String numero) {
-        this.numero = numero;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getLocalite() {
-        return localite;
+    public Instant getDateSignalement() {
+        return dateSignalement;
     }
 
-    public void setLocalite(String localite) {
-        this.localite = localite;
+    public void setDateSignalement(Instant dateSignalement) {
+        this.dateSignalement = dateSignalement;
     }
 
-    public String getContactTemoin() {
-        return contactTemoin;
+    public String getStatut() {
+        return statut;
     }
 
-    public void setContactTemoin(String contactTemoin) {
-        this.contactTemoin = contactTemoin;
-    }
-
-    public String getTypeAnomalie() {
-        return typeAnomalie;
-    }
-
-    public void setTypeAnomalie(String typeAnomalie) {
-        this.typeAnomalie = typeAnomalie;
-    }
-
-    public String getPriorite() {
-        return priorite;
-    }
-
-    public void setPriorite(String priorite) {
-        this.priorite = priorite;
-    }
-
-    public String getProblem() {
-        return problem;
-    }
-
-    public void setProblem(String problem) {
-        this.problem = problem;
-    }
-
-    public String getPorteur() {
-        return porteur;
-    }
-
-    public void setPorteur(String porteur) {
-        this.porteur = porteur;
-    }
-
-    public String getActionsEffectuees() {
-        return actionsEffectuees;
-    }
-
-    public void setActionsEffectuees(String actionsEffectuees) {
-        this.actionsEffectuees = actionsEffectuees;
-    }
-
-    public UtilisateurDTO getUtilisateur() {
-        return utilisateur;
-    }
-
-    public void setUtilisateur(UtilisateurDTO utilisateur) {
-        this.utilisateur = utilisateur;
-    }
-
-    public SiteDTO getSite() {
-        return site;
-    }
-
-    public void setSite(SiteDTO site) {
-        this.site = site;
+    public void setStatut(String statut) {
+        this.statut = statut;
     }
 
     @Override
@@ -153,16 +76,9 @@ public class DegradationDTO implements Serializable {
     public String toString() {
         return "DegradationDTO{" +
             "id=" + getId() +
-            ", numero='" + getNumero() + "'" +
-            ", localite='" + getLocalite() + "'" +
-            ", contactTemoin='" + getContactTemoin() + "'" +
-            ", typeAnomalie='" + getTypeAnomalie() + "'" +
-            ", priorite='" + getPriorite() + "'" +
-            ", problem='" + getProblem() + "'" +
-            ", porteur='" + getPorteur() + "'" +
-            ", actionsEffectuees='" + getActionsEffectuees() + "'" +
-            ", utilisateur=" + getUtilisateur() +
-            ", site=" + getSite() +
+            ", description='" + getDescription() + "'" +
+            ", dateSignalement='" + getDateSignalement() + "'" +
+            ", statut='" + getStatut() + "'" +
             "}";
     }
 }

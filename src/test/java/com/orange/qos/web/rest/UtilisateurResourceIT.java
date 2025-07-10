@@ -704,7 +704,7 @@ class UtilisateurResourceIT {
         Utilisateur partialUpdatedUtilisateur = new Utilisateur();
         partialUpdatedUtilisateur.setId(utilisateur.getId());
 
-        partialUpdatedUtilisateur.motDePasse(UPDATED_MOT_DE_PASSE);
+        partialUpdatedUtilisateur.nom(UPDATED_NOM).prenom(UPDATED_PRENOM).motDePasse(UPDATED_MOT_DE_PASSE);
 
         restUtilisateurMockMvc
             .perform(

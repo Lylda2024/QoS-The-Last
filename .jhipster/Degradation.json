@@ -6,62 +6,22 @@
   "dto": "mapstruct",
   "fields": [
     {
-      "fieldName": "numero",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldName": "description",
+      "fieldType": "String"
     },
     {
-      "fieldName": "localite",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldName": "dateSignalement",
+      "fieldType": "Instant"
     },
     {
-      "fieldName": "contactTemoin",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "typeAnomalie",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "priorite",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "problem",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "porteur",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "actionsEffectuees",
+      "fieldName": "statut",
       "fieldType": "String"
     }
   ],
   "jpaMetamodelFiltering": true,
   "name": "Degradation",
   "pagination": "pagination",
-  "relationships": [
-    {
-      "otherEntityName": "utilisateur",
-      "relationshipName": "utilisateur",
-      "relationshipSide": "left",
-      "relationshipType": "many-to-one"
-    },
-    {
-      "otherEntityName": "site",
-      "relationshipName": "site",
-      "relationshipSide": "left",
-      "relationshipType": "many-to-one"
-    }
-  ],
+  "relationships": [],
   "searchEngine": "no",
   "service": "serviceClass"
 }

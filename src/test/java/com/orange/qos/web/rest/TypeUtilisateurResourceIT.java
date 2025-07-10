@@ -610,11 +610,7 @@ class TypeUtilisateurResourceIT {
         TypeUtilisateur partialUpdatedTypeUtilisateur = new TypeUtilisateur();
         partialUpdatedTypeUtilisateur.setId(typeUtilisateur.getId());
 
-        partialUpdatedTypeUtilisateur
-            .nom(UPDATED_NOM)
-            .description(UPDATED_DESCRIPTION)
-            .niveau(UPDATED_NIVEAU)
-            .permissions(UPDATED_PERMISSIONS);
+        partialUpdatedTypeUtilisateur.description(UPDATED_DESCRIPTION).niveau(UPDATED_NIVEAU);
 
         restTypeUtilisateurMockMvc
             .perform(

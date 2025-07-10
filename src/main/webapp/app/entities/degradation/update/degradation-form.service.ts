@@ -1,10 +1,18 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { IDegradation, NewDegradation, DegradationFormGroupInput, DegradationFormGroup } from '../degradation.model';
+import { Observable } from 'rxjs';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { ISite, NewSite } from 'app/entities/site/site.model';
 
 @Injectable({ providedIn: 'root' })
 export class DegradationFormService {
-  constructor(private formBuilder: FormBuilder) {}
+  protected resourceUrl = 'api/sites';
+
+  constructor(
+    private formBuilder: FormBuilder,
+    protected http: HttpClient,
+  ) {}
 
   createDegradationFormGroup(degradation: DegradationFormGroupInput = { id: null }): DegradationFormGroup {
     return this.formBuilder.group({
@@ -15,25 +23,26 @@ export class DegradationFormService {
           validators: [Validators.required],
         },
       ),
-      numero: this.formBuilder.control(degradation.numero ?? '', [Validators.required]),
-      localite: this.formBuilder.control(degradation.localite ?? null),
-      contactTemoin: this.formBuilder.control(degradation.contactTemoin ?? null),
-      typeAnomalie: this.formBuilder.control(degradation.typeAnomalie ?? null),
-      priorite: this.formBuilder.control(degradation.priorite ?? null),
-      problem: this.formBuilder.control(degradation.problem ?? null),
-      porteur: this.formBuilder.control(degradation.porteur ?? null),
-      statut: this.formBuilder.control(degradation.statut ?? null),
-      actionsEffectuees: this.formBuilder.control(degradation.actionsEffectuees ?? null),
-      dateDetection: this.formBuilder.control(degradation.dateDetection ?? null),
-      commentaire: this.formBuilder.control(degradation.commentaire ?? null),
-      utilisateur: this.formBuilder.control(degradation.utilisateur ?? null),
-      site: this.formBuilder.control(degradation.site ?? null),
+
+      localite: this.formBuilder.control(degradation.localite ?? '', [Validators.required]),
+      contactTemoin: this.formBuilder.control(degradation.contactTemoin ?? '', [Validators.required]),
+      typeAnomalie: this.formBuilder.control(degradation.typeAnomalie ?? '', [Validators.required]),
+      priorite: this.formBuilder.control(degradation.priorite ?? '', [Validators.required]),
+      porteur: this.formBuilder.control(degradation.porteur ?? '', [Validators.required]),
+      actionsEffectuees: this.formBuilder.control(degradation.actionsEffectuees ?? '', [Validators.required]),
+      dateDetection: this.formBuilder.control(degradation.dateDetection ?? '', [Validators.required]),
+      commentaire: this.formBuilder.control(degradation.commentaire ?? ''),
+      site: this.formBuilder.control(degradation.site ?? null, [Validators.required]),
+
+      porteur2: this.formBuilder.control(degradation.porteur2 ?? ''),
+      nextStep: this.formBuilder.control(degradation.nextStep ?? ''),
+      ticketOceane: this.formBuilder.control(degradation.ticketOceane ?? ''),
+      statut: this.formBuilder.control(degradation.statut ?? ''),
     }) as DegradationFormGroup;
   }
 
   getDegradation(form: DegradationFormGroup): IDegradation | NewDegradation {
     const raw = form.getRawValue();
-
     return {
       ...raw,
       dateDetection: raw.dateDetection ? new Date(raw.dateDetection) : null,
@@ -45,5 +54,9 @@ export class DegradationFormService {
       ...degradation,
       id: { value: degradation.id, disabled: true },
     } as any);
+  }
+
+  createMany(sites: NewSite[]): Observable<HttpResponse<ISite[]>> {
+    return this.http.post<ISite[]>(`${this.resourceUrl}/bulk`, sites, { observe: 'response' });
   }
 }

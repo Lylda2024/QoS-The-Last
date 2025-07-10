@@ -54,8 +54,8 @@ public class SecurityConfiguration {
                             "default-src 'self'; " +
                             "script-src 'self' 'unsafe-inline'; " +
                             "script-src-elem 'self' 'unsafe-inline'; " +
-                            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; " + // Ajout ici
-                            "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; " + // Ajout ici
+                            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; " +
+                            "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; " +
                             "img-src 'self' data: https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org; " +
                             "font-src 'self' https://fonts.gstatic.com; " +
                             "connect-src 'self'; " +
@@ -83,6 +83,8 @@ public class SecurityConfiguration {
                     )
                     .permitAll()
                     .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp"))
+                    .permitAll()
+                    .requestMatchers(mvc.pattern("/assets/**")) // <-- Autorise l'accès aux assets
                     .permitAll()
                     .requestMatchers(mvc.pattern("/app/**"))
                     .permitAll()

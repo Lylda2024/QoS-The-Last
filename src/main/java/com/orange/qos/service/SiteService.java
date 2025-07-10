@@ -4,7 +4,9 @@ import com.orange.qos.domain.Site;
 import com.orange.qos.repository.SiteRepository;
 import com.orange.qos.service.dto.SiteDTO;
 import com.orange.qos.service.mapper.SiteMapper;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -94,5 +96,11 @@ public class SiteService {
     public void delete(Long id) {
         LOG.debug("Request to delete Site : {}", id);
         siteRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SiteDTO> findAll() {
+        LOG.debug("Request to get all Sites without pagination");
+        return siteRepository.findAll().stream().map(siteMapper::toDto).collect(Collectors.toList());
     }
 }

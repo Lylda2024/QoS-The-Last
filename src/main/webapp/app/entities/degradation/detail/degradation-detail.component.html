@@ -1,78 +1,58 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (degradation(); as degradationRef) {
-      <div>
-        <h2 data-cy="degradationDetailsHeading"><span jhiTranslate="codeStageApp.degradation.detail.title">Degradation</span></h2>
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-light">
+      <h2 class="mb-0" data-cy="degradationDetailsHeading">
+        <span jhiTranslate="codeStageApp.degradation.detail.title">Détail Dégradation</span>
+      </h2>
+    </div>
 
-        <hr />
+    <div class="card-body" *ngIf="degradation() as degradationRef">
+      <jhi-alert-error></jhi-alert-error>
+      <jhi-alert></jhi-alert>
 
-        <jhi-alert-error />
+      <dl class="row gy-3">
+        <dt class="col-sm-4"><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd class="col-sm-8">{{ degradationRef.id }}</dd>
 
-        <jhi-alert />
+        <dt class="col-sm-4"><span jhiTranslate="codeStageApp.degradation.localite">Localité</span></dt>
+        <dd class="col-sm-8">{{ degradationRef.localite }}</dd>
 
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ degradationRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="codeStageApp.degradation.numero">Numero</span></dt>
-          <dd>
-            <span>{{ degradationRef.numero }}</span>
-          </dd>
-          <dt><span jhiTranslate="codeStageApp.degradation.localite">Localite</span></dt>
-          <dd>
-            <span>{{ degradationRef.localite }}</span>
-          </dd>
-          <dt><span jhiTranslate="codeStageApp.degradation.contactTemoin">Contact Temoin</span></dt>
-          <dd>
-            <span>{{ degradationRef.contactTemoin }}</span>
-          </dd>
-          <dt><span jhiTranslate="codeStageApp.degradation.typeAnomalie">Type Anomalie</span></dt>
-          <dd>
-            <span>{{ degradationRef.typeAnomalie }}</span>
-          </dd>
-          <dt><span jhiTranslate="codeStageApp.degradation.priorite">Priorite</span></dt>
-          <dd>
-            <span>{{ degradationRef.priorite }}</span>
-          </dd>
-          <dt><span jhiTranslate="codeStageApp.degradation.problem">Problem</span></dt>
-          <dd>
-            <span>{{ degradationRef.problem }}</span>
-          </dd>
-          <dt><span jhiTranslate="codeStageApp.degradation.porteur">Porteur</span></dt>
-          <dd>
-            <span>{{ degradationRef.porteur }}</span>
-          </dd>
-          <dt><span jhiTranslate="codeStageApp.degradation.actionsEffectuees">Actions Effectuees</span></dt>
-          <dd>
-            <span>{{ degradationRef.actionsEffectuees }}</span>
-          </dd>
-          <dt><span jhiTranslate="codeStageApp.degradation.utilisateur">Utilisateur</span></dt>
-          <dd>
-            @if (degradation()!.utilisateur) {
-              <div>
-                <a [routerLink]="['/utilisateur', degradation()!.utilisateur?.id, 'view']">{{ degradationRef.utilisateur?.id }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="codeStageApp.degradation.site">Site</span></dt>
-          <dd>
-            @if (degradation()!.site) {
-              <div>
-                <a [routerLink]="['/site', degradation()!.site?.id, 'view']">{{ degradationRef.site?.id }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
+        <dt class="col-sm-4"><span jhiTranslate="codeStageApp.degradation.contactTemoin">Contact Témoin</span></dt>
+        <dd class="col-sm-8">{{ degradationRef.contactTemoin }}</dd>
 
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <dt class="col-sm-4"><span jhiTranslate="codeStageApp.degradation.typeAnomalie">Type d’anomalie</span></dt>
+        <dd class="col-sm-8">{{ degradationRef.typeAnomalie }}</dd>
+
+        <dt class="col-sm-4"><span jhiTranslate="codeStageApp.degradation.priorite">Priorité</span></dt>
+        <dd class="col-sm-8">{{ degradationRef.priorite }}</dd>
+
+        <dt class="col-sm-4"><span jhiTranslate="codeStageApp.degradation.porteur">Porteur</span></dt>
+        <dd class="col-sm-8">{{ degradationRef.porteur }}</dd>
+
+        <dt class="col-sm-4"><span jhiTranslate="codeStageApp.degradation.actionsEffectuees">Actions effectuées</span></dt>
+        <dd class="col-sm-8">{{ degradationRef.actionsEffectuees }}</dd>
+
+        <!-- Bloc utilisateur supprimé -->
+
+        <dt class="col-sm-4"><span jhiTranslate="codeStageApp.degradation.site">Site</span></dt>
+        <dd class="col-sm-8">
+          <ng-container *ngIf="degradationRef.site">
+            <a [routerLink]="['/site', degradationRef.site.id, 'view']">
+              {{ degradationRef.site.nomSite }}
+            </a>
+          </ng-container>
+        </dd>
+      </dl>
+
+      <div class="mt-4 d-flex justify-content-between">
+        <button type="button" (click)="previousState()" class="btn btn-outline-secondary" data-cy="entityDetailsBackButton">
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
         </button>
 
         <button type="button" [routerLink]="['/degradation', degradationRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Modifier</span>
         </button>
       </div>
-    }
+    </div>
   </div>
 </div>

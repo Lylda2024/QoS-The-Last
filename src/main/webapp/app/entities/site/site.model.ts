@@ -18,6 +18,9 @@ export interface ISite {
   dateMiseEnService?: dayjs.Dayjs | null;
   dateMes2G?: dayjs.Dayjs | null;
   dateMes3G?: dayjs.Dayjs | null;
+
+  // Ajoute cette ligne
+  ville?: string | null;
 }
 
 export type NewSite = Omit<ISite, 'id'> & { id: null };

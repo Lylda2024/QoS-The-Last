@@ -198,4 +198,11 @@ public class SiteResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<SiteDTO>> getAllSitesNoPagination() {
+        LOG.debug("REST request to get all Sites without pagination");
+        List<SiteDTO> sites = siteService.findAll();
+        return ResponseEntity.ok().body(sites);
+    }
 }

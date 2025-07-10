@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, inject } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, inject } from '@angular/core';
 import * as L from 'leaflet';
 
 import { DegradationService } from 'app/entities/degradation/service/degradation.service';
@@ -20,7 +20,7 @@ export class DegradationComponent implements AfterViewInit, OnDestroy {
   private map!: L.Map;
   private mapInitialized = false;
   private degradationService = inject(DegradationService);
-  private router = inject(Router); // Injection du Router
+  private router = inject(Router);
 
   allDegradations: IDegradation[] = [];
   markerGroup: L.LayerGroup = L.layerGroup();
@@ -94,7 +94,7 @@ export class DegradationComponent implements AfterViewInit, OnDestroy {
         });
 
         const popupContent = `
-          <strong>${deg.numero ?? 'N° ?'}</strong><br/>
+          <strong>ID: ${deg.id ?? '?'}</strong><br/>
           ${deg.localite ?? '-'}<br/>
           ${deg.typeAnomalie ?? '-'}<br/>
           Priorité : <b>${deg.priorite ?? '-'}</b>
@@ -135,6 +135,7 @@ export class DegradationComponent implements AfterViewInit, OnDestroy {
     this.loadDegradations();
   }
 
+  // Nécessaire pour *ngFor trackBy (améliore perf Angular)
   trackId(index: number, item: IDegradation): number {
     return item.id!;
   }
@@ -171,7 +172,6 @@ export class DegradationComponent implements AfterViewInit, OnDestroy {
     if (!isNaN(lat) && !isNaN(lng)) {
       this.map.setView([lat, lng], 12);
     }
-    // Navigation vers la page d'accueil
     this.router.navigate(['/home']);
   }
 }

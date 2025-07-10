@@ -6,7 +6,6 @@ import com.orange.qos.repository.DegradationRepository;
 import com.orange.qos.service.criteria.DegradationCriteria;
 import com.orange.qos.service.dto.DegradationDTO;
 import com.orange.qos.service.mapper.DegradationMapper;
-import jakarta.persistence.criteria.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -74,18 +73,9 @@ public class DegradationQueryService extends QueryService<Degradation> {
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
                 buildRangeSpecification(criteria.getId(), Degradation_.id),
-                buildStringSpecification(criteria.getNumero(), Degradation_.numero),
-                buildStringSpecification(criteria.getLocalite(), Degradation_.localite),
-                buildStringSpecification(criteria.getContactTemoin(), Degradation_.contactTemoin),
-                buildStringSpecification(criteria.getTypeAnomalie(), Degradation_.typeAnomalie),
-                buildStringSpecification(criteria.getPriorite(), Degradation_.priorite),
-                buildStringSpecification(criteria.getProblem(), Degradation_.problem),
-                buildStringSpecification(criteria.getPorteur(), Degradation_.porteur),
-                buildStringSpecification(criteria.getActionsEffectuees(), Degradation_.actionsEffectuees),
-                buildSpecification(criteria.getUtilisateurId(), root ->
-                    root.join(Degradation_.utilisateur, JoinType.LEFT).get(Utilisateur_.id)
-                ),
-                buildSpecification(criteria.getSiteId(), root -> root.join(Degradation_.site, JoinType.LEFT).get(Site_.id))
+                buildStringSpecification(criteria.getDescription(), Degradation_.description),
+                buildRangeSpecification(criteria.getDateSignalement(), Degradation_.dateSignalement),
+                buildStringSpecification(criteria.getStatut(), Degradation_.statut)
             );
         }
         return specification;

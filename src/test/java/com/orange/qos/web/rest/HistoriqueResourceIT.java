@@ -524,7 +524,7 @@ class HistoriqueResourceIT {
         Historique partialUpdatedHistorique = new Historique();
         partialUpdatedHistorique.setId(historique.getId());
 
-        partialUpdatedHistorique.section(UPDATED_SECTION).horodatage(UPDATED_HORODATAGE);
+        partialUpdatedHistorique.utilisateur(UPDATED_UTILISATEUR).horodatage(UPDATED_HORODATAGE);
 
         restHistoriqueMockMvc
             .perform(

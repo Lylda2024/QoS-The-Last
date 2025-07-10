@@ -6,15 +6,12 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Utilisateur.
+ *  Utilisateur.
  */
 @Entity
 @Table(name = "utilisateur")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Utilisateur implements Serializable {
 
@@ -43,19 +40,19 @@ public class Utilisateur implements Serializable {
     private String motDePasse;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "type_utilisateur_id") // précisé explicitement
     private TypeUtilisateur typeUtilisateur;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "rel_utilisateur__roles",
         joinColumns = @JoinColumn(name = "utilisateur_id"),
-        inverseJoinColumns = @JoinColumn(name = "roles_id")
+        inverseJoinColumns = @JoinColumn(name = "role_id") // correction ici : "role_id" au singulier
     )
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "utilisateurs" }, allowSetters = true)
     private Set<Role> roles = new HashSet<>();
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    // Getters, setters et méthodes de chainage fluide
 
     public Long getId() {
         return this.id;
@@ -158,34 +155,37 @@ public class Utilisateur implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Utilisateur)) {
-            return false;
-        }
-        return getId() != null && getId().equals(((Utilisateur) o).getId());
+        if (this == o) return true;
+        if (!(o instanceof Utilisateur)) return false;
+        return id != null && id.equals(((Utilisateur) o).getId());
     }
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Utilisateur{" +
-            "id=" + getId() +
-            ", nom='" + getNom() + "'" +
-            ", prenom='" + getPrenom() + "'" +
-            ", email='" + getEmail() + "'" +
-            ", motDePasse='" + getMotDePasse() + "'" +
-            "}";
+        return (
+            "Utilisateur{" +
+            "id=" +
+            getId() +
+            ", nom='" +
+            getNom() +
+            '\'' +
+            ", prenom='" +
+            getPrenom() +
+            '\'' +
+            ", email='" +
+            getEmail() +
+            '\'' +
+            ", motDePasse='" +
+            getMotDePasse() +
+            '\'' +
+            '}'
+        );
     }
 }

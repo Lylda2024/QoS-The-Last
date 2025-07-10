@@ -31,6 +31,7 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
+              "src/main/webapp/assets",
               "src/main/webapp/content",
               "src/main/webapp/favicon.ico",
               "src/main/webapp/manifest.webapp",
@@ -63,8 +64,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "2mb",
+                  "maximumError": "3mb"
                 },
                 {
                   "type": "anyComponentStyle",

@@ -1,18 +1,14 @@
 package com.orange.qos.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import java.time.Instant;
 
 /**
  * A Degradation.
  */
 @Entity
 @Table(name = "degradation")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Degradation implements Serializable {
 
@@ -24,43 +20,14 @@ public class Degradation implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @NotNull
-    @Column(name = "numero", nullable = false)
-    private String numero;
+    @Column(name = "description")
+    private String description;
 
-    @NotNull
-    @Column(name = "localite", nullable = false)
-    private String localite;
+    @Column(name = "date_signalement")
+    private Instant dateSignalement;
 
-    @NotNull
-    @Column(name = "contact_temoin", nullable = false)
-    private String contactTemoin;
-
-    @NotNull
-    @Column(name = "type_anomalie", nullable = false)
-    private String typeAnomalie;
-
-    @NotNull
-    @Column(name = "priorite", nullable = false)
-    private String priorite;
-
-    @NotNull
-    @Column(name = "problem", nullable = false)
-    private String problem;
-
-    @NotNull
-    @Column(name = "porteur", nullable = false)
-    private String porteur;
-
-    @Column(name = "actions_effectuees")
-    private String actionsEffectuees;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "typeUtilisateur", "roles" }, allowSetters = true)
-    private Utilisateur utilisateur;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Site site;
+    @Column(name = "statut")
+    private String statut;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -77,134 +44,43 @@ public class Degradation implements Serializable {
         this.id = id;
     }
 
-    public String getNumero() {
-        return this.numero;
+    public String getDescription() {
+        return this.description;
     }
 
-    public Degradation numero(String numero) {
-        this.setNumero(numero);
+    public Degradation description(String description) {
+        this.setDescription(description);
         return this;
     }
 
-    public void setNumero(String numero) {
-        this.numero = numero;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getLocalite() {
-        return this.localite;
+    public Instant getDateSignalement() {
+        return this.dateSignalement;
     }
 
-    public Degradation localite(String localite) {
-        this.setLocalite(localite);
+    public Degradation dateSignalement(Instant dateSignalement) {
+        this.setDateSignalement(dateSignalement);
         return this;
     }
 
-    public void setLocalite(String localite) {
-        this.localite = localite;
+    public void setDateSignalement(Instant dateSignalement) {
+        this.dateSignalement = dateSignalement;
     }
 
-    public String getContactTemoin() {
-        return this.contactTemoin;
+    public String getStatut() {
+        return this.statut;
     }
 
-    public Degradation contactTemoin(String contactTemoin) {
-        this.setContactTemoin(contactTemoin);
+    public Degradation statut(String statut) {
+        this.setStatut(statut);
         return this;
     }
 
-    public void setContactTemoin(String contactTemoin) {
-        this.contactTemoin = contactTemoin;
-    }
-
-    public String getTypeAnomalie() {
-        return this.typeAnomalie;
-    }
-
-    public Degradation typeAnomalie(String typeAnomalie) {
-        this.setTypeAnomalie(typeAnomalie);
-        return this;
-    }
-
-    public void setTypeAnomalie(String typeAnomalie) {
-        this.typeAnomalie = typeAnomalie;
-    }
-
-    public String getPriorite() {
-        return this.priorite;
-    }
-
-    public Degradation priorite(String priorite) {
-        this.setPriorite(priorite);
-        return this;
-    }
-
-    public void setPriorite(String priorite) {
-        this.priorite = priorite;
-    }
-
-    public String getProblem() {
-        return this.problem;
-    }
-
-    public Degradation problem(String problem) {
-        this.setProblem(problem);
-        return this;
-    }
-
-    public void setProblem(String problem) {
-        this.problem = problem;
-    }
-
-    public String getPorteur() {
-        return this.porteur;
-    }
-
-    public Degradation porteur(String porteur) {
-        this.setPorteur(porteur);
-        return this;
-    }
-
-    public void setPorteur(String porteur) {
-        this.porteur = porteur;
-    }
-
-    public String getActionsEffectuees() {
-        return this.actionsEffectuees;
-    }
-
-    public Degradation actionsEffectuees(String actionsEffectuees) {
-        this.setActionsEffectuees(actionsEffectuees);
-        return this;
-    }
-
-    public void setActionsEffectuees(String actionsEffectuees) {
-        this.actionsEffectuees = actionsEffectuees;
-    }
-
-    public Utilisateur getUtilisateur() {
-        return this.utilisateur;
-    }
-
-    public void setUtilisateur(Utilisateur utilisateur) {
-        this.utilisateur = utilisateur;
-    }
-
-    public Degradation utilisateur(Utilisateur utilisateur) {
-        this.setUtilisateur(utilisateur);
-        return this;
-    }
-
-    public Site getSite() {
-        return this.site;
-    }
-
-    public void setSite(Site site) {
-        this.site = site;
-    }
-
-    public Degradation site(Site site) {
-        this.setSite(site);
-        return this;
+    public void setStatut(String statut) {
+        this.statut = statut;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -231,14 +107,9 @@ public class Degradation implements Serializable {
     public String toString() {
         return "Degradation{" +
             "id=" + getId() +
-            ", numero='" + getNumero() + "'" +
-            ", localite='" + getLocalite() + "'" +
-            ", contactTemoin='" + getContactTemoin() + "'" +
-            ", typeAnomalie='" + getTypeAnomalie() + "'" +
-            ", priorite='" + getPriorite() + "'" +
-            ", problem='" + getProblem() + "'" +
-            ", porteur='" + getPorteur() + "'" +
-            ", actionsEffectuees='" + getActionsEffectuees() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", dateSignalement='" + getDateSignalement() + "'" +
+            ", statut='" + getStatut() + "'" +
             "}";
     }
 }

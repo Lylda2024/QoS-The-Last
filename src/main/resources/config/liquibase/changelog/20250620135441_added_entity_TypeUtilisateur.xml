@@ -10,7 +10,7 @@
         Added the entity TypeUtilisateur.
     -->
     <changeSet id="20250620135441-1" author="jhipster">
-        <createTable tableName="type_utilisateur" remarks="Modèle de données conforme au diagramme UML">
+        <createTable tableName="type_utilisateur" remarks="Modèle de données conforme au diagramme UML corrigé">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

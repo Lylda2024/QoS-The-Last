@@ -1,8 +1,6 @@
 package com.orange.qos.domain;
 
 import static com.orange.qos.domain.DegradationTestSamples.*;
-import static com.orange.qos.domain.SiteTestSamples.*;
-import static com.orange.qos.domain.UtilisateurTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.orange.qos.web.rest.TestUtil;
@@ -22,29 +20,5 @@ class DegradationTest {
 
         degradation2 = getDegradationSample2();
         assertThat(degradation1).isNotEqualTo(degradation2);
-    }
-
-    @Test
-    void utilisateurTest() {
-        Degradation degradation = getDegradationRandomSampleGenerator();
-        Utilisateur utilisateurBack = getUtilisateurRandomSampleGenerator();
-
-        degradation.setUtilisateur(utilisateurBack);
-        assertThat(degradation.getUtilisateur()).isEqualTo(utilisateurBack);
-
-        degradation.utilisateur(null);
-        assertThat(degradation.getUtilisateur()).isNull();
-    }
-
-    @Test
-    void siteTest() {
-        Degradation degradation = getDegradationRandomSampleGenerator();
-        Site siteBack = getSiteRandomSampleGenerator();
-
-        degradation.setSite(siteBack);
-        assertThat(degradation.getSite()).isEqualTo(siteBack);
-
-        degradation.site(null);
-        assertThat(degradation.getSite()).isNull();
     }
 }

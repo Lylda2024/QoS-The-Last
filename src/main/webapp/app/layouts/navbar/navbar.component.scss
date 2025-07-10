@@ -101,3 +101,12 @@
 .notification-container .text-danger {
   color: #dc3545;
 }
+body {
+  background: linear-gradient(135deg, #fffaf6, #fff3e0);
+  /* Ou une couleur unie plus douce */
+  /* background-color: #fff8f0; */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #444;
+  margin: 0;
+  padding: 0;
+}

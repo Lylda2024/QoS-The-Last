@@ -76,16 +76,9 @@ class DegradationCriteriaTest {
 
     private static void setAllFilters(DegradationCriteria degradationCriteria) {
         degradationCriteria.id();
-        degradationCriteria.numero();
-        degradationCriteria.localite();
-        degradationCriteria.contactTemoin();
-        degradationCriteria.typeAnomalie();
-        degradationCriteria.priorite();
-        degradationCriteria.problem();
-        degradationCriteria.porteur();
-        degradationCriteria.actionsEffectuees();
-        degradationCriteria.utilisateurId();
-        degradationCriteria.siteId();
+        degradationCriteria.description();
+        degradationCriteria.dateSignalement();
+        degradationCriteria.statut();
         degradationCriteria.distinct();
     }
 
@@ -93,16 +86,9 @@ class DegradationCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
-                condition.apply(criteria.getNumero()) &&
-                condition.apply(criteria.getLocalite()) &&
-                condition.apply(criteria.getContactTemoin()) &&
-                condition.apply(criteria.getTypeAnomalie()) &&
-                condition.apply(criteria.getPriorite()) &&
-                condition.apply(criteria.getProblem()) &&
-                condition.apply(criteria.getPorteur()) &&
-                condition.apply(criteria.getActionsEffectuees()) &&
-                condition.apply(criteria.getUtilisateurId()) &&
-                condition.apply(criteria.getSiteId()) &&
+                condition.apply(criteria.getDescription()) &&
+                condition.apply(criteria.getDateSignalement()) &&
+                condition.apply(criteria.getStatut()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -112,16 +98,9 @@ class DegradationCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
-                condition.apply(criteria.getNumero(), copy.getNumero()) &&
-                condition.apply(criteria.getLocalite(), copy.getLocalite()) &&
-                condition.apply(criteria.getContactTemoin(), copy.getContactTemoin()) &&
-                condition.apply(criteria.getTypeAnomalie(), copy.getTypeAnomalie()) &&
-                condition.apply(criteria.getPriorite(), copy.getPriorite()) &&
-                condition.apply(criteria.getProblem(), copy.getProblem()) &&
-                condition.apply(criteria.getPorteur(), copy.getPorteur()) &&
-                condition.apply(criteria.getActionsEffectuees(), copy.getActionsEffectuees()) &&
-                condition.apply(criteria.getUtilisateurId(), copy.getUtilisateurId()) &&
-                condition.apply(criteria.getSiteId(), copy.getSiteId()) &&
+                condition.apply(criteria.getDescription(), copy.getDescription()) &&
+                condition.apply(criteria.getDateSignalement(), copy.getDateSignalement()) &&
+                condition.apply(criteria.getStatut(), copy.getStatut()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

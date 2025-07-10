@@ -1,14 +1,33 @@
-<div class="container mt-3">
-  <div class="mb-3">
-    <label for="prioritySelect" class="form-label">Filtrer par priorité :</label>
-    <select id="prioritySelect" class="form-select" [(ngModel)]="selectedPriority" (ngModelChange)="applyFilter()">
-      <option value="">Toutes</option>
-      <option value="critique">Critique</option>
-      <option value="élevée">Élevée</option>
-      <option value="moyenne">Moyenne</option>
-      <option value="faible">Faible</option>
-    </select>
+<div class="container mt-4">
+  <!-- Filtre par priorité -->
+  <div class="row justify-content-center mb-3">
+    <div class="col-md-6 col-lg-5">
+      <label for="priorityFilter" class="form-label fw-semibold text-secondary">
+        <i class="fa-solid fa-filter me-1 text-primary"></i> Filtrer par priorité
+      </label>
+      <div class="input-group">
+        <select
+          id="priorityFilter"
+          [(ngModel)]="selectedPriority"
+          (change)="applyFilter()"
+          class="form-select"
+          aria-label="Filtrer par priorité"
+        >
+          <option value="">Toutes les priorités</option>
+          <option *ngFor="let priority of priorities" [value]="priority">{{ priority }}</option>
+        </select>
+        <button type="button" class="btn btn-outline-secondary" (click)="clearFilter()" title="Réinitialiser le filtre">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div #mapContainer style="height: 500px; border: 1px solid #ccc"></div>
+  <!-- Carte Leaflet -->
+  <div
+    #mapContainer
+    id="mapContainer"
+    class="rounded shadow border"
+    style="height: 300px; width: 100%; max-width: 900px; margin: 0 auto"
+  ></div>
 </div>

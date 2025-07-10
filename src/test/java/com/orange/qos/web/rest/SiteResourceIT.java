@@ -806,7 +806,12 @@ class SiteResourceIT {
         Site partialUpdatedSite = new Site();
         partialUpdatedSite.setId(site.getId());
 
-        partialUpdatedSite.codeOCI(UPDATED_CODE_OCI).longitude(UPDATED_LONGITUDE).statut(UPDATED_STATUT).enService(UPDATED_EN_SERVICE);
+        partialUpdatedSite
+            .nomSite(UPDATED_NOM_SITE)
+            .longitude(UPDATED_LONGITUDE)
+            .latitude(UPDATED_LATITUDE)
+            .technologie(UPDATED_TECHNOLOGIE)
+            .enService(UPDATED_EN_SERVICE);
 
         restSiteMockMvc
             .perform(

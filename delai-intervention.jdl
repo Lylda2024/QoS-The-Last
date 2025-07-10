@@ -1,0 +1,29 @@
+entity Degradation {
+  description String
+  dateSignalement Instant
+  statut String
+}
+
+entity DelaiIntervention {
+  dateDebut Instant required
+  dateLimite Instant required
+  commentaire String
+  statut StatutIntervention
+}
+
+enum StatutIntervention {
+  EN_COURS,
+  TRANSFERE,
+  TERMINE
+}
+
+relationship ManyToOne {
+  DelaiIntervention{acteur(login)} to User with builtInEntity
+  DelaiIntervention{degradation} to Degradation
+}
+
+
+dto Degradation, DelaiIntervention with mapstruct
+service Degradation, DelaiIntervention with serviceClass
+paginate Degradation, DelaiIntervention with pagination
+filter Degradation, DelaiIntervention

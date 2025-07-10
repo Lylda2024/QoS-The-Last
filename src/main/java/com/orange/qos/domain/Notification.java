@@ -1,18 +1,14 @@
 package com.orange.qos.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * A Notification.
  */
 @Entity
 @Table(name = "notification")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Notification implements Serializable {
 
@@ -37,7 +33,6 @@ public class Notification implements Serializable {
     private Boolean statutLecture;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "utilisateur", "site" }, allowSetters = true)
     private Degradation degradation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

@@ -1,191 +1,48 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-site-heading" data-cy="SiteCreateUpdateHeading" jhiTranslate="codeStageApp.site.home.createOrEditLabel">
-        Créer ou éditer un Site
-      </h2>
+<div class="mt-5 border-top pt-4">
+  <h3>📂 Importer les sites via un fichier Excel</h3>
+  <!-- Indication des colonnes attendues -->
+  <p>
+    Merci de préparer votre fichier Excel avec les colonnes suivantes (dans cet ordre) :<br />
+    <strong>nomSite, longitude, latitude, gestionnaire, proprietaire, codeOCI, typeSite</strong>
+  </p>
+  <!-- Sélecteur de fichier -->
+  <input type="file" class="form-control w-auto" (change)="onFileChange($event)" accept=".xlsx, .xls" />
+  <p *ngIf="fileName" class="mt-2">
+    Fichier sélectionné : <strong>{{ fileName }}</strong>
+  </p>
 
-      <div>
-        <jhi-alert-error />
+  <!-- Boutons Importer et Annuler -->
+  <div class="mt-2">
+    <button class="btn btn-success me-2" (click)="saveImportedSites()" [disabled]="isLoading || importedSites.length === 0">
+      {{ isLoading ? 'Importation en cours...' : 'Importer les sites' }}
+    </button>
 
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="codeStageApp.site.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        <div class="mb-3">
-          <label class="form-label" for="field_nomSite" jhiTranslate="codeStageApp.site.nomSite">Nom Site</label>
-          <input type="text" class="form-control" name="nomSite" id="field_nomSite" data-cy="nomSite" formControlName="nomSite" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_codeOCI" jhiTranslate="codeStageApp.site.codeOCI">Code OCI</label>
-          <input type="text" class="form-control" name="codeOCI" id="field_codeOCI" data-cy="codeOCI" formControlName="codeOCI" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_longitude" jhiTranslate="codeStageApp.site.longitude">Longitude</label>
-          <input type="number" class="form-control" name="longitude" id="field_longitude" data-cy="longitude" formControlName="longitude" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_latitude" jhiTranslate="codeStageApp.site.latitude">Latitude</label>
-          <input type="number" class="form-control" name="latitude" id="field_latitude" data-cy="latitude" formControlName="latitude" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_gestionnaire" jhiTranslate="codeStageApp.site.gestionnaire">Gestionnaire</label>
-          <input
-            type="text"
-            class="form-control"
-            name="gestionnaire"
-            id="field_gestionnaire"
-            data-cy="gestionnaire"
-            formControlName="gestionnaire"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_proprietaire" jhiTranslate="codeStageApp.site.proprietaire">Proprietaire</label>
-          <input
-            type="text"
-            class="form-control"
-            name="proprietaire"
-            id="field_proprietaire"
-            data-cy="proprietaire"
-            formControlName="proprietaire"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_equipementier" jhiTranslate="codeStageApp.site.equipementier">Equipementier</label>
-          <input
-            type="text"
-            class="form-control"
-            name="equipementier"
-            id="field_equipementier"
-            data-cy="equipementier"
-            formControlName="equipementier"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_typeSite" jhiTranslate="codeStageApp.site.typeSite">Type Site</label>
-          <input type="text" class="form-control" name="typeSite" id="field_typeSite" data-cy="typeSite" formControlName="typeSite" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_modeAntenne" jhiTranslate="codeStageApp.site.modeAntenne">Mode Antenne</label>
-          <input
-            type="text"
-            class="form-control"
-            name="modeAntenne"
-            id="field_modeAntenne"
-            data-cy="modeAntenne"
-            formControlName="modeAntenne"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_statut" jhiTranslate="codeStageApp.site.statut">Statut</label>
-          <input type="text" class="form-control" name="statut" id="field_statut" data-cy="statut" formControlName="statut" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_couche" jhiTranslate="codeStageApp.site.couche">Couche</label>
-          <input type="text" class="form-control" name="couche" id="field_couche" data-cy="couche" formControlName="couche" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_enService" jhiTranslate="codeStageApp.site.enService">En Service</label>
-          <input type="checkbox" class="form-check" name="enService" id="field_enService" data-cy="enService" formControlName="enService" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_technologie" jhiTranslate="codeStageApp.site.technologie">Technologie</label>
-          <input
-            type="text"
-            class="form-control"
-            name="technologie"
-            id="field_technologie"
-            data-cy="technologie"
-            formControlName="technologie"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_dateMiseEnService" jhiTranslate="codeStageApp.site.dateMiseEnService"
-            >Date Mise En Service</label
-          >
-          <div class="input-group">
-            <input
-              id="field_dateMiseEnService"
-              data-cy="dateMiseEnService"
-              type="text"
-              class="form-control"
-              name="dateMiseEnService"
-              ngbDatepicker
-              #dateMiseEnServiceDp="ngbDatepicker"
-              formControlName="dateMiseEnService"
-            />
-            <button type="button" class="btn btn-secondary" (click)="dateMiseEnServiceDp.toggle()">
-              <fa-icon icon="calendar-alt"></fa-icon>
-            </button>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_dateMes2G" jhiTranslate="codeStageApp.site.dateMes2G">Date Mes 2 G</label>
-          <div class="input-group">
-            <input
-              id="field_dateMes2G"
-              data-cy="dateMes2G"
-              type="text"
-              class="form-control"
-              name="dateMes2G"
-              ngbDatepicker
-              #dateMes2GDp="ngbDatepicker"
-              formControlName="dateMes2G"
-            />
-            <button type="button" class="btn btn-secondary" (click)="dateMes2GDp.toggle()"><fa-icon icon="calendar-alt"></fa-icon></button>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_dateMes3G" jhiTranslate="codeStageApp.site.dateMes3G">Date Mes 3 G</label>
-          <div class="input-group">
-            <input
-              id="field_dateMes3G"
-              data-cy="dateMes3G"
-              type="text"
-              class="form-control"
-              name="dateMes3G"
-              ngbDatepicker
-              #dateMes3GDp="ngbDatepicker"
-              formControlName="dateMes3G"
-            />
-            <button type="button" class="btn btn-secondary" (click)="dateMes3GDp.toggle()"><fa-icon icon="calendar-alt"></fa-icon></button>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
-        </button>
-      </div>
-    </form>
+    <button class="btn btn-secondary" (click)="cancelImport()" [disabled]="isLoading && importedSites.length === 0">Annuler</button>
   </div>
+
+  <!-- Aperçu du contenu importé -->
+  <table class="table table-bordered table-sm mt-3" *ngIf="importedSites.length > 0">
+    <thead class="table-light">
+      <tr>
+        <th>Nom du site</th>
+        <th>Code OCI</th>
+        <th>Longitude</th>
+        <th>Latitude</th>
+        <th>Gestionnaire</th>
+        <th>Propriétaire</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let site of importedSites">
+        <td>{{ site.nomSite }}</td>
+        <td>{{ site.codeOCI }}</td>
+        <td>{{ site.longitude }}</td>
+        <td>{{ site.latitude }}</td>
+        <td>{{ site.gestionnaire }}</td>
+        <td>{{ site.proprietaire }}</td>
+        <td>{{ site.typeSite }}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

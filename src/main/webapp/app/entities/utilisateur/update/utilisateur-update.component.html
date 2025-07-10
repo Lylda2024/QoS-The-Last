@@ -10,14 +10,13 @@
       </h2>
 
       <div>
-        <jhi-alert-error />
+        <jhi-alert-error></jhi-alert-error>
 
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="codeStageApp.utilisateur.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
+        <!-- Afficher ID si existant -->
+        <div *ngIf="editForm.controls.id.value !== null" class="mb-3">
+          <label class="form-label" for="field_id" jhiTranslate="codeStageApp.utilisateur.id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" readonly />
+        </div>
 
         <div class="mb-3">
           <label class="form-label" for="field_nom" jhiTranslate="codeStageApp.utilisateur.nom">Nom</label>
@@ -59,9 +58,9 @@
             [compareWith]="compareTypeUtilisateur"
           >
             <option [ngValue]="null"></option>
-            @for (typeUtilisateurOption of typeUtilisateursSharedCollection; track $index) {
-              <option [ngValue]="typeUtilisateurOption">{{ typeUtilisateurOption.id }}</option>
-            }
+            <option *ngFor="let typeUtilisateurOption of typeUtilisateursSharedCollection" [ngValue]="typeUtilisateurOption">
+              {{ typeUtilisateurOption.id }}
+            </option>
           </select>
         </div>
 
@@ -76,9 +75,9 @@
             formControlName="roles"
             [compareWith]="compareRole"
           >
-            @for (roleOption of rolesSharedCollection; track $index) {
-              <option [ngValue]="roleOption">{{ roleOption.id }}</option>
-            }
+            <option *ngFor="let roleOption of rolesSharedCollection" [ngValue]="roleOption">
+              {{ roleOption.id }}
+            </option>
           </select>
         </div>
       </div>

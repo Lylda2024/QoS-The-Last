@@ -14,38 +14,18 @@
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="numero" type="varchar(255)">
-                <constraints nullable="false" />
-            </column>
-            <column name="localite" type="varchar(255)">
-                <constraints nullable="false" />
-            </column>
-            <column name="contact_temoin" type="varchar(255)">
-                <constraints nullable="false" />
-            </column>
-            <column name="type_anomalie" type="varchar(255)">
-                <constraints nullable="false" />
-            </column>
-            <column name="priorite" type="varchar(255)">
-                <constraints nullable="false" />
-            </column>
-            <column name="problem" type="varchar(255)">
-                <constraints nullable="false" />
-            </column>
-            <column name="porteur" type="varchar(255)">
-                <constraints nullable="false" />
-            </column>
-            <column name="actions_effectuees" type="varchar(255)">
+            <column name="description" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="utilisateur_id" type="bigint">
+            <column name="date_signalement" type="${datetimeType}">
                 <constraints nullable="true" />
             </column>
-            <column name="site_id" type="bigint">
+            <column name="statut" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
+        <dropDefaultValue tableName="degradation" columnName="date_signalement" columnDataType="${datetimeType}"/>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
@@ -65,14 +45,9 @@
                   tableName="degradation"
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
-            <column name="numero" type="string"/>
-            <column name="localite" type="string"/>
-            <column name="contact_temoin" type="string"/>
-            <column name="type_anomalie" type="string"/>
-            <column name="priorite" type="string"/>
-            <column name="problem" type="string"/>
-            <column name="porteur" type="string"/>
-            <column name="actions_effectuees" type="string"/>
+            <column name="description" type="string"/>
+            <column name="date_signalement" type="date"/>
+            <column name="statut" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

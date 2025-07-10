@@ -1,0 +1,41 @@
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="20250703-add-date_mise_en_service" author="tonNom">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="site" columnName="date_mise_en_service"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="site">
+      <column name="date_mise_en_service" type="date"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="20250703-add-date_mes_2g" author="tonNom">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="site" columnName="date_mes_2g"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="site">
+      <column name="date_mes_2g" type="date"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="20250703-add-date_mes_3g" author="tonNom">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="site" columnName="date_mes_3g"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="site">
+      <column name="date_mes_3g" type="date"/>
+    </addColumn>
+  </changeSet>
+
+</databaseChangeLog>

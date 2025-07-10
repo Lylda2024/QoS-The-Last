@@ -6,15 +6,12 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * A Role.
  */
 @Entity
 @Table(name = "role")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Role implements Serializable {
 
@@ -34,7 +31,6 @@ public class Role implements Serializable {
     private String description;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "typeUtilisateur", "roles" }, allowSetters = true)
     private Set<Utilisateur> utilisateurs = new HashSet<>();
 

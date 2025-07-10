@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * A DTO for the {@link com.orange.qos.domain.TypeUtilisateur} entity.
  */
-@Schema(description = "Modèle de données conforme au diagramme UML")
+@Schema(description = "Modèle de données conforme au diagramme UML corrigé")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class TypeUtilisateurDTO implements Serializable {
 

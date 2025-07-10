@@ -17,6 +17,8 @@
 ---
 # Conditionally disable springdoc on missing api-docs profile
 spring:
+  main:
+    banner-mode: 'off'
   config:
     activate:
       on-profile: '!api-docs'

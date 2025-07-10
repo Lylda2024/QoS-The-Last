@@ -3,15 +3,12 @@ package com.orange.qos.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Modèle de données conforme au diagramme UML
+ * Modèle de données conforme au diagramme UML corrigé
  */
 @Entity
 @Table(name = "type_utilisateur")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class TypeUtilisateur implements Serializable {
 

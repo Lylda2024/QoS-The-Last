@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -19,18 +19,26 @@ import { environment } from 'environments/environment';
 })
 export default class NavbarComponent implements OnInit {
   inProduction?: boolean;
-  isNavbarCollapsed = signal(true);
-  languages = LANGUAGES;
   openAPIEnabled?: boolean;
   version = '';
+  languages = LANGUAGES;
+
+  // État de la barre de navigation
+  isNavbarCollapsed = signal(true);
+
+  // Compte utilisateur observable
   account = inject(AccountService).trackCurrentAccount();
+
+  // Liste des entités générées par JHipster
   entitiesNavbarItems = EntityNavbarItems;
 
+  // Injections de services
   private readonly loginService = inject(LoginService);
   private readonly translateService = inject(TranslateService);
   private readonly stateStorageService = inject(StateStorageService);
   private readonly profileService = inject(ProfileService);
   private readonly router = inject(Router);
+  private readonly accountService = inject(AccountService);
 
   constructor() {
     const { VERSION } = environment;
@@ -55,21 +63,26 @@ export default class NavbarComponent implements OnInit {
     this.isNavbarCollapsed.set(true);
   }
 
+  toggleNavbar(): void {
+    this.isNavbarCollapsed.update(value => !value);
+  }
+
   login(): void {
     this.router.navigate(['/login']);
   }
 
   logout(): void {
-    this.collapseNavbar(); // referme le menu mobile si nécessaire
-    this.loginService.logout(); // nettoyage de la session
-
-    // Redirection propre vers /login sans garder l'ancienne page
+    this.collapseNavbar();
+    this.loginService.logout();
     this.router.navigateByUrl('/dummy', { skipLocationChange: true }).then(() => {
       this.router.navigate(['/login']);
     });
   }
 
-  toggleNavbar(): void {
-    this.isNavbarCollapsed.update(isNavbarCollapsed => !isNavbarCollapsed);
+  /**
+   * Vérifie si l'utilisateur actuel est un administrateur.
+   */
+  isAdmin(): boolean {
+    return this.accountService.hasAnyAuthority(['ROLE_ADMIN']);
   }
 }

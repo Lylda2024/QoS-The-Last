@@ -66,4 +66,11 @@ export class DegradationService {
     });
     return [...additions, ...degradationCollection];
   }
+
+  /**
+   * Récupérer toutes les dégradations avec leurs sites associés.
+   */
+  getAllWithSite(): Observable<EntityArrayResponseType> {
+    return this.http.get<IDegradation[]>(`${this.resourceUrl}/all-with-site`, { observe: 'response' });
+  }
 }
