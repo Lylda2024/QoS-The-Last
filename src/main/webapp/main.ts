@@ -5,6 +5,6 @@ import { appConfig } from './app/app.config';
 bootstrapApplication(AppComponent, appConfig)
   .then(ref => {
     const iconInit = ref.injector.get('fa-icon-init', null);
-    if (iconInit) iconInit(); // ✅ Charge les icônes FontAwesome
+    if (iconInit) iconInit();
   })
   .catch(err => console.error(err));

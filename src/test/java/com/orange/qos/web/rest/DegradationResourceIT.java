@@ -10,12 +10,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.qos.IntegrationTest;
 import com.orange.qos.domain.Degradation;
+import com.orange.qos.domain.Site;
+import com.orange.qos.domain.Utilisateur;
 import com.orange.qos.repository.DegradationRepository;
 import com.orange.qos.service.dto.DegradationDTO;
 import com.orange.qos.service.mapper.DegradationMapper;
 import jakarta.persistence.EntityManager;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
@@ -36,11 +36,23 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class DegradationResourceIT {
 
-    private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
-    private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
+    private static final String DEFAULT_LOCALITE = "AAAAAAAAAA";
+    private static final String UPDATED_LOCALITE = "BBBBBBBBBB";
 
-    private static final Instant DEFAULT_DATE_SIGNALEMENT = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_DATE_SIGNALEMENT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final String DEFAULT_CONTACT_TEMOIN = "AAAAAAAAAA";
+    private static final String UPDATED_CONTACT_TEMOIN = "BBBBBBBBBB";
+
+    private static final String DEFAULT_TYPE_ANOMALIE = "AAAAAAAAAA";
+    private static final String UPDATED_TYPE_ANOMALIE = "BBBBBBBBBB";
+
+    private static final String DEFAULT_PRIORITE = "AAAAAAAAAA";
+    private static final String UPDATED_PRIORITE = "BBBBBBBBBB";
+
+    private static final String DEFAULT_PORTEUR = "AAAAAAAAAA";
+    private static final String UPDATED_PORTEUR = "BBBBBBBBBB";
+
+    private static final String DEFAULT_ACTIONS_EFFECTUEES = "AAAAAAAAAA";
+    private static final String UPDATED_ACTIONS_EFFECTUEES = "BBBBBBBBBB";
 
     private static final String DEFAULT_STATUT = "AAAAAAAAAA";
     private static final String UPDATED_STATUT = "BBBBBBBBBB";
@@ -77,7 +89,14 @@ class DegradationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Degradation createEntity() {
-        return new Degradation().description(DEFAULT_DESCRIPTION).dateSignalement(DEFAULT_DATE_SIGNALEMENT).statut(DEFAULT_STATUT);
+        return new Degradation()
+            .localite(DEFAULT_LOCALITE)
+            .contactTemoin(DEFAULT_CONTACT_TEMOIN)
+            .typeAnomalie(DEFAULT_TYPE_ANOMALIE)
+            .priorite(DEFAULT_PRIORITE)
+            .porteur(DEFAULT_PORTEUR)
+            .actionsEffectuees(DEFAULT_ACTIONS_EFFECTUEES)
+            .statut(DEFAULT_STATUT);
     }
 
     /**
@@ -87,7 +106,14 @@ class DegradationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Degradation createUpdatedEntity() {
-        return new Degradation().description(UPDATED_DESCRIPTION).dateSignalement(UPDATED_DATE_SIGNALEMENT).statut(UPDATED_STATUT);
+        return new Degradation()
+            .localite(UPDATED_LOCALITE)
+            .contactTemoin(UPDATED_CONTACT_TEMOIN)
+            .typeAnomalie(UPDATED_TYPE_ANOMALIE)
+            .priorite(UPDATED_PRIORITE)
+            .porteur(UPDATED_PORTEUR)
+            .actionsEffectuees(UPDATED_ACTIONS_EFFECTUEES)
+            .statut(UPDATED_STATUT);
     }
 
     @BeforeEach
@@ -147,6 +173,91 @@ class DegradationResourceIT {
 
     @Test
     @Transactional
+    void checkLocaliteIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        degradation.setLocalite(null);
+
+        // Create the Degradation, which fails.
+        DegradationDTO degradationDTO = degradationMapper.toDto(degradation);
+
+        restDegradationMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(degradationDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkContactTemoinIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        degradation.setContactTemoin(null);
+
+        // Create the Degradation, which fails.
+        DegradationDTO degradationDTO = degradationMapper.toDto(degradation);
+
+        restDegradationMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(degradationDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkTypeAnomalieIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        degradation.setTypeAnomalie(null);
+
+        // Create the Degradation, which fails.
+        DegradationDTO degradationDTO = degradationMapper.toDto(degradation);
+
+        restDegradationMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(degradationDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkPrioriteIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        degradation.setPriorite(null);
+
+        // Create the Degradation, which fails.
+        DegradationDTO degradationDTO = degradationMapper.toDto(degradation);
+
+        restDegradationMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(degradationDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkPorteurIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        degradation.setPorteur(null);
+
+        // Create the Degradation, which fails.
+        DegradationDTO degradationDTO = degradationMapper.toDto(degradation);
+
+        restDegradationMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(degradationDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllDegradations() throws Exception {
         // Initialize the database
         insertedDegradation = degradationRepository.saveAndFlush(degradation);
@@ -157,8 +268,12 @@ class DegradationResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(degradation.getId().intValue())))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
-            .andExpect(jsonPath("$.[*].dateSignalement").value(hasItem(DEFAULT_DATE_SIGNALEMENT.toString())))
+            .andExpect(jsonPath("$.[*].localite").value(hasItem(DEFAULT_LOCALITE)))
+            .andExpect(jsonPath("$.[*].contactTemoin").value(hasItem(DEFAULT_CONTACT_TEMOIN)))
+            .andExpect(jsonPath("$.[*].typeAnomalie").value(hasItem(DEFAULT_TYPE_ANOMALIE)))
+            .andExpect(jsonPath("$.[*].priorite").value(hasItem(DEFAULT_PRIORITE)))
+            .andExpect(jsonPath("$.[*].porteur").value(hasItem(DEFAULT_PORTEUR)))
+            .andExpect(jsonPath("$.[*].actionsEffectuees").value(hasItem(DEFAULT_ACTIONS_EFFECTUEES)))
             .andExpect(jsonPath("$.[*].statut").value(hasItem(DEFAULT_STATUT)));
     }
 
@@ -174,8 +289,12 @@ class DegradationResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(degradation.getId().intValue()))
-            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
-            .andExpect(jsonPath("$.dateSignalement").value(DEFAULT_DATE_SIGNALEMENT.toString()))
+            .andExpect(jsonPath("$.localite").value(DEFAULT_LOCALITE))
+            .andExpect(jsonPath("$.contactTemoin").value(DEFAULT_CONTACT_TEMOIN))
+            .andExpect(jsonPath("$.typeAnomalie").value(DEFAULT_TYPE_ANOMALIE))
+            .andExpect(jsonPath("$.priorite").value(DEFAULT_PRIORITE))
+            .andExpect(jsonPath("$.porteur").value(DEFAULT_PORTEUR))
+            .andExpect(jsonPath("$.actionsEffectuees").value(DEFAULT_ACTIONS_EFFECTUEES))
             .andExpect(jsonPath("$.statut").value(DEFAULT_STATUT));
     }
 
@@ -196,94 +315,326 @@ class DegradationResourceIT {
 
     @Test
     @Transactional
-    void getAllDegradationsByDescriptionIsEqualToSomething() throws Exception {
+    void getAllDegradationsByLocaliteIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedDegradation = degradationRepository.saveAndFlush(degradation);
 
-        // Get all the degradationList where description equals to
-        defaultDegradationFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
+        // Get all the degradationList where localite equals to
+        defaultDegradationFiltering("localite.equals=" + DEFAULT_LOCALITE, "localite.equals=" + UPDATED_LOCALITE);
     }
 
     @Test
     @Transactional
-    void getAllDegradationsByDescriptionIsInShouldWork() throws Exception {
+    void getAllDegradationsByLocaliteIsInShouldWork() throws Exception {
         // Initialize the database
         insertedDegradation = degradationRepository.saveAndFlush(degradation);
 
-        // Get all the degradationList where description in
+        // Get all the degradationList where localite in
+        defaultDegradationFiltering("localite.in=" + DEFAULT_LOCALITE + "," + UPDATED_LOCALITE, "localite.in=" + UPDATED_LOCALITE);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByLocaliteIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where localite is not null
+        defaultDegradationFiltering("localite.specified=true", "localite.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByLocaliteContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where localite contains
+        defaultDegradationFiltering("localite.contains=" + DEFAULT_LOCALITE, "localite.contains=" + UPDATED_LOCALITE);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByLocaliteNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where localite does not contain
+        defaultDegradationFiltering("localite.doesNotContain=" + UPDATED_LOCALITE, "localite.doesNotContain=" + DEFAULT_LOCALITE);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByContactTemoinIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where contactTemoin equals to
+        defaultDegradationFiltering("contactTemoin.equals=" + DEFAULT_CONTACT_TEMOIN, "contactTemoin.equals=" + UPDATED_CONTACT_TEMOIN);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByContactTemoinIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where contactTemoin in
         defaultDegradationFiltering(
-            "description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION,
-            "description.in=" + UPDATED_DESCRIPTION
+            "contactTemoin.in=" + DEFAULT_CONTACT_TEMOIN + "," + UPDATED_CONTACT_TEMOIN,
+            "contactTemoin.in=" + UPDATED_CONTACT_TEMOIN
         );
     }
 
     @Test
     @Transactional
-    void getAllDegradationsByDescriptionIsNullOrNotNull() throws Exception {
+    void getAllDegradationsByContactTemoinIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedDegradation = degradationRepository.saveAndFlush(degradation);
 
-        // Get all the degradationList where description is not null
-        defaultDegradationFiltering("description.specified=true", "description.specified=false");
+        // Get all the degradationList where contactTemoin is not null
+        defaultDegradationFiltering("contactTemoin.specified=true", "contactTemoin.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllDegradationsByDescriptionContainsSomething() throws Exception {
+    void getAllDegradationsByContactTemoinContainsSomething() throws Exception {
         // Initialize the database
         insertedDegradation = degradationRepository.saveAndFlush(degradation);
 
-        // Get all the degradationList where description contains
-        defaultDegradationFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
+        // Get all the degradationList where contactTemoin contains
+        defaultDegradationFiltering("contactTemoin.contains=" + DEFAULT_CONTACT_TEMOIN, "contactTemoin.contains=" + UPDATED_CONTACT_TEMOIN);
     }
 
     @Test
     @Transactional
-    void getAllDegradationsByDescriptionNotContainsSomething() throws Exception {
+    void getAllDegradationsByContactTemoinNotContainsSomething() throws Exception {
         // Initialize the database
         insertedDegradation = degradationRepository.saveAndFlush(degradation);
 
-        // Get all the degradationList where description does not contain
+        // Get all the degradationList where contactTemoin does not contain
         defaultDegradationFiltering(
-            "description.doesNotContain=" + UPDATED_DESCRIPTION,
-            "description.doesNotContain=" + DEFAULT_DESCRIPTION
+            "contactTemoin.doesNotContain=" + UPDATED_CONTACT_TEMOIN,
+            "contactTemoin.doesNotContain=" + DEFAULT_CONTACT_TEMOIN
         );
     }
 
     @Test
     @Transactional
-    void getAllDegradationsByDateSignalementIsEqualToSomething() throws Exception {
+    void getAllDegradationsByTypeAnomalieIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedDegradation = degradationRepository.saveAndFlush(degradation);
 
-        // Get all the degradationList where dateSignalement equals to
+        // Get all the degradationList where typeAnomalie equals to
+        defaultDegradationFiltering("typeAnomalie.equals=" + DEFAULT_TYPE_ANOMALIE, "typeAnomalie.equals=" + UPDATED_TYPE_ANOMALIE);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByTypeAnomalieIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where typeAnomalie in
         defaultDegradationFiltering(
-            "dateSignalement.equals=" + DEFAULT_DATE_SIGNALEMENT,
-            "dateSignalement.equals=" + UPDATED_DATE_SIGNALEMENT
+            "typeAnomalie.in=" + DEFAULT_TYPE_ANOMALIE + "," + UPDATED_TYPE_ANOMALIE,
+            "typeAnomalie.in=" + UPDATED_TYPE_ANOMALIE
         );
     }
 
     @Test
     @Transactional
-    void getAllDegradationsByDateSignalementIsInShouldWork() throws Exception {
+    void getAllDegradationsByTypeAnomalieIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedDegradation = degradationRepository.saveAndFlush(degradation);
 
-        // Get all the degradationList where dateSignalement in
+        // Get all the degradationList where typeAnomalie is not null
+        defaultDegradationFiltering("typeAnomalie.specified=true", "typeAnomalie.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByTypeAnomalieContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where typeAnomalie contains
+        defaultDegradationFiltering("typeAnomalie.contains=" + DEFAULT_TYPE_ANOMALIE, "typeAnomalie.contains=" + UPDATED_TYPE_ANOMALIE);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByTypeAnomalieNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where typeAnomalie does not contain
         defaultDegradationFiltering(
-            "dateSignalement.in=" + DEFAULT_DATE_SIGNALEMENT + "," + UPDATED_DATE_SIGNALEMENT,
-            "dateSignalement.in=" + UPDATED_DATE_SIGNALEMENT
+            "typeAnomalie.doesNotContain=" + UPDATED_TYPE_ANOMALIE,
+            "typeAnomalie.doesNotContain=" + DEFAULT_TYPE_ANOMALIE
         );
     }
 
     @Test
     @Transactional
-    void getAllDegradationsByDateSignalementIsNullOrNotNull() throws Exception {
+    void getAllDegradationsByPrioriteIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedDegradation = degradationRepository.saveAndFlush(degradation);
 
-        // Get all the degradationList where dateSignalement is not null
-        defaultDegradationFiltering("dateSignalement.specified=true", "dateSignalement.specified=false");
+        // Get all the degradationList where priorite equals to
+        defaultDegradationFiltering("priorite.equals=" + DEFAULT_PRIORITE, "priorite.equals=" + UPDATED_PRIORITE);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByPrioriteIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where priorite in
+        defaultDegradationFiltering("priorite.in=" + DEFAULT_PRIORITE + "," + UPDATED_PRIORITE, "priorite.in=" + UPDATED_PRIORITE);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByPrioriteIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where priorite is not null
+        defaultDegradationFiltering("priorite.specified=true", "priorite.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByPrioriteContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where priorite contains
+        defaultDegradationFiltering("priorite.contains=" + DEFAULT_PRIORITE, "priorite.contains=" + UPDATED_PRIORITE);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByPrioriteNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where priorite does not contain
+        defaultDegradationFiltering("priorite.doesNotContain=" + UPDATED_PRIORITE, "priorite.doesNotContain=" + DEFAULT_PRIORITE);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByPorteurIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where porteur equals to
+        defaultDegradationFiltering("porteur.equals=" + DEFAULT_PORTEUR, "porteur.equals=" + UPDATED_PORTEUR);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByPorteurIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where porteur in
+        defaultDegradationFiltering("porteur.in=" + DEFAULT_PORTEUR + "," + UPDATED_PORTEUR, "porteur.in=" + UPDATED_PORTEUR);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByPorteurIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where porteur is not null
+        defaultDegradationFiltering("porteur.specified=true", "porteur.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByPorteurContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where porteur contains
+        defaultDegradationFiltering("porteur.contains=" + DEFAULT_PORTEUR, "porteur.contains=" + UPDATED_PORTEUR);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByPorteurNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where porteur does not contain
+        defaultDegradationFiltering("porteur.doesNotContain=" + UPDATED_PORTEUR, "porteur.doesNotContain=" + DEFAULT_PORTEUR);
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByActionsEffectueesIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where actionsEffectuees equals to
+        defaultDegradationFiltering(
+            "actionsEffectuees.equals=" + DEFAULT_ACTIONS_EFFECTUEES,
+            "actionsEffectuees.equals=" + UPDATED_ACTIONS_EFFECTUEES
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByActionsEffectueesIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where actionsEffectuees in
+        defaultDegradationFiltering(
+            "actionsEffectuees.in=" + DEFAULT_ACTIONS_EFFECTUEES + "," + UPDATED_ACTIONS_EFFECTUEES,
+            "actionsEffectuees.in=" + UPDATED_ACTIONS_EFFECTUEES
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByActionsEffectueesIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where actionsEffectuees is not null
+        defaultDegradationFiltering("actionsEffectuees.specified=true", "actionsEffectuees.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByActionsEffectueesContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where actionsEffectuees contains
+        defaultDegradationFiltering(
+            "actionsEffectuees.contains=" + DEFAULT_ACTIONS_EFFECTUEES,
+            "actionsEffectuees.contains=" + UPDATED_ACTIONS_EFFECTUEES
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsByActionsEffectueesNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDegradation = degradationRepository.saveAndFlush(degradation);
+
+        // Get all the degradationList where actionsEffectuees does not contain
+        defaultDegradationFiltering(
+            "actionsEffectuees.doesNotContain=" + UPDATED_ACTIONS_EFFECTUEES,
+            "actionsEffectuees.doesNotContain=" + DEFAULT_ACTIONS_EFFECTUEES
+        );
     }
 
     @Test
@@ -336,6 +687,50 @@ class DegradationResourceIT {
         defaultDegradationFiltering("statut.doesNotContain=" + UPDATED_STATUT, "statut.doesNotContain=" + DEFAULT_STATUT);
     }
 
+    @Test
+    @Transactional
+    void getAllDegradationsByUtilisateurIsEqualToSomething() throws Exception {
+        Utilisateur utilisateur;
+        if (TestUtil.findAll(em, Utilisateur.class).isEmpty()) {
+            degradationRepository.saveAndFlush(degradation);
+            utilisateur = UtilisateurResourceIT.createEntity();
+        } else {
+            utilisateur = TestUtil.findAll(em, Utilisateur.class).get(0);
+        }
+        em.persist(utilisateur);
+        em.flush();
+        degradation.setUtilisateur(utilisateur);
+        degradationRepository.saveAndFlush(degradation);
+        Long utilisateurId = utilisateur.getId();
+        // Get all the degradationList where utilisateur equals to utilisateurId
+        defaultDegradationShouldBeFound("utilisateurId.equals=" + utilisateurId);
+
+        // Get all the degradationList where utilisateur equals to (utilisateurId + 1)
+        defaultDegradationShouldNotBeFound("utilisateurId.equals=" + (utilisateurId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllDegradationsBySiteIsEqualToSomething() throws Exception {
+        Site site;
+        if (TestUtil.findAll(em, Site.class).isEmpty()) {
+            degradationRepository.saveAndFlush(degradation);
+            site = SiteResourceIT.createEntity();
+        } else {
+            site = TestUtil.findAll(em, Site.class).get(0);
+        }
+        em.persist(site);
+        em.flush();
+        degradation.setSite(site);
+        degradationRepository.saveAndFlush(degradation);
+        Long siteId = site.getId();
+        // Get all the degradationList where site equals to siteId
+        defaultDegradationShouldBeFound("siteId.equals=" + siteId);
+
+        // Get all the degradationList where site equals to (siteId + 1)
+        defaultDegradationShouldNotBeFound("siteId.equals=" + (siteId + 1));
+    }
+
     private void defaultDegradationFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
         defaultDegradationShouldBeFound(shouldBeFound);
         defaultDegradationShouldNotBeFound(shouldNotBeFound);
@@ -350,8 +745,12 @@ class DegradationResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(degradation.getId().intValue())))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
-            .andExpect(jsonPath("$.[*].dateSignalement").value(hasItem(DEFAULT_DATE_SIGNALEMENT.toString())))
+            .andExpect(jsonPath("$.[*].localite").value(hasItem(DEFAULT_LOCALITE)))
+            .andExpect(jsonPath("$.[*].contactTemoin").value(hasItem(DEFAULT_CONTACT_TEMOIN)))
+            .andExpect(jsonPath("$.[*].typeAnomalie").value(hasItem(DEFAULT_TYPE_ANOMALIE)))
+            .andExpect(jsonPath("$.[*].priorite").value(hasItem(DEFAULT_PRIORITE)))
+            .andExpect(jsonPath("$.[*].porteur").value(hasItem(DEFAULT_PORTEUR)))
+            .andExpect(jsonPath("$.[*].actionsEffectuees").value(hasItem(DEFAULT_ACTIONS_EFFECTUEES)))
             .andExpect(jsonPath("$.[*].statut").value(hasItem(DEFAULT_STATUT)));
 
         // Check, that the count call also returns 1
@@ -400,7 +799,14 @@ class DegradationResourceIT {
         Degradation updatedDegradation = degradationRepository.findById(degradation.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedDegradation are not directly saved in db
         em.detach(updatedDegradation);
-        updatedDegradation.description(UPDATED_DESCRIPTION).dateSignalement(UPDATED_DATE_SIGNALEMENT).statut(UPDATED_STATUT);
+        updatedDegradation
+            .localite(UPDATED_LOCALITE)
+            .contactTemoin(UPDATED_CONTACT_TEMOIN)
+            .typeAnomalie(UPDATED_TYPE_ANOMALIE)
+            .priorite(UPDATED_PRIORITE)
+            .porteur(UPDATED_PORTEUR)
+            .actionsEffectuees(UPDATED_ACTIONS_EFFECTUEES)
+            .statut(UPDATED_STATUT);
         DegradationDTO degradationDTO = degradationMapper.toDto(updatedDegradation);
 
         restDegradationMockMvc
@@ -490,7 +896,11 @@ class DegradationResourceIT {
         Degradation partialUpdatedDegradation = new Degradation();
         partialUpdatedDegradation.setId(degradation.getId());
 
-        partialUpdatedDegradation.description(UPDATED_DESCRIPTION).dateSignalement(UPDATED_DATE_SIGNALEMENT);
+        partialUpdatedDegradation
+            .localite(UPDATED_LOCALITE)
+            .contactTemoin(UPDATED_CONTACT_TEMOIN)
+            .priorite(UPDATED_PRIORITE)
+            .porteur(UPDATED_PORTEUR);
 
         restDegradationMockMvc
             .perform(
@@ -521,7 +931,14 @@ class DegradationResourceIT {
         Degradation partialUpdatedDegradation = new Degradation();
         partialUpdatedDegradation.setId(degradation.getId());
 
-        partialUpdatedDegradation.description(UPDATED_DESCRIPTION).dateSignalement(UPDATED_DATE_SIGNALEMENT).statut(UPDATED_STATUT);
+        partialUpdatedDegradation
+            .localite(UPDATED_LOCALITE)
+            .contactTemoin(UPDATED_CONTACT_TEMOIN)
+            .typeAnomalie(UPDATED_TYPE_ANOMALIE)
+            .priorite(UPDATED_PRIORITE)
+            .porteur(UPDATED_PORTEUR)
+            .actionsEffectuees(UPDATED_ACTIONS_EFFECTUEES)
+            .statut(UPDATED_STATUT);
 
         restDegradationMockMvc
             .perform(

@@ -62,6 +62,7 @@ public class DelaiInterventionAsserts {
     public static void assertDelaiInterventionUpdatableRelationshipsEquals(DelaiIntervention expected, DelaiIntervention actual) {
         assertThat(actual)
             .as("Verify DelaiIntervention relationships")
-            .satisfies(a -> assertThat(a.getDegradation()).as("check degradation").isEqualTo(expected.getDegradation()));
+            .satisfies(a -> assertThat(a.getDegradation()).as("check degradation").isEqualTo(expected.getDegradation()))
+            .satisfies(a -> assertThat(a.getUtilisateur()).as("check utilisateur").isEqualTo(expected.getUtilisateur()));
     }
 }

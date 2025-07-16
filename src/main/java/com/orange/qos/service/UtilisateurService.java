@@ -4,7 +4,9 @@ import com.orange.qos.domain.Utilisateur;
 import com.orange.qos.repository.UtilisateurRepository;
 import com.orange.qos.service.dto.UtilisateurDTO;
 import com.orange.qos.service.mapper.UtilisateurMapper;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -105,5 +107,10 @@ public class UtilisateurService {
     public void delete(Long id) {
         LOG.debug("Request to delete Utilisateur : {}", id);
         utilisateurRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UtilisateurDTO> findAll() {
+        return utilisateurRepository.findAll().stream().map(utilisateurMapper::toDto).collect(Collectors.toList());
     }
 }

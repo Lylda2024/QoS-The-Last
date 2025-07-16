@@ -1,7 +1,7 @@
 package com.orange.qos.service.dto;
 
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -12,11 +12,28 @@ public class DegradationDTO implements Serializable {
 
     private Long id;
 
-    private String description;
+    @NotNull
+    private String localite;
 
-    private Instant dateSignalement;
+    @NotNull
+    private String contactTemoin;
+
+    @NotNull
+    private String typeAnomalie;
+
+    @NotNull
+    private String priorite;
+
+    @NotNull
+    private String porteur;
+
+    private String actionsEffectuees;
 
     private String statut;
+
+    private UtilisateurDTO utilisateur;
+
+    private SiteDTO site;
 
     public Long getId() {
         return id;
@@ -26,20 +43,52 @@ public class DegradationDTO implements Serializable {
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
+    public String getLocalite() {
+        return localite;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setLocalite(String localite) {
+        this.localite = localite;
     }
 
-    public Instant getDateSignalement() {
-        return dateSignalement;
+    public String getContactTemoin() {
+        return contactTemoin;
     }
 
-    public void setDateSignalement(Instant dateSignalement) {
-        this.dateSignalement = dateSignalement;
+    public void setContactTemoin(String contactTemoin) {
+        this.contactTemoin = contactTemoin;
+    }
+
+    public String getTypeAnomalie() {
+        return typeAnomalie;
+    }
+
+    public void setTypeAnomalie(String typeAnomalie) {
+        this.typeAnomalie = typeAnomalie;
+    }
+
+    public String getPriorite() {
+        return priorite;
+    }
+
+    public void setPriorite(String priorite) {
+        this.priorite = priorite;
+    }
+
+    public String getPorteur() {
+        return porteur;
+    }
+
+    public void setPorteur(String porteur) {
+        this.porteur = porteur;
+    }
+
+    public String getActionsEffectuees() {
+        return actionsEffectuees;
+    }
+
+    public void setActionsEffectuees(String actionsEffectuees) {
+        this.actionsEffectuees = actionsEffectuees;
     }
 
     public String getStatut() {
@@ -48,6 +97,22 @@ public class DegradationDTO implements Serializable {
 
     public void setStatut(String statut) {
         this.statut = statut;
+    }
+
+    public UtilisateurDTO getUtilisateur() {
+        return utilisateur;
+    }
+
+    public void setUtilisateur(UtilisateurDTO utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
+    public SiteDTO getSite() {
+        return site;
+    }
+
+    public void setSite(SiteDTO site) {
+        this.site = site;
     }
 
     @Override
@@ -76,9 +141,15 @@ public class DegradationDTO implements Serializable {
     public String toString() {
         return "DegradationDTO{" +
             "id=" + getId() +
-            ", description='" + getDescription() + "'" +
-            ", dateSignalement='" + getDateSignalement() + "'" +
+            ", localite='" + getLocalite() + "'" +
+            ", contactTemoin='" + getContactTemoin() + "'" +
+            ", typeAnomalie='" + getTypeAnomalie() + "'" +
+            ", priorite='" + getPriorite() + "'" +
+            ", porteur='" + getPorteur() + "'" +
+            ", actionsEffectuees='" + getActionsEffectuees() + "'" +
             ", statut='" + getStatut() + "'" +
+            ", utilisateur=" + getUtilisateur() +
+            ", site=" + getSite() +
             "}";
     }
 }

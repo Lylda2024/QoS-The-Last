@@ -1,61 +1,78 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild, ChangeDetectorRef, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpResponse } from '@angular/common/http';
 import * as L from 'leaflet';
 import { Subscription } from 'rxjs';
-
+import { NotificationExtendedService } from 'app/entities/notification/service/notification-extended.service';
 import { DegradationService } from 'app/entities/degradation/service/degradation.service';
 import { IDegradation } from 'app/entities/degradation/degradation.model';
 import { MapService, MapLocation } from 'app/services/map.service';
 
+import { ToastrModule } from 'ngx-toastr';
+
 @Component({
   selector: 'jhi-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [CommonModule, FormsModule, ToastrModule], // *Sans* forRoot()  templateUrl: './home.component.html',
+  templateUrl: './home.component.html', // <--- ici
+  styleUrls: ['./home.component.scss'],
 })
 export default class HomeComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef<HTMLDivElement>;
 
-  private map!: L.Map;
   private degradationService = inject(DegradationService);
   private mapService = inject(MapService);
   private cdRef = inject(ChangeDetectorRef);
+  private notifService = inject(NotificationExtendedService);
 
-  priorities: string[] = ['Critique', 'Élevée', 'Moyenne', 'Faible'];
-  selectedPriority: string = '';
-  allDegradations: IDegradation[] = [];
+  private map!: L.Map;
   markerGroup: L.LayerGroup = L.layerGroup();
 
-  private degradationSubscription?: Subscription;
-  private locationSubscription?: Subscription;
+  priorities: string[] = ['Critique', 'Élevée', 'Moyenne', 'Faible'];
+  selectedPriority = '';
+  allDegradations: IDegradation[] = [];
+
+  statuts: string[] = [];
+  localites: string[] = [];
+  acteurs: string[] = [];
+
+  selectedStatut = '';
+  selectedLocalite = '';
+  selectedActeur = '';
+
+  private degradationSub?: Subscription;
+  private locationSub?: Subscription;
+  private notificationIntervalId?: any;
 
   ngAfterViewInit(): void {
-    console.log('[HomeComponent] ngAfterViewInit called');
-
-    if (!this.mapContainer) {
-      console.error('❌ Élément mapContainer non trouvé');
-      return;
-    }
-
     this.fixLeafletIcons();
     this.initMap();
     this.loadDegradations();
 
-    this.locationSubscription = this.mapService.location$.subscribe(loc => {
+    this.locationSub = this.mapService.location$.subscribe(loc => {
       if (loc) {
         this.addDynamicMarker(loc);
         this.mapService.clearLocation();
       }
     });
 
-    // Empêche l'erreur NG0100
+    this.checkDelaiNotifications();
+
     setTimeout(() => this.cdRef.detectChanges(), 0);
   }
 
+  ngOnDestroy(): void {
+    this.map?.remove();
+    this.degradationSub?.unsubscribe();
+    this.locationSub?.unsubscribe();
+
+    if (this.notificationIntervalId) {
+      clearInterval(this.notificationIntervalId);
+    }
+  }
+
   private initMap(): void {
-    console.log('[HomeComponent] Initialisation de la carte...');
     this.map = L.map(this.mapContainer.nativeElement).setView([5.35, -4.02], 7);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -64,13 +81,33 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     }).addTo(this.map);
 
     this.markerGroup.addTo(this.map);
+    this.addLegend();
 
-    setTimeout(() => {
-      this.map.invalidateSize();
-    }, 100);
+    setTimeout(() => this.map.invalidateSize(), 100);
   }
 
-  fixLeafletIcons(): void {
+  private addLegend(): void {
+    const legend = new L.Control({ position: 'bottomright' });
+    legend.onAdd = () => {
+      const div = L.DomUtil.create('div', 'info legend');
+      const items: { label: string; color: string }[] = [
+        { label: 'Délai respecté', color: '#16a34a' },
+        { label: 'Délai proche (≤ 2j)', color: '#eab308' },
+        { label: 'Délai dépassé', color: '#dc2626' },
+        { label: 'Pas de délai', color: '#f9fafb' },
+        { label: 'Terminée', color: '#6b7280' },
+      ];
+      div.innerHTML =
+        '<strong>Statut délai</strong><br/>' +
+        items
+          .map(i => `<i style="background:${i.color};width:12px;height:12px;display:inline-block;margin-right:6px;"></i>${i.label}`)
+          .join('<br/>');
+      return div;
+    };
+    legend.addTo(this.map);
+  }
+
+  private fixLeafletIcons(): void {
     delete (L.Icon.Default.prototype as any)._getIconUrl;
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -79,107 +116,188 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  loadDegradations(): void {
-    this.degradationSubscription = this.degradationService.query().subscribe({
-      next: response => {
-        this.allDegradations = response.body ?? [];
+  private loadDegradations(): void {
+    this.degradationSub = this.degradationService.query().subscribe({
+      next: (res: HttpResponse<IDegradation[]>) => {
+        this.allDegradations = res.body ?? [];
+        this.extractFilterOptions();
         this.applyFilter();
+
+        // Notification après chargement
+        this.notifService.notifyDelaiAlertes(this.allDegradations);
       },
-      error: error => {
-        console.error('[HomeComponent] Erreur chargement dégradations:', error);
-      },
+      error: err => console.error('[HomeComponent] Erreur chargement dégradations :', err),
     });
   }
 
   applyFilter(): void {
     this.markerGroup.clearLayers();
 
-    const filtered = this.selectedPriority
-      ? this.allDegradations.filter(d => d.priorite?.toLowerCase() === this.selectedPriority.toLowerCase())
-      : this.allDegradations;
+    const list = this.allDegradations.filter(d => {
+      const matchPriority = this.selectedPriority ? d.priorite?.toLowerCase() === this.selectedPriority.toLowerCase() : true;
+      const matchStatut = this.selectedStatut ? d.statut?.toLowerCase() === this.selectedStatut.toLowerCase() : true;
+      const matchLocalite = this.selectedLocalite ? d.localite === this.selectedLocalite : true;
+      const matchActeur = this.selectedActeur ? d.porteur === this.selectedActeur : true;
 
-    filtered.forEach(deg => {
-      const lat = this.parseCoord(deg.site?.latitude);
-      const lng = this.parseCoord(deg.site?.longitude);
-
-      if (!isNaN(lat) && !isNaN(lng)) {
-        const color = this.getColorByPriority(deg.priorite?.toLowerCase());
-        const marker = L.circleMarker([lat, lng], {
-          radius: 8,
-          color,
-          fillColor: color,
-          fillOpacity: 0.8,
-        });
-
-        const popup = `
-          <strong>ID #${deg.id ?? '?'}</strong><br/>
-          ${deg.localite ?? '-'}<br/>
-          ${deg.typeAnomalie ?? '-'}<br/>
-          Priorité : <b>${deg.priorite ?? '-'}</b><br/>
-          <small>Lat: ${lat}, Lng: ${lng}</small>
-        `;
-
-        marker.bindPopup(popup);
-        this.markerGroup.addLayer(marker);
-      } else {
-        console.warn(`[HomeComponent] Coordonnées invalides pour la dégradation ${deg.id}`);
-      }
+      return matchPriority && matchStatut && matchLocalite && matchActeur;
     });
 
+    list.forEach(d => this.addMarkerIfValid(d));
+
     const layers = this.markerGroup.getLayers();
-    if (layers.length > 0) {
-      const group = L.featureGroup(layers as L.Layer[]);
-      this.map.fitBounds(group.getBounds().pad(0.2));
+    if (layers.length) {
+      const bounds = (L.featureGroup(layers as L.Layer[]) as any).getBounds().pad(0.2);
+      this.map.fitBounds(bounds);
     }
+
+    // Notification après filtrage
+    this.notifService.notifyDelaiAlertes(list);
   }
 
-  parseCoord(coord: string | number | undefined | null): number {
-    if (typeof coord === 'string') return parseFloat(coord);
-    if (typeof coord === 'number') return coord;
-    return NaN;
+  private addMarkerIfValid(d: IDegradation): void {
+    const lat = this.parseCoord(d.site?.latitude);
+    const lng = this.parseCoord(d.site?.longitude);
+
+    if (lat === null || lng === null) {
+      console.warn(`[HomeComponent] Coordonnées invalides pour la dégradation ${d.id}`);
+      return;
+    }
+
+    const color = this.getColorByDelayStatus(d);
+
+    const marker = L.circleMarker([lat, lng], {
+      radius: 8,
+      color,
+      fillColor: color,
+      fillOpacity: 0.85,
+    });
+
+    marker.bindPopup(
+      `<strong>ID #${d.id ?? '?'}</strong><br/>
+       Localité : ${d.localite ?? '-'}<br/>
+       Type : ${d.typeAnomalie ?? '-'}<br/>
+       Priorité : <b>${d.priorite ?? '-'}</b><br/>
+       Statut : ${d.statut ?? '-'}<br/>
+       Date limite : ${d.dateLimite ? new Date(d.dateLimite).toLocaleDateString() : '-'}<br/>
+       Responsable : ${d.porteur ?? '-'}<br/>
+       <a href="/degradation/${d.id}" target="_blank">🔎 Voir fiche</a>`,
+    );
+
+    this.markerGroup.addLayer(marker);
   }
 
-  addDynamicMarker(loc: MapLocation): void {
-    const { latitude, longitude, priorite } = loc;
-    const color = this.getColorByPriority(priorite?.toLowerCase());
-
-    const marker = L.circleMarker([latitude, longitude], {
+  private addDynamicMarker(loc: MapLocation): void {
+    const color = this.getColorByPriority(loc.priorite?.toLowerCase());
+    const marker = L.circleMarker([loc.latitude, loc.longitude], {
       radius: 10,
       color,
       fillColor: color,
       fillOpacity: 0.9,
-    });
+    }).bindPopup(
+      `<strong>Nouvelle dégradation</strong><br/>
+       Priorité : <b>${loc.priorite ?? '-'}</b><br/>
+       <small>Lat : ${loc.latitude}, Lng : ${loc.longitude}</small>`,
+    );
 
-    const popup = `
-      <strong>Nouvelle dégradation</strong><br/>
-      Priorité : <b>${priorite ?? '-'}</b><br/>
-      <small>Lat: ${latitude}, Lng: ${longitude}</small>
-    `;
-
-    marker.bindPopup(popup);
     this.markerGroup.addLayer(marker);
-    this.map.flyTo([latitude, longitude], 15);
+    this.map.flyTo([loc.latitude, loc.longitude], 15);
   }
 
-  getColorByPriority(priority: string | null | undefined): string {
-    const colors = {
+  private getColorByPriority(priority?: string | null): string {
+    const colors: Record<string, string> = {
       critique: '#dc2626',
       élevée: '#ea580c',
       moyenne: '#ca8a04',
       faible: '#16a34a',
     };
-    return colors[priority as keyof typeof colors] || '#3b82f6';
+    return priority ? (colors[priority] ?? '#3b82f6') : '#3b82f6';
+  }
+
+  private getColorByDelayStatus(degradation: IDegradation): string {
+    const now = new Date();
+    const dateLimite = degradation.dateLimite ? new Date(degradation.dateLimite) : null;
+    const statut = degradation.statut?.toLowerCase();
+
+    if (statut === 'terminée' || statut === 'clôturée') {
+      return '#6b7280'; // gris
+    }
+
+    if (!dateLimite) {
+      return '#f9fafb'; // blanc
+    }
+
+    const diffInMs = dateLimite.getTime() - now.getTime();
+    const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
+
+    if (diffInDays < 0) {
+      return '#dc2626'; // rouge
+    } else if (diffInDays <= 2) {
+      return '#eab308'; // jaune
+    } else {
+      return '#16a34a'; // vert
+    }
+  }
+
+  private parseCoord(val?: string | number | null): number | null {
+    if (val === null || val === undefined) return null;
+    let str = typeof val === 'number' ? val.toString() : val;
+    str = str.replace(',', '.').trim();
+    const n = parseFloat(str);
+    return !isFinite(n) ? null : n;
   }
 
   clearFilter(): void {
     this.selectedPriority = '';
+    this.selectedStatut = '';
+    this.selectedLocalite = '';
+    this.selectedActeur = '';
     this.applyFilter();
+    this.notifService.resetNotified();
   }
 
-  ngOnDestroy(): void {
-    console.log('[HomeComponent] Nettoyage...');
-    this.map.remove();
-    this.degradationSubscription?.unsubscribe();
-    this.locationSubscription?.unsubscribe();
+  goToUrgences(): void {
+    const urgentes = this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#dc2626');
+    if (urgentes.length) {
+      const first = urgentes[0];
+      const lat = this.parseCoord(first.site?.latitude);
+      const lng = this.parseCoord(first.site?.longitude);
+      if (lat !== null && lng !== null) {
+        this.map.flyTo([lat, lng], 15);
+      }
+    }
+  }
+
+  private extractFilterOptions(): void {
+    const unique = <T>(arr: (T | null | undefined)[]) => [...new Set(arr.filter((v): v is T => !!v))].sort();
+
+    this.statuts = unique(this.allDegradations.map(d => d.statut));
+    this.localites = unique(this.allDegradations.map(d => d.localite));
+    this.acteurs = unique(this.allDegradations.map(d => d.porteur));
+  }
+
+  get countVert(): number {
+    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#16a34a').length;
+  }
+
+  get countJaune(): number {
+    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#eab308').length;
+  }
+
+  get countRouge(): number {
+    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#dc2626').length;
+  }
+
+  get countBlanc(): number {
+    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#f9fafb').length;
+  }
+
+  get countGris(): number {
+    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#6b7280').length;
+  }
+
+  private checkDelaiNotifications(): void {
+    this.notificationIntervalId = setInterval(() => {
+      this.notifService.notifyDelaiAlertes(this.allDegradations);
+    }, 300000); // toutes les 5 minutes
   }
 }

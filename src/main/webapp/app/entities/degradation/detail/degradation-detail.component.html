@@ -6,7 +6,7 @@
       </h2>
     </div>
 
-    <div class="card-body" *ngIf="degradation() as degradationRef">
+    <div class="card-body" *ngIf="degradation as degradationRef">
       <jhi-alert-error></jhi-alert-error>
       <jhi-alert></jhi-alert>
 
@@ -43,6 +43,40 @@
           </ng-container>
         </dd>
       </dl>
+      <div class="mt-4">
+        <h4 class="mb-3" jhiTranslate="codeStageApp.delaiIntervention.home.title">Délais d’intervention</h4>
+
+        <div *ngIf="delais.length > 0; else noDelai">
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th><span jhiTranslate="codeStageApp.delaiIntervention.dateDebut">Date début</span></th>
+                  <th><span jhiTranslate="codeStageApp.delaiIntervention.dateLimite">Date limite</span></th>
+                  <th><span jhiTranslate="codeStageApp.delaiIntervention.commentaire">Commentaire</span></th>
+                  <th><span jhiTranslate="codeStageApp.delaiIntervention.statut">Statut</span></th>
+                  <th><span jhiTranslate="codeStageApp.delaiIntervention.acteur">Acteur</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let delai of delais">
+                  <td>{{ delai.dateDebut?.toDate() | date: 'short' }}</td>
+                  <td>{{ delai.dateLimite?.toDate() | date: 'short' }}</td>
+                  <td>{{ delai.commentaire }}</td>
+                  <td>{{ delai.statut }}</td>
+                  <td>{{ delai.acteur?.nom }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <ng-template #noDelai>
+          <div class="alert alert-info">
+            <span jhiTranslate="codeStageApp.delaiIntervention.home.notFound">Aucun délai d’intervention trouvé.</span>
+          </div>
+        </ng-template>
+      </div>
 
       <div class="mt-4 d-flex justify-content-between">
         <button type="button" (click)="previousState()" class="btn btn-outline-secondary" data-cy="entityDetailsBackButton">

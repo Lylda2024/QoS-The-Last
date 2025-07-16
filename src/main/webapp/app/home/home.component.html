@@ -1,33 +1,87 @@
 <div class="container mt-4">
-  <!-- Filtre par priorité -->
-  <div class="row justify-content-center mb-3">
-    <div class="col-md-6 col-lg-5">
-      <label for="priorityFilter" class="form-label fw-semibold text-secondary">
-        <i class="fa-solid fa-filter me-1 text-primary"></i> Filtrer par priorité
-      </label>
-      <div class="input-group">
-        <select
-          id="priorityFilter"
-          [(ngModel)]="selectedPriority"
-          (change)="applyFilter()"
-          class="form-select"
-          aria-label="Filtrer par priorité"
-        >
+  <div class="row justify-content-center mb-4">
+    <!-- 🟢 Filtres -->
+    <div class="col-lg-5">
+      <div class="card shadow-sm p-3">
+        <label for="priorityFilter" class="form-label fw-semibold text-secondary">
+          <i class="fa-solid fa-filter me-1 text-primary"></i> Filtrer par priorité
+        </label>
+        <select id="priorityFilter" [(ngModel)]="selectedPriority" (change)="applyFilter()" class="form-select mb-3">
           <option value="">Toutes les priorités</option>
           <option *ngFor="let priority of priorities" [value]="priority">{{ priority }}</option>
         </select>
-        <button type="button" class="btn btn-outline-secondary" (click)="clearFilter()" title="Réinitialiser le filtre">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+
+        <label class="form-label fw-semibold text-secondary"> <i class="fa-solid fa-flag me-1 text-warning"></i> Filtrer par statut </label>
+        <select class="form-select mb-3" [(ngModel)]="selectedStatut" (change)="applyFilter()">
+          <option value="">Tous les statuts</option>
+          <option *ngFor="let s of statuts" [value]="s">{{ s }}</option>
+        </select>
+
+        <label class="form-label fw-semibold text-secondary">
+          <i class="fa-solid fa-map-pin me-1 text-danger"></i> Filtrer par localité
+        </label>
+        <select class="form-select mb-3" [(ngModel)]="selectedLocalite" (change)="applyFilter()">
+          <option value="">Toutes les localités</option>
+          <option *ngFor="let l of localites" [value]="l">{{ l }}</option>
+        </select>
+
+        <label class="form-label fw-semibold text-secondary">
+          <i class="fa-solid fa-user-tie me-1 text-success"></i> Filtrer par responsable
+        </label>
+        <select class="form-select mb-3" [(ngModel)]="selectedActeur" (change)="applyFilter()">
+          <option value="">Tous les acteurs</option>
+          <option *ngFor="let a of acteurs" [value]="a">{{ a }}</option>
+        </select>
+
+        <div class="text-end">
+          <button class="btn btn-outline-secondary" (click)="clearFilter()"><i class="fa-solid fa-xmark"></i> Réinitialiser</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🗺️ Carte + 📊 Résumé -->
+    <div class="col-lg-7">
+      <!-- 🗺️ Carte -->
+      <div #mapContainer id="mapContainer" class="rounded shadow border mb-4" style="height: 70vh; width: 100%"></div>
+
+      <!-- 📊 Résumé -->
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-primary mb-3"><i class="fa-solid fa-chart-simple me-2"></i>Résumé</h5>
+
+          <ul class="list-group list-group-flush small mb-3">
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Total :</span>
+              <span class="fw-bold">{{ allDegradations.length }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>🟢 Délai respecté :</span>
+              <span>{{ countVert }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>🟡 Délai proche :</span>
+              <span>{{ countJaune }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>🔴 Délai dépassé :</span>
+              <span>{{ countRouge }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>⚪ Sans délai :</span>
+              <span>{{ countBlanc }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>⚫ Terminées :</span>
+              <span>{{ countGris }}</span>
+            </li>
+          </ul>
+
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-danger" (click)="goToUrgences()">🚨 Urgences</button>
+            <a class="btn btn-primary" routerLink="/degradation">📋 Voir tout</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- Carte Leaflet -->
-  <div
-    #mapContainer
-    id="mapContainer"
-    class="rounded shadow border"
-    style="height: 300px; width: 100%; max-width: 900px; margin: 0 auto"
-  ></div>
 </div>

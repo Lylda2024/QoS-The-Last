@@ -2,7 +2,7 @@ import dayjs from 'dayjs/esm';
 import { IDegradation } from 'app/entities/degradation/degradation.model';
 
 export interface INotification {
-  id: number;
+  id: number | null;
   type?: string | null;
   message?: string | null;
   dateEnvoi?: dayjs.Dayjs | null;

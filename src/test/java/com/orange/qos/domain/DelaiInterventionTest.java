@@ -2,6 +2,7 @@ package com.orange.qos.domain;
 
 import static com.orange.qos.domain.DegradationTestSamples.*;
 import static com.orange.qos.domain.DelaiInterventionTestSamples.*;
+import static com.orange.qos.domain.UtilisateurTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.orange.qos.web.rest.TestUtil;
@@ -33,5 +34,17 @@ class DelaiInterventionTest {
 
         delaiIntervention.degradation(null);
         assertThat(delaiIntervention.getDegradation()).isNull();
+    }
+
+    @Test
+    void utilisateurTest() {
+        DelaiIntervention delaiIntervention = getDelaiInterventionRandomSampleGenerator();
+        Utilisateur utilisateurBack = getUtilisateurRandomSampleGenerator();
+
+        delaiIntervention.setUtilisateur(utilisateurBack);
+        assertThat(delaiIntervention.getUtilisateur()).isEqualTo(utilisateurBack);
+
+        delaiIntervention.utilisateur(null);
+        assertThat(delaiIntervention.getUtilisateur()).isNull();
     }
 }

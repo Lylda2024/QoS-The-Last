@@ -13,6 +13,9 @@ import {
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideToastr } from 'ngx-toastr';
+
 import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 
 import './config/dayjs';
@@ -52,7 +55,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes, ...routerFeatures),
     importProvidersFrom(BrowserModule),
-    // Set this to true to enable service worker (PWA)
+    // PWA service worker
     importProvidersFrom(ServiceWorkerModule.register('ngsw-worker.js', { enabled: false })),
     importProvidersFrom(TranslationModule),
     provideHttpClient(withInterceptorsFromDi()),
@@ -62,7 +65,7 @@ export const appConfig: ApplicationConfig = {
     httpInterceptorProviders,
     { provide: TitleStrategy, useClass: AppPageTitleStrategy },
 
-    // ✅ FontAwesome support
+    // FontAwesome support
     importProvidersFrom(FontAwesomeModule),
     {
       provide: 'fa-icon-init',
@@ -71,6 +74,15 @@ export const appConfig: ApplicationConfig = {
       },
       deps: [FaIconLibrary],
     },
+
+    // ** Ajout ngx-toastr ici **
+    provideAnimations(), // obligatoire pour ngx-toastr
+    provideToastr({
+      positionClass: 'toast-bottom-right',
+      closeButton: true,
+      progressBar: true,
+      timeOut: 6000,
+    }),
 
     // jhipster-needle-angular-add-module JHipster will add new module here
   ],

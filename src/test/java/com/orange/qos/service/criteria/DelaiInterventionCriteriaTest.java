@@ -80,8 +80,8 @@ class DelaiInterventionCriteriaTest {
         delaiInterventionCriteria.dateLimite();
         delaiInterventionCriteria.commentaire();
         delaiInterventionCriteria.statut();
-        delaiInterventionCriteria.acteurId();
         delaiInterventionCriteria.degradationId();
+        delaiInterventionCriteria.utilisateurId();
         delaiInterventionCriteria.distinct();
     }
 
@@ -93,8 +93,8 @@ class DelaiInterventionCriteriaTest {
                 condition.apply(criteria.getDateLimite()) &&
                 condition.apply(criteria.getCommentaire()) &&
                 condition.apply(criteria.getStatut()) &&
-                condition.apply(criteria.getActeurId()) &&
                 condition.apply(criteria.getDegradationId()) &&
+                condition.apply(criteria.getUtilisateurId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -111,8 +111,8 @@ class DelaiInterventionCriteriaTest {
                 condition.apply(criteria.getDateLimite(), copy.getDateLimite()) &&
                 condition.apply(criteria.getCommentaire(), copy.getCommentaire()) &&
                 condition.apply(criteria.getStatut(), copy.getStatut()) &&
-                condition.apply(criteria.getActeurId(), copy.getActeurId()) &&
                 condition.apply(criteria.getDegradationId(), copy.getDegradationId()) &&
+                condition.apply(criteria.getUtilisateurId(), copy.getUtilisateurId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

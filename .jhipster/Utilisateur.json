@@ -28,6 +28,7 @@
   ],
   "jpaMetamodelFiltering": true,
   "name": "Utilisateur",
+  "pagination": "pagination",
   "relationships": [
     {
       "otherEntityName": "typeUtilisateur",

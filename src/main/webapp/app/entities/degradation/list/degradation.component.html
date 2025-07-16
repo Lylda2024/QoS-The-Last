@@ -15,7 +15,7 @@
         [routerLink]="['/degradation/new']"
       >
         <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="codeStageApp.degradation.home.createLabel">Créer un nouveau Degradation</span>
+        <span jhiTranslate="codeStageApp.degradation.home.createLabel">Créer</span>
       </button>
     </div>
   </h2>
@@ -24,7 +24,7 @@
   <jhi-alert></jhi-alert>
 
   <div *ngIf="degradations.length === 0; else tableBlock" class="alert alert-warning" id="no-result">
-    <span jhiTranslate="codeStageApp.degradation.home.notFound">Aucun Degradation trouvé</span>
+    <span jhiTranslate="codeStageApp.degradation.home.notFound">Aucune Degradation trouvée</span>
   </div>
 
   <ng-template #tableBlock>
@@ -34,15 +34,12 @@
           <thead>
             <tr>
               <th>ID</th>
-              <!-- <th>Numéro</th> supprimé -->
               <th>Localité</th>
               <th>Contact</th>
               <th>Type</th>
               <th>Priorité</th>
-              <!-- <th>Problème</th> supprimé -->
               <th>Porteur</th>
               <th>Actions</th>
-              <!-- <th>Utilisateur</th> supprimé -->
               <th>Site</th>
               <th class="text-end">Actions</th>
             </tr>
@@ -52,19 +49,12 @@
               <td>
                 <a [routerLink]="['/degradation', degradation.id, 'view']">{{ degradation.id }}</a>
               </td>
-              <!-- <td>{{ degradation.numero }}</td> supprimé -->
               <td>{{ degradation.localite }}</td>
               <td>{{ degradation.contactTemoin }}</td>
               <td>{{ degradation.typeAnomalie }}</td>
               <td>{{ degradation.priorite }}</td>
-              <!-- <td>{{ degradation.problem }}</td> supprimé -->
               <td>{{ degradation.porteur }}</td>
               <td>{{ degradation.actionsEffectuees }}</td>
-              <!-- <td>
-              <a *ngIf="degradation.utilisateur" [routerLink]="['/utilisateur', degradation.utilisateur.id, 'view']">
-                {{ degradation.utilisateur.id }}
-              </a>
-            </td> supprimé -->
               <td>
                 <a *ngIf="degradation.site" [routerLink]="['/site', degradation.site.id, 'view']">
                   {{ degradation.site.id }}
@@ -84,9 +74,13 @@
                     <fa-icon icon="times"></fa-icon>
                     <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
                   </button>
-                  <button type="button" (click)="showOnMap(degradation)" class="btn btn-secondary btn-sm" title="Afficher sur la carte">
-                    <fa-icon icon="map-marker-alt"></fa-icon>
-                    <span class="d-none d-md-inline">Carte</span>
+                  <button
+                    type="button"
+                    (click)="ouvrirFormulaireDelai(degradation.id)"
+                    class="btn btn-secondary btn-sm"
+                    title="Afficher sur la carte"
+                  >
+                    <span class="d-none d-md-inline">Prolonger/Transférez</span>
                   </button>
                 </div>
               </td>

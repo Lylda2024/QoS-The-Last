@@ -1,0 +1,46 @@
+<form [formGroup]="editForm" (ngSubmit)="save()">
+  <div class="form-group">
+    <label for="dateDebut">Date de début</label>
+    <input id="dateDebut" type="datetime-local" class="form-control" formControlName="dateDebut" placeholder="Choisir la date de début" />
+    <div class="text-danger" *ngIf="editForm.get('dateDebut')?.invalid && editForm.get('dateDebut')?.touched">
+      La date de début est requise.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="dateLimite">Date limite</label>
+    <input id="dateLimite" type="datetime-local" class="form-control" formControlName="dateLimite" placeholder="Choisir la date limite" />
+    <div class="text-danger" *ngIf="editForm.get('dateLimite')?.invalid && editForm.get('dateLimite')?.touched">
+      La date limite est requise.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="commentaire">Commentaire</label>
+    <textarea id="commentaire" class="form-control" formControlName="commentaire" rows="3"></textarea>
+    <div class="text-danger" *ngIf="editForm.get('commentaire')?.invalid && editForm.get('commentaire')?.touched">
+      <div *ngIf="editForm.get('commentaire')?.errors?.['required']">Le commentaire est requis.</div>
+      <div *ngIf="editForm.get('commentaire')?.errors?.['minlength']">Minimum 5 caractères requis.</div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="statut">Statut</label>
+    <select id="statut" class="form-control" formControlName="statut">
+      <option [ngValue]="null">-- Sélectionner un statut --</option>
+      <option *ngFor="let s of statutOptions" [value]="s">{{ s }}</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="acteur">Acteur</label>
+    <select id="acteur" class="form-control" formControlName="acteur" [compareWith]="compareUtilisateurs">
+      <option [ngValue]="null">-- Choisir un acteur --</option>
+      <option *ngFor="let user of utilisateurs" [ngValue]="user">{{ user.nom }} {{ user.prenom }} ({{ user.email }})</option>
+    </select>
+    <div class="text-danger" *ngIf="editForm.get('acteur')?.invalid && editForm.get('acteur')?.touched">L’acteur est requis.</div>
+  </div>
+
+  <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid || isSaving">Sauvegarder</button>
+  <button type="button" class="btn btn-secondary" (click)="previousState()">Annuler</button>
+</form>

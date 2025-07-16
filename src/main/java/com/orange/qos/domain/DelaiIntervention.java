@@ -1,6 +1,7 @@
 package com.orange.qos.domain;
 
-import com.orange.qos.domain.enumeration.StatutIntervention;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.orange.qos.domain.enumeration.StatutDelai;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -35,13 +36,15 @@ public class DelaiIntervention implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "statut")
-    private StatutIntervention statut;
+    private StatutDelai statut;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User acteur;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "utilisateur", "site" }, allowSetters = true)
     private Degradation degradation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "typeUtilisateur", "roles" }, allowSetters = true)
+    private Utilisateur utilisateur;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -97,30 +100,17 @@ public class DelaiIntervention implements Serializable {
         this.commentaire = commentaire;
     }
 
-    public StatutIntervention getStatut() {
+    public StatutDelai getStatut() {
         return this.statut;
     }
 
-    public DelaiIntervention statut(StatutIntervention statut) {
+    public DelaiIntervention statut(StatutDelai statut) {
         this.setStatut(statut);
         return this;
     }
 
-    public void setStatut(StatutIntervention statut) {
+    public void setStatut(StatutDelai statut) {
         this.statut = statut;
-    }
-
-    public User getActeur() {
-        return this.acteur;
-    }
-
-    public void setActeur(User user) {
-        this.acteur = user;
-    }
-
-    public DelaiIntervention acteur(User user) {
-        this.setActeur(user);
-        return this;
     }
 
     public Degradation getDegradation() {
@@ -133,6 +123,19 @@ public class DelaiIntervention implements Serializable {
 
     public DelaiIntervention degradation(Degradation degradation) {
         this.setDegradation(degradation);
+        return this;
+    }
+
+    public Utilisateur getUtilisateur() {
+        return this.utilisateur;
+    }
+
+    public void setUtilisateur(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
+    public DelaiIntervention utilisateur(Utilisateur utilisateur) {
+        this.setUtilisateur(utilisateur);
         return this;
     }
 

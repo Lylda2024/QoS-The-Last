@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+           http://www.liquibase.org/xml/ns/dbchangelog
+           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="20250714-1" author="ton_nom">
+    <createTable tableName="delai_intervention">
+      <column name="id" type="bigserial">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="date_debut" type="timestamp without time zone">
+        <constraints nullable="false"/>
+      </column>
+      <column name="date_limite" type="timestamp without time zone">
+        <constraints nullable="false"/>
+      </column>
+      <column name="commentaire" type="varchar(255)"/>
+      <column name="statut" type="varchar(255)"/>
+      <column name="degradation_id" type="bigint"/>
+      <column name="utilisateur_id" type="bigint"/>
+    </createTable>
+
+    <addForeignKeyConstraint baseTableName="delai_intervention"
+                             baseColumnNames="degradation_id"
+                             constraintName="fk_delai_intervention_degradation"
+                             referencedTableName="degradation"
+                             referencedColumnNames="id"
+                             deferrable="false" initiallyDeferred="false" />
+
+    <addForeignKeyConstraint baseTableName="delai_intervention"
+                             baseColumnNames="utilisateur_id"
+                             constraintName="fk_delai_intervention_utilisateur"
+                             referencedTableName="utilisateur"
+                             referencedColumnNames="id"
+                             deferrable="false" initiallyDeferred="false" />
+  </changeSet>
+
+</databaseChangeLog>

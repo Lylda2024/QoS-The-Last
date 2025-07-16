@@ -27,7 +27,12 @@ public class SiteDTO implements Serializable {
 
     private String technologie;
 
+    private String ville; // ✅ Ajouté
+    private String typeSite; // ✅ Ajouté
+
     private Boolean enService;
+
+    // Getters / Setters
 
     public Long getId() {
         return id;
@@ -85,6 +90,22 @@ public class SiteDTO implements Serializable {
         this.technologie = technologie;
     }
 
+    public String getVille() {
+        return ville;
+    }
+
+    public void setVille(String ville) {
+        this.ville = ville;
+    }
+
+    public String getTypeSite() {
+        return typeSite;
+    }
+
+    public void setTypeSite(String typeSite) {
+        this.typeSite = typeSite;
+    }
+
     public Boolean getEnService() {
         return enService;
     }
@@ -93,39 +114,52 @@ public class SiteDTO implements Serializable {
         this.enService = enService;
     }
 
+    // equals, hashCode, toString
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof SiteDTO)) {
-            return false;
-        }
-
+        if (this == o) return true;
+        if (!(o instanceof SiteDTO)) return false;
         SiteDTO siteDTO = (SiteDTO) o;
-        if (this.id == null) {
-            return false;
-        }
-        return Objects.equals(this.id, siteDTO.id);
+        return id != null && Objects.equals(id, siteDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id);
+        return Objects.hash(id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "SiteDTO{" +
-            "id=" + getId() +
-            ", nomSite='" + getNomSite() + "'" +
-            ", codeOCI='" + getCodeOCI() + "'" +
-            ", longitude=" + getLongitude() +
-            ", latitude=" + getLatitude() +
-            ", statut='" + getStatut() + "'" +
-            ", technologie='" + getTechnologie() + "'" +
-            ", enService='" + getEnService() + "'" +
-            "}";
+        return (
+            "SiteDTO{" +
+            "id=" +
+            id +
+            ", nomSite='" +
+            nomSite +
+            '\'' +
+            ", codeOCI='" +
+            codeOCI +
+            '\'' +
+            ", longitude=" +
+            longitude +
+            ", latitude=" +
+            latitude +
+            ", statut='" +
+            statut +
+            '\'' +
+            ", technologie='" +
+            technologie +
+            '\'' +
+            ", ville='" +
+            ville +
+            '\'' +
+            ", typeSite='" +
+            typeSite +
+            '\'' +
+            ", enService=" +
+            enService +
+            '}'
+        );
     }
 }

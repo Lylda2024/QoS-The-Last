@@ -7,6 +7,7 @@ import com.orange.qos.security.AuthoritiesConstants;
 import com.orange.qos.service.MailService;
 import com.orange.qos.service.UserService;
 import com.orange.qos.service.dto.AdminUserDTO;
+import com.orange.qos.service.dto.UserDTO;
 import com.orange.qos.web.rest.errors.BadRequestAlertException;
 import com.orange.qos.web.rest.errors.EmailAlreadyUsedException;
 import com.orange.qos.web.rest.errors.LoginAlreadyUsedException;
@@ -204,5 +205,13 @@ public class UserResource {
         LOG.debug("REST request to delete User: {}", login);
         userService.deleteUser(login);
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, "userManagement.deleted", login)).build();
+    }
+
+    @GetMapping("/users-public")
+    @PreAuthorize("hasAuthority(\"ROLE_USER\")") // ou sans sécurité
+    public ResponseEntity<List<UserDTO>> getAllPublicUsers(Pageable pageable) {
+        Page<UserDTO> page = userService.getAllPublicUsers(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 }

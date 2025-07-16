@@ -110,7 +110,7 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "allowedCommonJsDependencies": ["leaflet"],
+            "allowedCommonJsDependencies": ["leaflet", "dayjs"],
 
             "configPath": "jest.conf.js",
             "tsConfig": "tsconfig.spec.json"

@@ -1,6 +1,6 @@
 package com.orange.qos.service.criteria;
 
-import com.orange.qos.domain.enumeration.StatutIntervention;
+import com.orange.qos.domain.enumeration.StatutDelai;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,19 +22,19 @@ import tech.jhipster.service.filter.*;
 public class DelaiInterventionCriteria implements Serializable, Criteria {
 
     /**
-     * Class for filtering StatutIntervention
+     * Class for filtering StatutDelai
      */
-    public static class StatutInterventionFilter extends Filter<StatutIntervention> {
+    public static class StatutDelaiFilter extends Filter<StatutDelai> {
 
-        public StatutInterventionFilter() {}
+        public StatutDelaiFilter() {}
 
-        public StatutInterventionFilter(StatutInterventionFilter filter) {
+        public StatutDelaiFilter(StatutDelaiFilter filter) {
             super(filter);
         }
 
         @Override
-        public StatutInterventionFilter copy() {
-            return new StatutInterventionFilter(this);
+        public StatutDelaiFilter copy() {
+            return new StatutDelaiFilter(this);
         }
     }
 
@@ -48,11 +48,11 @@ public class DelaiInterventionCriteria implements Serializable, Criteria {
 
     private StringFilter commentaire;
 
-    private StatutInterventionFilter statut;
-
-    private LongFilter acteurId;
+    private StatutDelaiFilter statut;
 
     private LongFilter degradationId;
+
+    private LongFilter utilisateurId;
 
     private Boolean distinct;
 
@@ -63,9 +63,9 @@ public class DelaiInterventionCriteria implements Serializable, Criteria {
         this.dateDebut = other.optionalDateDebut().map(InstantFilter::copy).orElse(null);
         this.dateLimite = other.optionalDateLimite().map(InstantFilter::copy).orElse(null);
         this.commentaire = other.optionalCommentaire().map(StringFilter::copy).orElse(null);
-        this.statut = other.optionalStatut().map(StatutInterventionFilter::copy).orElse(null);
-        this.acteurId = other.optionalActeurId().map(LongFilter::copy).orElse(null);
+        this.statut = other.optionalStatut().map(StatutDelaiFilter::copy).orElse(null);
         this.degradationId = other.optionalDegradationId().map(LongFilter::copy).orElse(null);
+        this.utilisateurId = other.optionalUtilisateurId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -150,42 +150,23 @@ public class DelaiInterventionCriteria implements Serializable, Criteria {
         this.commentaire = commentaire;
     }
 
-    public StatutInterventionFilter getStatut() {
+    public StatutDelaiFilter getStatut() {
         return statut;
     }
 
-    public Optional<StatutInterventionFilter> optionalStatut() {
+    public Optional<StatutDelaiFilter> optionalStatut() {
         return Optional.ofNullable(statut);
     }
 
-    public StatutInterventionFilter statut() {
+    public StatutDelaiFilter statut() {
         if (statut == null) {
-            setStatut(new StatutInterventionFilter());
+            setStatut(new StatutDelaiFilter());
         }
         return statut;
     }
 
-    public void setStatut(StatutInterventionFilter statut) {
+    public void setStatut(StatutDelaiFilter statut) {
         this.statut = statut;
-    }
-
-    public LongFilter getActeurId() {
-        return acteurId;
-    }
-
-    public Optional<LongFilter> optionalActeurId() {
-        return Optional.ofNullable(acteurId);
-    }
-
-    public LongFilter acteurId() {
-        if (acteurId == null) {
-            setActeurId(new LongFilter());
-        }
-        return acteurId;
-    }
-
-    public void setActeurId(LongFilter acteurId) {
-        this.acteurId = acteurId;
     }
 
     public LongFilter getDegradationId() {
@@ -205,6 +186,25 @@ public class DelaiInterventionCriteria implements Serializable, Criteria {
 
     public void setDegradationId(LongFilter degradationId) {
         this.degradationId = degradationId;
+    }
+
+    public LongFilter getUtilisateurId() {
+        return utilisateurId;
+    }
+
+    public Optional<LongFilter> optionalUtilisateurId() {
+        return Optional.ofNullable(utilisateurId);
+    }
+
+    public LongFilter utilisateurId() {
+        if (utilisateurId == null) {
+            setUtilisateurId(new LongFilter());
+        }
+        return utilisateurId;
+    }
+
+    public void setUtilisateurId(LongFilter utilisateurId) {
+        this.utilisateurId = utilisateurId;
     }
 
     public Boolean getDistinct() {
@@ -241,15 +241,15 @@ public class DelaiInterventionCriteria implements Serializable, Criteria {
             Objects.equals(dateLimite, that.dateLimite) &&
             Objects.equals(commentaire, that.commentaire) &&
             Objects.equals(statut, that.statut) &&
-            Objects.equals(acteurId, that.acteurId) &&
             Objects.equals(degradationId, that.degradationId) &&
+            Objects.equals(utilisateurId, that.utilisateurId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, dateDebut, dateLimite, commentaire, statut, acteurId, degradationId, distinct);
+        return Objects.hash(id, dateDebut, dateLimite, commentaire, statut, degradationId, utilisateurId, distinct);
     }
 
     // prettier-ignore
@@ -261,8 +261,8 @@ public class DelaiInterventionCriteria implements Serializable, Criteria {
             optionalDateLimite().map(f -> "dateLimite=" + f + ", ").orElse("") +
             optionalCommentaire().map(f -> "commentaire=" + f + ", ").orElse("") +
             optionalStatut().map(f -> "statut=" + f + ", ").orElse("") +
-            optionalActeurId().map(f -> "acteurId=" + f + ", ").orElse("") +
             optionalDegradationId().map(f -> "degradationId=" + f + ", ").orElse("") +
+            optionalUtilisateurId().map(f -> "utilisateurId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

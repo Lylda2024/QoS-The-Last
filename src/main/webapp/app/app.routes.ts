@@ -4,6 +4,9 @@ import { Authority } from 'app/config/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { errorRoute } from './layouts/error/error.route';
 
+// 🔁 Importation des routes entités
+import ENTITY_ROUTES from './entities/entity.routes';
+
 const routes: Routes = [
   // ➤ Redirection initiale vers /home
   {
@@ -12,34 +15,34 @@ const routes: Routes = [
     redirectTo: 'home',
   },
 
-  // ➤ Navbar dans outlet
+  // ➤ Navbar
   {
     path: '',
     loadComponent: () => import('./layouts/navbar/navbar.component'),
     outlet: 'navbar',
   },
 
-  // ➤ Composant Home (page d’accueil sécurisée)
+  // ➤ Composant Home (accueil)
   {
     path: 'home',
     loadComponent: () => import('./home/home.component'),
     canActivate: [UserRouteAccessService],
   },
 
-  // ➤ Composant Login
+  // ➤ Login
   {
     path: 'login',
     loadComponent: () => import('./login/login.component'),
     title: 'login.title',
   },
 
-  // ➤ Compte utilisateur (register, settings, etc.)
+  // ➤ Compte utilisateur
   {
     path: 'account',
     loadChildren: () => import('./account/account.route'),
   },
 
-  // ➤ Admin sécurisé (pour les ADMIN uniquement)
+  // ➤ Admin
   {
     path: 'admin',
     data: {
@@ -49,13 +52,13 @@ const routes: Routes = [
     loadChildren: () => import('./admin/admin.routes'),
   },
 
-  // ➤ Routes pour les entités métier (ex : /historique, /degradation, etc.)
+  // ➤ Routes entités métier (inclut délai)
   {
     path: '',
-    loadChildren: () => import('./entities/entity.routes'),
+    children: ENTITY_ROUTES,
   },
 
-  // ➤ Gestion des erreurs (404, etc.)
+  // ➤ Gestion des erreurs
   ...errorRoute,
 ];
 

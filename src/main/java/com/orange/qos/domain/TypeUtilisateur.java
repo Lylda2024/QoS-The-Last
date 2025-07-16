@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 
 /**
- * Modèle de données conforme au diagramme UML corrigé
+ * A TypeUtilisateur.
  */
 @Entity
 @Table(name = "type_utilisateur")

@@ -1,29 +1,24 @@
-entity Degradation {
-  description String
-  dateSignalement Instant
-  statut String
+enum StatutDelai {
+  EN_ATTENTE,
+  EN_COURS,
+  TRANSFERE,
+  TERMINE,
+  CLOTURE,
+  ANNULE
 }
 
 entity DelaiIntervention {
-  dateDebut Instant required
-  dateLimite Instant required
-  commentaire String
-  statut StatutIntervention
-}
-
-enum StatutIntervention {
-  EN_COURS,
-  TRANSFERE,
-  TERMINE
+  dateDebut Instant required,
+  dateLimite Instant required,
+  commentaire String,
+  statut StatutDelai
 }
 
 relationship ManyToOne {
-  DelaiIntervention{acteur(login)} to User with builtInEntity
-  DelaiIntervention{degradation} to Degradation
+  DelaiIntervention{degradation} to Degradation,
+  DelaiIntervention{utilisateur} to Utilisateur
 }
 
-
-dto Degradation, DelaiIntervention with mapstruct
-service Degradation, DelaiIntervention with serviceClass
-paginate Degradation, DelaiIntervention with pagination
-filter Degradation, DelaiIntervention
+paginate DelaiIntervention with pagination
+dto DelaiIntervention with mapstruct
+service DelaiIntervention with serviceClass

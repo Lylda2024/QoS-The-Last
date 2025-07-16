@@ -1,45 +1,55 @@
+// src/main/webapp/app/entities/entity.routes.ts
 import { Routes } from '@angular/router';
+
+import authorityRoutes from './admin/authority/authority.routes';
+import typeUtilisateurRoutes from './type-utilisateur/type-utilisateur.routes';
+import utilisateurRoutes from './utilisateur/utilisateur.routes';
+import roleRoutes from './role/role.routes';
+import siteRoutes from './site/site.routes';
+import degradationRoutes from './degradation/degradation.routes';
+import { delaiInterventionRoute } from './delai-intervention/delai-intervention.routes';
+import notificationRoutes from './notification/notification.routes';
 
 const routes: Routes = [
   {
     path: 'authority',
     data: { pageTitle: 'codeStageApp.adminAuthority.home.title' },
-    loadChildren: () => import('./admin/authority/authority.routes'),
+    children: authorityRoutes,
   },
   {
     path: 'type-utilisateur',
     data: { pageTitle: 'codeStageApp.typeUtilisateur.home.title' },
-    loadChildren: () => import('./type-utilisateur/type-utilisateur.routes'),
+    children: typeUtilisateurRoutes,
   },
   {
     path: 'utilisateur',
     data: { pageTitle: 'codeStageApp.utilisateur.home.title' },
-    loadChildren: () => import('./utilisateur/utilisateur.routes'),
+    children: utilisateurRoutes,
   },
   {
     path: 'role',
     data: { pageTitle: 'codeStageApp.role.home.title' },
-    loadChildren: () => import('./role/role.routes'),
+    children: roleRoutes,
   },
   {
     path: 'site',
     data: { pageTitle: 'codeStageApp.site.home.title' },
-    loadChildren: () => import('./site/site.routes'),
+    children: siteRoutes,
   },
   {
     path: 'degradation',
     data: { pageTitle: 'codeStageApp.degradation.home.title' },
-    loadChildren: () => import('./degradation/degradation.routes'),
+    children: degradationRoutes,
   },
   {
-    path: 'historique',
-    data: { pageTitle: 'codeStageApp.historique.home.title' },
-    loadChildren: () => import('./historique/historique.routes'),
+    path: 'delai-intervention',
+    data: { pageTitle: 'codeStageApp.delaiIntervention.home.title' },
+    children: delaiInterventionRoute,
   },
   {
     path: 'notification',
     data: { pageTitle: 'codeStageApp.notification.home.title' },
-    loadChildren: () => import('./notification/notification.routes'),
+    children: notificationRoutes,
   },
   /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
 ];

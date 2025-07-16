@@ -3,7 +3,6 @@
     "changelogDate": "20250620135441"
   },
   "applications": "*",
-  "documentation": "Modèle de données conforme au diagramme UML corrigé",
   "dto": "mapstruct",
   "fields": [
     {
@@ -26,6 +25,7 @@
   ],
   "jpaMetamodelFiltering": true,
   "name": "TypeUtilisateur",
+  "pagination": "pagination",
   "relationships": [],
   "searchEngine": "no",
   "service": "serviceClass"

@@ -1,6 +1,6 @@
 package com.orange.qos.service;
 
-import com.orange.qos.domain.*; // for static metamodels
+import com.orange.qos.domain.*; // pour les métamodèles statiques (DelaiIntervention_, Degradation_, Utilisateur_)
 import com.orange.qos.domain.DelaiIntervention;
 import com.orange.qos.repository.DelaiInterventionRepository;
 import com.orange.qos.service.criteria.DelaiInterventionCriteria;
@@ -50,7 +50,7 @@ public class DelaiInterventionQueryService extends QueryService<DelaiInterventio
     public Page<DelaiInterventionDTO> findByCriteria(DelaiInterventionCriteria criteria, Pageable page) {
         LOG.debug("find by criteria : {}, page: {}", criteria, page);
         final Specification<DelaiIntervention> specification = createSpecification(criteria);
-        return delaiInterventionRepository.findAll(specification, page).map(delaiInterventionMapper::toDto);
+        return delaiInterventionRepository.findAll(specification, page).map(delai -> delaiInterventionMapper.toDtoWithEtatCouleur(delai)); // ✅ lambda utilisé
     }
 
     /**
@@ -73,7 +73,6 @@ public class DelaiInterventionQueryService extends QueryService<DelaiInterventio
     protected Specification<DelaiIntervention> createSpecification(DelaiInterventionCriteria criteria) {
         Specification<DelaiIntervention> specification = Specification.where(null);
         if (criteria != null) {
-            // This has to be called first, because the distinct method returns null
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
                 buildRangeSpecification(criteria.getId(), DelaiIntervention_.id),
@@ -81,9 +80,11 @@ public class DelaiInterventionQueryService extends QueryService<DelaiInterventio
                 buildRangeSpecification(criteria.getDateLimite(), DelaiIntervention_.dateLimite),
                 buildStringSpecification(criteria.getCommentaire(), DelaiIntervention_.commentaire),
                 buildSpecification(criteria.getStatut(), DelaiIntervention_.statut),
-                buildSpecification(criteria.getActeurId(), root -> root.join(DelaiIntervention_.acteur, JoinType.LEFT).get(User_.id)),
                 buildSpecification(criteria.getDegradationId(), root ->
                     root.join(DelaiIntervention_.degradation, JoinType.LEFT).get(Degradation_.id)
+                ),
+                buildSpecification(criteria.getUtilisateurId(), root ->
+                    root.join(DelaiIntervention_.utilisateur, JoinType.LEFT).get(Utilisateur_.id)
                 )
             );
         }

@@ -24,11 +24,23 @@ public class DegradationCriteria implements Serializable, Criteria {
 
     private LongFilter id;
 
-    private StringFilter description;
+    private StringFilter localite;
 
-    private InstantFilter dateSignalement;
+    private StringFilter contactTemoin;
+
+    private StringFilter typeAnomalie;
+
+    private StringFilter priorite;
+
+    private StringFilter porteur;
+
+    private StringFilter actionsEffectuees;
 
     private StringFilter statut;
+
+    private LongFilter utilisateurId;
+
+    private LongFilter siteId;
 
     private Boolean distinct;
 
@@ -36,9 +48,15 @@ public class DegradationCriteria implements Serializable, Criteria {
 
     public DegradationCriteria(DegradationCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
-        this.description = other.optionalDescription().map(StringFilter::copy).orElse(null);
-        this.dateSignalement = other.optionalDateSignalement().map(InstantFilter::copy).orElse(null);
+        this.localite = other.optionalLocalite().map(StringFilter::copy).orElse(null);
+        this.contactTemoin = other.optionalContactTemoin().map(StringFilter::copy).orElse(null);
+        this.typeAnomalie = other.optionalTypeAnomalie().map(StringFilter::copy).orElse(null);
+        this.priorite = other.optionalPriorite().map(StringFilter::copy).orElse(null);
+        this.porteur = other.optionalPorteur().map(StringFilter::copy).orElse(null);
+        this.actionsEffectuees = other.optionalActionsEffectuees().map(StringFilter::copy).orElse(null);
         this.statut = other.optionalStatut().map(StringFilter::copy).orElse(null);
+        this.utilisateurId = other.optionalUtilisateurId().map(LongFilter::copy).orElse(null);
+        this.siteId = other.optionalSiteId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -66,42 +84,118 @@ public class DegradationCriteria implements Serializable, Criteria {
         this.id = id;
     }
 
-    public StringFilter getDescription() {
-        return description;
+    public StringFilter getLocalite() {
+        return localite;
     }
 
-    public Optional<StringFilter> optionalDescription() {
-        return Optional.ofNullable(description);
+    public Optional<StringFilter> optionalLocalite() {
+        return Optional.ofNullable(localite);
     }
 
-    public StringFilter description() {
-        if (description == null) {
-            setDescription(new StringFilter());
+    public StringFilter localite() {
+        if (localite == null) {
+            setLocalite(new StringFilter());
         }
-        return description;
+        return localite;
     }
 
-    public void setDescription(StringFilter description) {
-        this.description = description;
+    public void setLocalite(StringFilter localite) {
+        this.localite = localite;
     }
 
-    public InstantFilter getDateSignalement() {
-        return dateSignalement;
+    public StringFilter getContactTemoin() {
+        return contactTemoin;
     }
 
-    public Optional<InstantFilter> optionalDateSignalement() {
-        return Optional.ofNullable(dateSignalement);
+    public Optional<StringFilter> optionalContactTemoin() {
+        return Optional.ofNullable(contactTemoin);
     }
 
-    public InstantFilter dateSignalement() {
-        if (dateSignalement == null) {
-            setDateSignalement(new InstantFilter());
+    public StringFilter contactTemoin() {
+        if (contactTemoin == null) {
+            setContactTemoin(new StringFilter());
         }
-        return dateSignalement;
+        return contactTemoin;
     }
 
-    public void setDateSignalement(InstantFilter dateSignalement) {
-        this.dateSignalement = dateSignalement;
+    public void setContactTemoin(StringFilter contactTemoin) {
+        this.contactTemoin = contactTemoin;
+    }
+
+    public StringFilter getTypeAnomalie() {
+        return typeAnomalie;
+    }
+
+    public Optional<StringFilter> optionalTypeAnomalie() {
+        return Optional.ofNullable(typeAnomalie);
+    }
+
+    public StringFilter typeAnomalie() {
+        if (typeAnomalie == null) {
+            setTypeAnomalie(new StringFilter());
+        }
+        return typeAnomalie;
+    }
+
+    public void setTypeAnomalie(StringFilter typeAnomalie) {
+        this.typeAnomalie = typeAnomalie;
+    }
+
+    public StringFilter getPriorite() {
+        return priorite;
+    }
+
+    public Optional<StringFilter> optionalPriorite() {
+        return Optional.ofNullable(priorite);
+    }
+
+    public StringFilter priorite() {
+        if (priorite == null) {
+            setPriorite(new StringFilter());
+        }
+        return priorite;
+    }
+
+    public void setPriorite(StringFilter priorite) {
+        this.priorite = priorite;
+    }
+
+    public StringFilter getPorteur() {
+        return porteur;
+    }
+
+    public Optional<StringFilter> optionalPorteur() {
+        return Optional.ofNullable(porteur);
+    }
+
+    public StringFilter porteur() {
+        if (porteur == null) {
+            setPorteur(new StringFilter());
+        }
+        return porteur;
+    }
+
+    public void setPorteur(StringFilter porteur) {
+        this.porteur = porteur;
+    }
+
+    public StringFilter getActionsEffectuees() {
+        return actionsEffectuees;
+    }
+
+    public Optional<StringFilter> optionalActionsEffectuees() {
+        return Optional.ofNullable(actionsEffectuees);
+    }
+
+    public StringFilter actionsEffectuees() {
+        if (actionsEffectuees == null) {
+            setActionsEffectuees(new StringFilter());
+        }
+        return actionsEffectuees;
+    }
+
+    public void setActionsEffectuees(StringFilter actionsEffectuees) {
+        this.actionsEffectuees = actionsEffectuees;
     }
 
     public StringFilter getStatut() {
@@ -121,6 +215,44 @@ public class DegradationCriteria implements Serializable, Criteria {
 
     public void setStatut(StringFilter statut) {
         this.statut = statut;
+    }
+
+    public LongFilter getUtilisateurId() {
+        return utilisateurId;
+    }
+
+    public Optional<LongFilter> optionalUtilisateurId() {
+        return Optional.ofNullable(utilisateurId);
+    }
+
+    public LongFilter utilisateurId() {
+        if (utilisateurId == null) {
+            setUtilisateurId(new LongFilter());
+        }
+        return utilisateurId;
+    }
+
+    public void setUtilisateurId(LongFilter utilisateurId) {
+        this.utilisateurId = utilisateurId;
+    }
+
+    public LongFilter getSiteId() {
+        return siteId;
+    }
+
+    public Optional<LongFilter> optionalSiteId() {
+        return Optional.ofNullable(siteId);
+    }
+
+    public LongFilter siteId() {
+        if (siteId == null) {
+            setSiteId(new LongFilter());
+        }
+        return siteId;
+    }
+
+    public void setSiteId(LongFilter siteId) {
+        this.siteId = siteId;
     }
 
     public Boolean getDistinct() {
@@ -153,16 +285,34 @@ public class DegradationCriteria implements Serializable, Criteria {
         final DegradationCriteria that = (DegradationCriteria) o;
         return (
             Objects.equals(id, that.id) &&
-            Objects.equals(description, that.description) &&
-            Objects.equals(dateSignalement, that.dateSignalement) &&
+            Objects.equals(localite, that.localite) &&
+            Objects.equals(contactTemoin, that.contactTemoin) &&
+            Objects.equals(typeAnomalie, that.typeAnomalie) &&
+            Objects.equals(priorite, that.priorite) &&
+            Objects.equals(porteur, that.porteur) &&
+            Objects.equals(actionsEffectuees, that.actionsEffectuees) &&
             Objects.equals(statut, that.statut) &&
+            Objects.equals(utilisateurId, that.utilisateurId) &&
+            Objects.equals(siteId, that.siteId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, description, dateSignalement, statut, distinct);
+        return Objects.hash(
+            id,
+            localite,
+            contactTemoin,
+            typeAnomalie,
+            priorite,
+            porteur,
+            actionsEffectuees,
+            statut,
+            utilisateurId,
+            siteId,
+            distinct
+        );
     }
 
     // prettier-ignore
@@ -170,9 +320,15 @@ public class DegradationCriteria implements Serializable, Criteria {
     public String toString() {
         return "DegradationCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
-            optionalDescription().map(f -> "description=" + f + ", ").orElse("") +
-            optionalDateSignalement().map(f -> "dateSignalement=" + f + ", ").orElse("") +
+            optionalLocalite().map(f -> "localite=" + f + ", ").orElse("") +
+            optionalContactTemoin().map(f -> "contactTemoin=" + f + ", ").orElse("") +
+            optionalTypeAnomalie().map(f -> "typeAnomalie=" + f + ", ").orElse("") +
+            optionalPriorite().map(f -> "priorite=" + f + ", ").orElse("") +
+            optionalPorteur().map(f -> "porteur=" + f + ", ").orElse("") +
+            optionalActionsEffectuees().map(f -> "actionsEffectuees=" + f + ", ").orElse("") +
             optionalStatut().map(f -> "statut=" + f + ", ").orElse("") +
+            optionalUtilisateurId().map(f -> "utilisateurId=" + f + ", ").orElse("") +
+            optionalSiteId().map(f -> "siteId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

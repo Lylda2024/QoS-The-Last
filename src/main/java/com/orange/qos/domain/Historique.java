@@ -1,5 +1,6 @@
 package com.orange.qos.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -32,6 +33,7 @@ public class Historique implements Serializable {
     private Instant horodatage;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "utilisateur", "site" }, allowSetters = true)
     private Degradation degradation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

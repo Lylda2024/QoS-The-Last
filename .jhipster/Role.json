@@ -17,6 +17,7 @@
   ],
   "jpaMetamodelFiltering": true,
   "name": "Role",
+  "pagination": "pagination",
   "relationships": [
     {
       "otherEntityName": "utilisateur",

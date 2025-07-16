@@ -75,4 +75,7 @@ export class UtilisateurService {
     }
     return utilisateurCollection;
   }
+  queryActeurs(): Observable<EntityArrayResponseType> {
+    return this.http.get<IUtilisateur[]>(this.resourceUrl + '/acteurs', { observe: 'response' });
+  }
 }

@@ -21,8 +21,9 @@
     },
     {
       "fieldName": "statut",
-      "fieldType": "StatutIntervention",
-      "fieldValues": "EN_COURS,TRANSFERE,TERMINE"
+      "fieldType": "StatutDelai",
+      "fieldTypeDocumentation": "Modèle complet QoS avec gestion des délais et notifications\\nOptions métier recommandées intégrées",
+      "fieldValues": "EN_ATTENTE,EN_COURS,TRANSFERE,TERMINE,CLOTURE,ANNULE"
     }
   ],
   "jpaMetamodelFiltering": true,
@@ -30,16 +31,14 @@
   "pagination": "pagination",
   "relationships": [
     {
-      "otherEntityField": "login",
-      "otherEntityName": "user",
-      "relationshipName": "acteur",
-      "relationshipSide": "left",
-      "relationshipType": "many-to-one",
-      "relationshipWithBuiltInEntity": true
-    },
-    {
       "otherEntityName": "degradation",
       "relationshipName": "degradation",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "utilisateur",
+      "relationshipName": "utilisateur",
       "relationshipSide": "left",
       "relationshipType": "many-to-one"
     }

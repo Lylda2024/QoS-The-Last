@@ -4,7 +4,6 @@ import static com.orange.qos.domain.DelaiInterventionAsserts.*;
 import static com.orange.qos.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -12,29 +11,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.qos.IntegrationTest;
 import com.orange.qos.domain.Degradation;
 import com.orange.qos.domain.DelaiIntervention;
-import com.orange.qos.domain.User;
-import com.orange.qos.domain.enumeration.StatutIntervention;
+import com.orange.qos.domain.Utilisateur;
+import com.orange.qos.domain.enumeration.StatutDelai;
 import com.orange.qos.repository.DelaiInterventionRepository;
-import com.orange.qos.repository.UserRepository;
-import com.orange.qos.service.DelaiInterventionService;
 import com.orange.qos.service.dto.DelaiInterventionDTO;
 import com.orange.qos.service.mapper.DelaiInterventionMapper;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link DelaiInterventionResource} REST controller.
  */
 @IntegrationTest
-@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
 class DelaiInterventionResourceIT {
@@ -58,8 +48,8 @@ class DelaiInterventionResourceIT {
     private static final String DEFAULT_COMMENTAIRE = "AAAAAAAAAA";
     private static final String UPDATED_COMMENTAIRE = "BBBBBBBBBB";
 
-    private static final StatutIntervention DEFAULT_STATUT = StatutIntervention.EN_COURS;
-    private static final StatutIntervention UPDATED_STATUT = StatutIntervention.TRANSFERE;
+    private static final StatutDelai DEFAULT_STATUT = StatutDelai.EN_ATTENTE;
+    private static final StatutDelai UPDATED_STATUT = StatutDelai.EN_COURS;
 
     private static final String ENTITY_API_URL = "/api/delai-interventions";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -74,16 +64,7 @@ class DelaiInterventionResourceIT {
     private DelaiInterventionRepository delaiInterventionRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Mock
-    private DelaiInterventionRepository delaiInterventionRepositoryMock;
-
-    @Autowired
     private DelaiInterventionMapper delaiInterventionMapper;
-
-    @Mock
-    private DelaiInterventionService delaiInterventionServiceMock;
 
     @Autowired
     private EntityManager em;
@@ -228,23 +209,6 @@ class DelaiInterventionResourceIT {
             .andExpect(jsonPath("$.[*].dateLimite").value(hasItem(DEFAULT_DATE_LIMITE.toString())))
             .andExpect(jsonPath("$.[*].commentaire").value(hasItem(DEFAULT_COMMENTAIRE)))
             .andExpect(jsonPath("$.[*].statut").value(hasItem(DEFAULT_STATUT.toString())));
-    }
-
-    @SuppressWarnings({ "unchecked" })
-    void getAllDelaiInterventionsWithEagerRelationshipsIsEnabled() throws Exception {
-        when(delaiInterventionServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
-
-        restDelaiInterventionMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
-
-        verify(delaiInterventionServiceMock, times(1)).findAllWithEagerRelationships(any());
-    }
-
-    @SuppressWarnings({ "unchecked" })
-    void getAllDelaiInterventionsWithEagerRelationshipsIsNotEnabled() throws Exception {
-        when(delaiInterventionServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
-
-        restDelaiInterventionMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
-        verify(delaiInterventionRepositoryMock, times(1)).findAll(any(Pageable.class));
     }
 
     @Test
@@ -434,28 +398,6 @@ class DelaiInterventionResourceIT {
 
     @Test
     @Transactional
-    void getAllDelaiInterventionsByActeurIsEqualToSomething() throws Exception {
-        User acteur;
-        if (TestUtil.findAll(em, User.class).isEmpty()) {
-            delaiInterventionRepository.saveAndFlush(delaiIntervention);
-            acteur = UserResourceIT.createEntity();
-        } else {
-            acteur = TestUtil.findAll(em, User.class).get(0);
-        }
-        em.persist(acteur);
-        em.flush();
-        delaiIntervention.setActeur(acteur);
-        delaiInterventionRepository.saveAndFlush(delaiIntervention);
-        Long acteurId = acteur.getId();
-        // Get all the delaiInterventionList where acteur equals to acteurId
-        defaultDelaiInterventionShouldBeFound("acteurId.equals=" + acteurId);
-
-        // Get all the delaiInterventionList where acteur equals to (acteurId + 1)
-        defaultDelaiInterventionShouldNotBeFound("acteurId.equals=" + (acteurId + 1));
-    }
-
-    @Test
-    @Transactional
     void getAllDelaiInterventionsByDegradationIsEqualToSomething() throws Exception {
         Degradation degradation;
         if (TestUtil.findAll(em, Degradation.class).isEmpty()) {
@@ -474,6 +416,28 @@ class DelaiInterventionResourceIT {
 
         // Get all the delaiInterventionList where degradation equals to (degradationId + 1)
         defaultDelaiInterventionShouldNotBeFound("degradationId.equals=" + (degradationId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllDelaiInterventionsByUtilisateurIsEqualToSomething() throws Exception {
+        Utilisateur utilisateur;
+        if (TestUtil.findAll(em, Utilisateur.class).isEmpty()) {
+            delaiInterventionRepository.saveAndFlush(delaiIntervention);
+            utilisateur = UtilisateurResourceIT.createEntity();
+        } else {
+            utilisateur = TestUtil.findAll(em, Utilisateur.class).get(0);
+        }
+        em.persist(utilisateur);
+        em.flush();
+        delaiIntervention.setUtilisateur(utilisateur);
+        delaiInterventionRepository.saveAndFlush(delaiIntervention);
+        Long utilisateurId = utilisateur.getId();
+        // Get all the delaiInterventionList where utilisateur equals to utilisateurId
+        defaultDelaiInterventionShouldBeFound("utilisateurId.equals=" + utilisateurId);
+
+        // Get all the delaiInterventionList where utilisateur equals to (utilisateurId + 1)
+        defaultDelaiInterventionShouldNotBeFound("utilisateurId.equals=" + (utilisateurId + 1));
     }
 
     private void defaultDelaiInterventionFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {

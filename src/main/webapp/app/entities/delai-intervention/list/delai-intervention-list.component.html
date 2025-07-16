@@ -1,0 +1,55 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 jhiTranslate="codeStageApp.delaiIntervention.home.title">Délais d'intervention enregistrés</h3>
+  <a [routerLink]="['/delai-intervention', 'new']" class="btn btn-success" title="Ajouter un nouveau délai">
+    <fa-icon icon="plus"></fa-icon> <span jhiTranslate="entity.action.add">Ajouter</span>
+  </a>
+</div>
+
+<div class="table-responsive" *ngIf="!isLoading; else loading">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th><span jhiTranslate="global.field.id">ID</span></th>
+        <th><span jhiTranslate="codeStageApp.delaiIntervention.dateDebut">Date début</span></th>
+        <th><span jhiTranslate="codeStageApp.delaiIntervention.dateLimite">Date limite</span></th>
+        <th><span jhiTranslate="codeStageApp.delaiIntervention.commentaire">Commentaire</span></th>
+        <th><span jhiTranslate="codeStageApp.delaiIntervention.statut">Statut</span></th>
+        <th class="text-end"><span jhiTranslate="entity.action.actions">Actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let delai of delais; trackBy: trackId">
+        <td>{{ delai.id }}</td>
+        <td>
+          {{ delai.dateDebut ? (getDateAsDate(delai.dateDebut) | date: 'short') : '' }}
+        </td>
+        <td>
+          {{ delai.dateLimite ? (getDateAsDate(delai.dateLimite) | date: 'short') : '' }}
+        </td>
+        <td>{{ delai.commentaire }}</td>
+        <td>{{ delai.statut }}</td>
+        <td class="text-end">
+          <div class="btn-group" role="group">
+            <button class="btn btn-sm btn-info" title="Voir" (click)="view(delai)" type="button">
+              <fa-icon icon="eye"></fa-icon>
+            </button>
+
+            <button class="btn btn-sm btn-primary" title="Modifier" (click)="edit(delai)" type="button">
+              <fa-icon icon="pencil-alt"></fa-icon>
+            </button>
+
+            <button class="btn btn-sm btn-danger" title="Supprimer" (click)="delete(delai)" type="button">
+              <fa-icon icon="trash"></fa-icon>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #loading>
+  <div class="text-center my-4">
+    <span jhiTranslate="entity.action.loading">Chargement...</span>
+  </div>
+</ng-template>

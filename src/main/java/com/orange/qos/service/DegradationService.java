@@ -2,9 +2,14 @@ package com.orange.qos.service;
 
 import com.orange.qos.domain.Degradation;
 import com.orange.qos.repository.DegradationRepository;
+import com.orange.qos.repository.DelaiInterventionRepository;
 import com.orange.qos.service.dto.DegradationDTO;
+import com.orange.qos.service.dto.DelaiInterventionDTO;
 import com.orange.qos.service.mapper.DegradationMapper;
+import com.orange.qos.service.mapper.DelaiInterventionMapper;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,9 +28,20 @@ public class DegradationService {
 
     private final DegradationMapper degradationMapper;
 
-    public DegradationService(DegradationRepository degradationRepository, DegradationMapper degradationMapper) {
+    private final DelaiInterventionRepository delaiInterventionRepository;
+
+    private final DelaiInterventionMapper delaiInterventionMapper;
+
+    public DegradationService(
+        DegradationRepository degradationRepository,
+        DegradationMapper degradationMapper,
+        DelaiInterventionRepository delaiInterventionRepository,
+        DelaiInterventionMapper delaiInterventionMapper
+    ) {
         this.degradationRepository = degradationRepository;
         this.degradationMapper = degradationMapper;
+        this.delaiInterventionRepository = delaiInterventionRepository;
+        this.delaiInterventionMapper = delaiInterventionMapper;
     }
 
     /**
@@ -67,7 +83,6 @@ public class DegradationService {
             .findById(degradationDTO.getId())
             .map(existingDegradation -> {
                 degradationMapper.partialUpdate(existingDegradation, degradationDTO);
-
                 return existingDegradation;
             })
             .map(degradationRepository::save)
@@ -94,5 +109,22 @@ public class DegradationService {
     public void delete(Long id) {
         LOG.debug("Request to delete Degradation : {}", id);
         degradationRepository.deleteById(id);
+    }
+
+    /**
+     * Retourne la liste des délais d'intervention liés à une dégradation,
+     * avec calcul de la couleur d'état pour chaque délai.
+     *
+     * @param degradationId l'id de la dégradation
+     * @return liste des DTO délai avec état couleur
+     */
+    @Transactional(readOnly = true)
+    public List<DelaiInterventionDTO> findDelaisByDegradationId(Long degradationId) {
+        LOG.debug("Request to get delays by degradation id : {}", degradationId);
+        return delaiInterventionRepository
+            .findByDegradationId(degradationId)
+            .stream()
+            .map(delai -> delaiInterventionMapper.toDtoWithEtatCouleur(delai)) // correction ici : lambda, pas méthode référence
+            .collect(Collectors.toList());
     }
 }

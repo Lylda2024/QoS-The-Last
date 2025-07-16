@@ -47,8 +47,12 @@ public class DegradationAsserts {
     public static void assertDegradationUpdatableFieldsEquals(Degradation expected, Degradation actual) {
         assertThat(actual)
             .as("Verify Degradation relevant properties")
-            .satisfies(a -> assertThat(a.getDescription()).as("check description").isEqualTo(expected.getDescription()))
-            .satisfies(a -> assertThat(a.getDateSignalement()).as("check dateSignalement").isEqualTo(expected.getDateSignalement()))
+            .satisfies(a -> assertThat(a.getLocalite()).as("check localite").isEqualTo(expected.getLocalite()))
+            .satisfies(a -> assertThat(a.getContactTemoin()).as("check contactTemoin").isEqualTo(expected.getContactTemoin()))
+            .satisfies(a -> assertThat(a.getTypeAnomalie()).as("check typeAnomalie").isEqualTo(expected.getTypeAnomalie()))
+            .satisfies(a -> assertThat(a.getPriorite()).as("check priorite").isEqualTo(expected.getPriorite()))
+            .satisfies(a -> assertThat(a.getPorteur()).as("check porteur").isEqualTo(expected.getPorteur()))
+            .satisfies(a -> assertThat(a.getActionsEffectuees()).as("check actionsEffectuees").isEqualTo(expected.getActionsEffectuees()))
             .satisfies(a -> assertThat(a.getStatut()).as("check statut").isEqualTo(expected.getStatut()));
     }
 
@@ -59,6 +63,9 @@ public class DegradationAsserts {
      * @param actual the actual entity
      */
     public static void assertDegradationUpdatableRelationshipsEquals(Degradation expected, Degradation actual) {
-        // empty method
+        assertThat(actual)
+            .as("Verify Degradation relationships")
+            .satisfies(a -> assertThat(a.getUtilisateur()).as("check utilisateur").isEqualTo(expected.getUtilisateur()))
+            .satisfies(a -> assertThat(a.getSite()).as("check site").isEqualTo(expected.getSite()));
     }
 }

@@ -1,5 +1,6 @@
 package com.orange.qos.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
@@ -33,6 +34,7 @@ public class Notification implements Serializable {
     private Boolean statutLecture;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "utilisateur", "site" }, allowSetters = true)
     private Degradation degradation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

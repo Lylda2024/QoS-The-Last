@@ -16,6 +16,7 @@ export interface IDegradation {
   statut?: string | null;
   actionsEffectuees?: string | null;
   dateDetection?: Date | null;
+  dateLimite?: string; // <== Ajoute cette ligne
   commentaire?: string | null;
   nextStep?: string | null;
   ticketOceane?: string | null;

@@ -7,9 +7,10 @@ import com.orange.qos.service.criteria.RoleCriteria;
 import com.orange.qos.service.dto.RoleDTO;
 import com.orange.qos.service.mapper.RoleMapper;
 import jakarta.persistence.criteria.JoinType;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ import tech.jhipster.service.QueryService;
  * Service for executing complex queries for {@link Role} entities in the database.
  * The main input is a {@link RoleCriteria} which gets converted to {@link Specification},
  * in a way that all the filters must apply.
- * It returns a {@link List} of {@link RoleDTO} which fulfills the criteria.
+ * It returns a {@link Page} of {@link RoleDTO} which fulfills the criteria.
  */
 @Service
 @Transactional(readOnly = true)
@@ -37,15 +38,16 @@ public class RoleQueryService extends QueryService<Role> {
     }
 
     /**
-     * Return a {@link List} of {@link RoleDTO} which matches the criteria from the database.
+     * Return a {@link Page} of {@link RoleDTO} which matches the criteria from the database.
      * @param criteria The object which holds all the filters, which the entities should match.
+     * @param page The page, which should be returned.
      * @return the matching entities.
      */
     @Transactional(readOnly = true)
-    public List<RoleDTO> findByCriteria(RoleCriteria criteria) {
-        LOG.debug("find by criteria : {}", criteria);
+    public Page<RoleDTO> findByCriteria(RoleCriteria criteria, Pageable page) {
+        LOG.debug("find by criteria : {}, page: {}", criteria, page);
         final Specification<Role> specification = createSpecification(criteria);
-        return roleMapper.toDto(roleRepository.findAll(specification));
+        return roleRepository.findAll(specification, page).map(roleMapper::toDto);
     }
 
     /**

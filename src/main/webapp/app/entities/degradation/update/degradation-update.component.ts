@@ -219,6 +219,7 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
   protected onSaveSuccess(): void {
     this.previousState();
   }
+
   protected onSaveError(error: any): void {
     this.isSaving = false;
     console.error('❌ Erreur lors de la sauvegarde :', error);

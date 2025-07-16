@@ -1,8 +1,9 @@
 package com.orange.qos.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.time.Instant;
 
 /**
  * A Degradation.
@@ -20,14 +21,38 @@ public class Degradation implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "description")
-    private String description;
+    @NotNull
+    @Column(name = "localite", nullable = false)
+    private String localite;
 
-    @Column(name = "date_signalement")
-    private Instant dateSignalement;
+    @NotNull
+    @Column(name = "contact_temoin", nullable = false)
+    private String contactTemoin;
+
+    @NotNull
+    @Column(name = "type_anomalie", nullable = false)
+    private String typeAnomalie;
+
+    @NotNull
+    @Column(name = "priorite", nullable = false)
+    private String priorite;
+
+    @NotNull
+    @Column(name = "porteur", nullable = false)
+    private String porteur;
+
+    @Column(name = "actions_effectuees")
+    private String actionsEffectuees;
 
     @Column(name = "statut")
     private String statut;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "typeUtilisateur", "roles" }, allowSetters = true)
+    private Utilisateur utilisateur;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Site site;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -44,30 +69,82 @@ public class Degradation implements Serializable {
         this.id = id;
     }
 
-    public String getDescription() {
-        return this.description;
+    public String getLocalite() {
+        return this.localite;
     }
 
-    public Degradation description(String description) {
-        this.setDescription(description);
+    public Degradation localite(String localite) {
+        this.setLocalite(localite);
         return this;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setLocalite(String localite) {
+        this.localite = localite;
     }
 
-    public Instant getDateSignalement() {
-        return this.dateSignalement;
+    public String getContactTemoin() {
+        return this.contactTemoin;
     }
 
-    public Degradation dateSignalement(Instant dateSignalement) {
-        this.setDateSignalement(dateSignalement);
+    public Degradation contactTemoin(String contactTemoin) {
+        this.setContactTemoin(contactTemoin);
         return this;
     }
 
-    public void setDateSignalement(Instant dateSignalement) {
-        this.dateSignalement = dateSignalement;
+    public void setContactTemoin(String contactTemoin) {
+        this.contactTemoin = contactTemoin;
+    }
+
+    public String getTypeAnomalie() {
+        return this.typeAnomalie;
+    }
+
+    public Degradation typeAnomalie(String typeAnomalie) {
+        this.setTypeAnomalie(typeAnomalie);
+        return this;
+    }
+
+    public void setTypeAnomalie(String typeAnomalie) {
+        this.typeAnomalie = typeAnomalie;
+    }
+
+    public String getPriorite() {
+        return this.priorite;
+    }
+
+    public Degradation priorite(String priorite) {
+        this.setPriorite(priorite);
+        return this;
+    }
+
+    public void setPriorite(String priorite) {
+        this.priorite = priorite;
+    }
+
+    public String getPorteur() {
+        return this.porteur;
+    }
+
+    public Degradation porteur(String porteur) {
+        this.setPorteur(porteur);
+        return this;
+    }
+
+    public void setPorteur(String porteur) {
+        this.porteur = porteur;
+    }
+
+    public String getActionsEffectuees() {
+        return this.actionsEffectuees;
+    }
+
+    public Degradation actionsEffectuees(String actionsEffectuees) {
+        this.setActionsEffectuees(actionsEffectuees);
+        return this;
+    }
+
+    public void setActionsEffectuees(String actionsEffectuees) {
+        this.actionsEffectuees = actionsEffectuees;
     }
 
     public String getStatut() {
@@ -81,6 +158,32 @@ public class Degradation implements Serializable {
 
     public void setStatut(String statut) {
         this.statut = statut;
+    }
+
+    public Utilisateur getUtilisateur() {
+        return this.utilisateur;
+    }
+
+    public void setUtilisateur(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
+    public Degradation utilisateur(Utilisateur utilisateur) {
+        this.setUtilisateur(utilisateur);
+        return this;
+    }
+
+    public Site getSite() {
+        return this.site;
+    }
+
+    public void setSite(Site site) {
+        this.site = site;
+    }
+
+    public Degradation site(Site site) {
+        this.setSite(site);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -107,8 +210,12 @@ public class Degradation implements Serializable {
     public String toString() {
         return "Degradation{" +
             "id=" + getId() +
-            ", description='" + getDescription() + "'" +
-            ", dateSignalement='" + getDateSignalement() + "'" +
+            ", localite='" + getLocalite() + "'" +
+            ", contactTemoin='" + getContactTemoin() + "'" +
+            ", typeAnomalie='" + getTypeAnomalie() + "'" +
+            ", priorite='" + getPriorite() + "'" +
+            ", porteur='" + getPorteur() + "'" +
+            ", actionsEffectuees='" + getActionsEffectuees() + "'" +
             ", statut='" + getStatut() + "'" +
             "}";
     }

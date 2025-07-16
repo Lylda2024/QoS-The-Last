@@ -4,11 +4,11 @@ import com.orange.qos.domain.DelaiIntervention;
 import com.orange.qos.repository.DelaiInterventionRepository;
 import com.orange.qos.service.dto.DelaiInterventionDTO;
 import com.orange.qos.service.mapper.DelaiInterventionMapper;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,15 +80,6 @@ public class DelaiInterventionService {
     }
 
     /**
-     * Get all the delaiInterventions with eager load of many-to-many relationships.
-     *
-     * @return the list of entities.
-     */
-    public Page<DelaiInterventionDTO> findAllWithEagerRelationships(Pageable pageable) {
-        return delaiInterventionRepository.findAllWithEagerRelationships(pageable).map(delaiInterventionMapper::toDto);
-    }
-
-    /**
      * Get one delaiIntervention by id.
      *
      * @param id the id of the entity.
@@ -97,7 +88,7 @@ public class DelaiInterventionService {
     @Transactional(readOnly = true)
     public Optional<DelaiInterventionDTO> findOne(Long id) {
         LOG.debug("Request to get DelaiIntervention : {}", id);
-        return delaiInterventionRepository.findOneWithEagerRelationships(id).map(delaiInterventionMapper::toDto);
+        return delaiInterventionRepository.findById(id).map(delaiInterventionMapper::toDto);
     }
 
     /**
@@ -108,5 +99,15 @@ public class DelaiInterventionService {
     public void delete(Long id) {
         LOG.debug("Request to delete DelaiIntervention : {}", id);
         delaiInterventionRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DelaiInterventionDTO> findByDegradationId(Long degradationId) {
+        LOG.debug("Request to get DelaisIntervention by degradation id : {}", degradationId);
+        return delaiInterventionRepository
+            .findByDegradationId(degradationId)
+            .stream()
+            .map(delaiInterventionMapper::toDto)
+            .collect(Collectors.toList());
     }
 }
