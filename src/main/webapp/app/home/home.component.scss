@@ -49,3 +49,12 @@
   font-size: 0.95rem;
   color: #495057;
 }
+.leaflet-infobox {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  z-index: 1000;
+  width: 220px;
+  background: white;
+  border: 1px solid #ccc;
+}

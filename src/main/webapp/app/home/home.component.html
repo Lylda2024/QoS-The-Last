@@ -1,81 +1,151 @@
 <div class="container mt-4">
-  <div class="row justify-content-center mb-4">
-    <!-- 🟢 Filtres -->
-    <div class="col-lg-5">
-      <div class="card shadow-sm p-3">
-        <label for="priorityFilter" class="form-label fw-semibold text-secondary">
-          <i class="fa-solid fa-filter me-1 text-primary"></i> Filtrer par priorité
-        </label>
-        <select id="priorityFilter" [(ngModel)]="selectedPriority" (change)="applyFilter()" class="form-select mb-3">
-          <option value="">Toutes les priorités</option>
-          <option *ngFor="let priority of priorities" [value]="priority">{{ priority }}</option>
-        </select>
-
-        <label class="form-label fw-semibold text-secondary"> <i class="fa-solid fa-flag me-1 text-warning"></i> Filtrer par statut </label>
-        <select class="form-select mb-3" [(ngModel)]="selectedStatut" (change)="applyFilter()">
-          <option value="">Tous les statuts</option>
-          <option *ngFor="let s of statuts" [value]="s">{{ s }}</option>
-        </select>
-
-        <label class="form-label fw-semibold text-secondary">
-          <i class="fa-solid fa-map-pin me-1 text-danger"></i> Filtrer par localité
-        </label>
-        <select class="form-select mb-3" [(ngModel)]="selectedLocalite" (change)="applyFilter()">
-          <option value="">Toutes les localités</option>
-          <option *ngFor="let l of localites" [value]="l">{{ l }}</option>
-        </select>
-
-        <label class="form-label fw-semibold text-secondary">
-          <i class="fa-solid fa-user-tie me-1 text-success"></i> Filtrer par responsable
-        </label>
-        <select class="form-select mb-3" [(ngModel)]="selectedActeur" (change)="applyFilter()">
-          <option value="">Tous les acteurs</option>
-          <option *ngFor="let a of acteurs" [value]="a">{{ a }}</option>
-        </select>
-
-        <div class="text-end">
-          <button class="btn btn-outline-secondary" (click)="clearFilter()"><i class="fa-solid fa-xmark"></i> Réinitialiser</button>
-        </div>
+  <!-- Ligne filtres horizontaux -->
+  <div class="row justify-content-center mb-4 flex-row flex-wrap">
+    <div class="col-auto mb-2">
+      <label class="form-label fw-semibold text-secondary mb-2"> <i class="fa-solid fa-filter me-1 text-primary"></i> Priorité </label>
+      <div>
+        <button
+          type="button"
+          class="btn btn-sm me-2"
+          [ngClass]="selectedPriority === '' ? 'btn-primary' : 'btn-outline-primary'"
+          (click)="setPriority('')"
+        >
+          Toutes
+        </button>
+        <button
+          *ngFor="let priority of priorities"
+          type="button"
+          class="btn btn-sm me-2"
+          [ngClass]="selectedPriority === priority ? 'btn-primary' : 'btn-outline-primary'"
+          (click)="setPriority(priority)"
+        >
+          {{ priority }}
+        </button>
       </div>
     </div>
 
-    <!-- 🗺️ Carte + 📊 Résumé -->
-    <div class="col-lg-7">
-      <!-- 🗺️ Carte -->
-      <div #mapContainer id="mapContainer" class="rounded shadow border mb-4" style="height: 70vh; width: 100%"></div>
+    <div class="col-auto mb-2">
+      <label class="form-label fw-semibold text-secondary mb-2"> <i class="fa-solid fa-flag me-1 text-warning"></i> Statut </label>
+      <div>
+        <button
+          type="button"
+          class="btn btn-sm me-2"
+          [ngClass]="selectedStatut === '' ? 'btn-warning' : 'btn-outline-warning'"
+          (click)="setStatut('')"
+        >
+          Tous
+        </button>
+        <button
+          *ngFor="let s of statuts"
+          type="button"
+          class="btn btn-sm me-2"
+          [ngClass]="selectedStatut === s ? 'btn-warning' : 'btn-outline-warning'"
+          (click)="setStatut(s)"
+        >
+          {{ s }}
+        </button>
+      </div>
+    </div>
 
-      <!-- 📊 Résumé -->
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title text-primary mb-3"><i class="fa-solid fa-chart-simple me-2"></i>Résumé</h5>
+    <div class="col-auto mb-2">
+      <label class="form-label fw-semibold text-secondary mb-2"> <i class="fa-solid fa-map-pin me-1 text-danger"></i> Localité </label>
+      <div>
+        <button
+          type="button"
+          class="btn btn-sm me-2"
+          [ngClass]="selectedLocalite === '' ? 'btn-danger' : 'btn-outline-danger'"
+          (click)="setLocalite('')"
+        >
+          Toutes
+        </button>
+        <button
+          *ngFor="let l of localites"
+          type="button"
+          class="btn btn-sm me-2"
+          [ngClass]="selectedLocalite === l ? 'btn-danger' : 'btn-outline-danger'"
+          (click)="setLocalite(l)"
+        >
+          {{ l }}
+        </button>
+      </div>
+    </div>
 
-          <ul class="list-group list-group-flush small mb-3">
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Total :</span>
-              <span class="fw-bold">{{ allDegradations.length }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>🟢 Délai respecté :</span>
-              <span>{{ countVert }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>🟡 Délai proche :</span>
-              <span>{{ countJaune }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>🔴 Délai dépassé :</span>
-              <span>{{ countRouge }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>⚪ Sans délai :</span>
-              <span>{{ countBlanc }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>⚫ Terminées :</span>
-              <span>{{ countGris }}</span>
-            </li>
-          </ul>
+    <div class="col-auto mb-2">
+      <label class="form-label fw-semibold text-secondary mb-2"> <i class="fa-solid fa-user-tie me-1 text-success"></i> Responsable </label>
+      <div>
+        <button
+          type="button"
+          class="btn btn-sm me-2"
+          [ngClass]="selectedActeur === '' ? 'btn-success' : 'btn-outline-success'"
+          (click)="setActeur('')"
+        >
+          Tous
+        </button>
+        <button
+          *ngFor="let a of acteurs"
+          type="button"
+          class="btn btn-sm me-2"
+          [ngClass]="selectedActeur === a ? 'btn-success' : 'btn-outline-success'"
+          (click)="setActeur(a)"
+        >
+          {{ a }}
+        </button>
+      </div>
+    </div>
+  </div>
 
+  <!-- Ligne carte + résumé côte à côte -->
+  <div class="row">
+    <!-- Carte -->
+    <div class="col-lg-8 mb-4">
+      <div #mapContainer id="mapContainer" class="rounded shadow border" style="height: 70vh; width: 100%"></div>
+
+      <!-- Heatmap calendrier -->
+      <div id="calendar-heatmap" class="mt-3"></div>
+
+      <!-- Infobox flottant -->
+      <div class="leaflet-infobox shadow-sm p-3 rounded bg-white text-dark small mt-3">
+        <h6 class="fw-bold mb-2">Résumé</h6>
+        <div><strong>Total :</strong> {{ allDegradations.length }}</div>
+        <div><strong>🚨 Urgences :</strong> {{ countRouge }} ({{ (countRouge / allDegradations.length) * 100 | number: '1.0-0' }}%)</div>
+        <div><strong>🕒 MAJ :</strong> {{ lastUpdate | date: 'short' }}</div>
+      </div>
+    </div>
+
+    <!-- Résumé -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title text-primary mb-3"><i class="fa-solid fa-chart-simple me-2"></i>Résumé</h5>
+
+            <ul class="list-group list-group-flush small mb-3">
+              <li class="list-group-item d-flex justify-content-between">
+                <span>Total :</span>
+                <span class="fw-bold">{{ allDegradations.length }}</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>🟢 Délai respecté :</span>
+                <span>{{ countVert }}</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>🟡 Délai proche :</span>
+                <span>{{ countJaune }}</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>🔴 Délai dépassé :</span>
+                <span>{{ countRouge }}</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>⚪ Sans délai :</span>
+                <span>{{ countBlanc }}</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>⚫ Terminées :</span>
+                <span>{{ countGris }}</span>
+              </li>
+            </ul>
+          </div>
           <div class="d-grid gap-2">
             <button class="btn btn-outline-danger" (click)="goToUrgences()">🚨 Urgences</button>
             <a class="btn btn-primary" routerLink="/degradation">📋 Voir tout</a>

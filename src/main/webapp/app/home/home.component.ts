@@ -9,13 +9,23 @@ import { DegradationService } from 'app/entities/degradation/service/degradation
 import { IDegradation } from 'app/entities/degradation/degradation.model';
 import { MapService, MapLocation } from 'app/services/map.service';
 
+import * as d3 from 'd3';
+(window as any).d3 = d3; // 👉 rendre d3 global avant cal-heatmap
+
+// @ts-ignore: cal-heatmap est un module CommonJS
+const CalHeatMap = require('cal-heatmap');
+
+// Leaflet Fullscreen
+import 'leaflet.fullscreen';
+
+import dayjs from 'dayjs';
 import { ToastrModule } from 'ngx-toastr';
 
 @Component({
   selector: 'jhi-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastrModule], // *Sans* forRoot()  templateUrl: './home.component.html',
-  templateUrl: './home.component.html', // <--- ici
+  imports: [CommonModule, FormsModule, ToastrModule],
+  templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
 export default class HomeComponent implements AfterViewInit, OnDestroy {
@@ -45,6 +55,8 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
   private locationSub?: Subscription;
   private notificationIntervalId?: any;
 
+  lastUpdate: Date = new Date();
+
   ngAfterViewInit(): void {
     this.fixLeafletIcons();
     this.initMap();
@@ -58,7 +70,6 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     });
 
     this.checkDelaiNotifications();
-
     setTimeout(() => this.cdRef.detectChanges(), 0);
   }
 
@@ -66,23 +77,23 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     this.map?.remove();
     this.degradationSub?.unsubscribe();
     this.locationSub?.unsubscribe();
-
-    if (this.notificationIntervalId) {
-      clearInterval(this.notificationIntervalId);
-    }
+    if (this.notificationIntervalId) clearInterval(this.notificationIntervalId);
   }
 
   private initMap(): void {
-    this.map = L.map(this.mapContainer.nativeElement).setView([5.35, -4.02], 7);
+    this.map = L.map(this.mapContainer.nativeElement, {
+      center: [5.35, -4.02],
+      zoom: 7,
+    } as any);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
       maxZoom: 18,
     }).addTo(this.map);
 
+    (L.control as any).fullscreen({ position: 'topleft' }).addTo(this.map);
     this.markerGroup.addTo(this.map);
     this.addLegend();
-
     setTimeout(() => this.map.invalidateSize(), 100);
   }
 
@@ -122,9 +133,24 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
         this.allDegradations = res.body ?? [];
         this.extractFilterOptions();
         this.applyFilter();
-
-        // Notification après chargement
         this.notifService.notifyDelaiAlertes(this.allDegradations);
+        this.lastUpdate = new Date();
+
+        const dates = this.allDegradations.filter(d => !!d.dateDetection).map(d => dayjs(d.dateDetection).startOf('day').unix());
+
+        const data = dates.reduce((acc: Record<number, number>, ts) => {
+          acc[ts] = (acc[ts] || 0) + 1;
+          return acc;
+        }, {});
+
+        const cal = new CalHeatMap();
+        cal.paint({
+          data,
+          domain: 'month',
+          subDomain: 'day',
+          range: 2,
+          itemSelector: '#calendar-heatmap',
+        });
       },
       error: err => console.error('[HomeComponent] Erreur chargement dégradations :', err),
     });
@@ -132,57 +158,37 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
 
   applyFilter(): void {
     this.markerGroup.clearLayers();
-
     const list = this.allDegradations.filter(d => {
       const matchPriority = this.selectedPriority ? d.priorite?.toLowerCase() === this.selectedPriority.toLowerCase() : true;
       const matchStatut = this.selectedStatut ? d.statut?.toLowerCase() === this.selectedStatut.toLowerCase() : true;
       const matchLocalite = this.selectedLocalite ? d.localite === this.selectedLocalite : true;
       const matchActeur = this.selectedActeur ? d.porteur === this.selectedActeur : true;
-
       return matchPriority && matchStatut && matchLocalite && matchActeur;
     });
 
     list.forEach(d => this.addMarkerIfValid(d));
-
     const layers = this.markerGroup.getLayers();
     if (layers.length) {
       const bounds = (L.featureGroup(layers as L.Layer[]) as any).getBounds().pad(0.2);
       this.map.fitBounds(bounds);
     }
-
-    // Notification après filtrage
     this.notifService.notifyDelaiAlertes(list);
   }
 
   private addMarkerIfValid(d: IDegradation): void {
     const lat = this.parseCoord(d.site?.latitude);
     const lng = this.parseCoord(d.site?.longitude);
-
-    if (lat === null || lng === null) {
-      console.warn(`[HomeComponent] Coordonnées invalides pour la dégradation ${d.id}`);
-      return;
-    }
-
+    if (lat === null || lng === null) return;
     const color = this.getColorByDelayStatus(d);
-
     const marker = L.circleMarker([lat, lng], {
       radius: 8,
       color,
       fillColor: color,
       fillOpacity: 0.85,
     });
-
     marker.bindPopup(
-      `<strong>ID #${d.id ?? '?'}</strong><br/>
-       Localité : ${d.localite ?? '-'}<br/>
-       Type : ${d.typeAnomalie ?? '-'}<br/>
-       Priorité : <b>${d.priorite ?? '-'}</b><br/>
-       Statut : ${d.statut ?? '-'}<br/>
-       Date limite : ${d.dateLimite ? new Date(d.dateLimite).toLocaleDateString() : '-'}<br/>
-       Responsable : ${d.porteur ?? '-'}<br/>
-       <a href="/degradation/${d.id}" target="_blank">🔎 Voir fiche</a>`,
+      `<strong>ID #${d.id ?? '?'}</strong><br/>Localité : ${d.localite ?? '-'}<br/>Type : ${d.typeAnomalie ?? '-'}<br/>Priorité : <b>${d.priorite ?? '-'}</b><br/>Statut : ${d.statut ?? '-'}<br/>Date limite : ${d.dateLimite ? new Date(d.dateLimite).toLocaleDateString() : '-'}<br/>Responsable : ${d.porteur ?? '-'}<br/><a href="/degradation/${d.id}" target="_blank">🔎 Voir fiche</a>`,
     );
-
     this.markerGroup.addLayer(marker);
   }
 
@@ -194,11 +200,8 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
       fillColor: color,
       fillOpacity: 0.9,
     }).bindPopup(
-      `<strong>Nouvelle dégradation</strong><br/>
-       Priorité : <b>${loc.priorite ?? '-'}</b><br/>
-       <small>Lat : ${loc.latitude}, Lng : ${loc.longitude}</small>`,
+      `<strong>Nouvelle dégradation</strong><br/>Priorité : <b>${loc.priorite ?? '-'}</b><br/><small>Lat : ${loc.latitude}, Lng : ${loc.longitude}</small>`,
     );
-
     this.markerGroup.addLayer(marker);
     this.map.flyTo([loc.latitude, loc.longitude], 15);
   }
@@ -218,24 +221,14 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     const dateLimite = degradation.dateLimite ? new Date(degradation.dateLimite) : null;
     const statut = degradation.statut?.toLowerCase();
 
-    if (statut === 'terminée' || statut === 'clôturée') {
-      return '#6b7280'; // gris
-    }
-
-    if (!dateLimite) {
-      return '#f9fafb'; // blanc
-    }
+    if (statut === 'terminée' || statut === 'clôturée') return '#6b7280';
+    if (!dateLimite) return '#f9fafb';
 
     const diffInMs = dateLimite.getTime() - now.getTime();
     const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
-
-    if (diffInDays < 0) {
-      return '#dc2626'; // rouge
-    } else if (diffInDays <= 2) {
-      return '#eab308'; // jaune
-    } else {
-      return '#16a34a'; // vert
-    }
+    if (diffInDays < 0) return '#dc2626';
+    if (diffInDays <= 2) return '#eab308';
+    return '#16a34a';
   }
 
   private parseCoord(val?: string | number | null): number | null {
@@ -261,15 +254,12 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
       const first = urgentes[0];
       const lat = this.parseCoord(first.site?.latitude);
       const lng = this.parseCoord(first.site?.longitude);
-      if (lat !== null && lng !== null) {
-        this.map.flyTo([lat, lng], 15);
-      }
+      if (lat !== null && lng !== null) this.map.flyTo([lat, lng], 15);
     }
   }
 
   private extractFilterOptions(): void {
     const unique = <T>(arr: (T | null | undefined)[]) => [...new Set(arr.filter((v): v is T => !!v))].sort();
-
     this.statuts = unique(this.allDegradations.map(d => d.statut));
     this.localites = unique(this.allDegradations.map(d => d.localite));
     this.acteurs = unique(this.allDegradations.map(d => d.porteur));
@@ -278,19 +268,15 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
   get countVert(): number {
     return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#16a34a').length;
   }
-
   get countJaune(): number {
     return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#eab308').length;
   }
-
   get countRouge(): number {
     return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#dc2626').length;
   }
-
   get countBlanc(): number {
     return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#f9fafb').length;
   }
-
   get countGris(): number {
     return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#6b7280').length;
   }
@@ -298,6 +284,23 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
   private checkDelaiNotifications(): void {
     this.notificationIntervalId = setInterval(() => {
       this.notifService.notifyDelaiAlertes(this.allDegradations);
-    }, 300000); // toutes les 5 minutes
+    }, 300000);
+  }
+
+  setPriority(priority: string): void {
+    this.selectedPriority = priority;
+    this.applyFilter();
+  }
+  setStatut(statut: string): void {
+    this.selectedStatut = statut;
+    this.applyFilter();
+  }
+  setLocalite(localite: string): void {
+    this.selectedLocalite = localite;
+    this.applyFilter();
+  }
+  setActeur(acteur: string): void {
+    this.selectedActeur = acteur;
+    this.applyFilter();
   }
 }

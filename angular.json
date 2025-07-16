@@ -46,9 +46,9 @@
               "src/main/webapp/content/scss/vendor.scss",
               "src/main/webapp/content/scss/global.scss",
               "node_modules/leaflet/dist/leaflet.css",
-              "node_modules/leaflet/dist/leaflet.css"
+              "node_modules/leaflet.fullscreen/Control.FullScreen.css"
             ],
-            "scripts": []
+            "scripts": ["node_modules/leaflet/dist/leaflet.js", "node_modules/leaflet.fullscreen/Control.FullScreen.js"]
           },
           "configurations": {
             "production": {
@@ -110,7 +110,7 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "allowedCommonJsDependencies": ["leaflet", "dayjs"],
+            "allowedCommonJsDependencies": ["leaflet", "dayjs", "leaflet.fullscreen", "cal-heatmap"],
 
             "configPath": "jest.conf.js",
             "tsConfig": "tsconfig.spec.json"

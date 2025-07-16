@@ -3,7 +3,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { IUtilisateur } from 'app/entities/utilisateur/utilisateur.model';
 
-import dayjs from 'dayjs/esm';
+import dayjs from 'dayjs';
 
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
@@ -117,8 +117,8 @@ export class DelaiInterventionService {
   protected convertDateFromServer(rest: RestDelaiIntervention): IDelaiIntervention {
     return {
       ...rest,
-      dateDebut: rest.dateDebut ? dayjs(rest.dateDebut) : undefined,
-      dateLimite: rest.dateLimite ? dayjs(rest.dateLimite) : undefined,
+      dateDebut: rest.dateDebut ? dayjs(rest.dateDebut) : null,
+      dateLimite: rest.dateLimite ? dayjs(rest.dateLimite) : null,
     };
   }
 
@@ -133,11 +133,13 @@ export class DelaiInterventionService {
       body: res.body ? res.body.map(item => this.convertDateFromServer(item)) : null,
     });
   }
+
   getDelaisByDegradationId(degradationId: number): Observable<IDelaiIntervention[]> {
     return this.http
       .get<RestDelaiIntervention[]>(`${this.resourceUrl}/by-degradation/${degradationId}`)
       .pipe(map((res: RestDelaiIntervention[]) => res.map(r => this.convertDateFromServer(r))));
   }
+
   queryActeurs(req?: any): Observable<EntityArrayResponseType> {
     return this.http.get<IUtilisateur[]>(this.resourceUrl + '/acteurs', { params: req, observe: 'response' });
   }
