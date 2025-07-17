@@ -2,13 +2,12 @@ import * as XLSX from 'xlsx';
 import { Component } from '@angular/core';
 
 import { SiteService } from '../service/site.service';
-import { ISite } from '../site.model';
+import { NewSite } from '../site.model';
 
 @Component({
   selector: 'jhi-import',
-  imports: [],
   templateUrl: './import.component.html',
-  styleUrl: './import.component.scss',
+  styleUrls: ['./import.component.scss'],
 })
 export class ImportComponent {
   constructor(private siteService: SiteService) {}
@@ -23,7 +22,8 @@ export class ImportComponent {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet);
 
-      const sites: ISite[] = (rows as any[]).map(row => ({
+      const sites: NewSite[] = (rows as any[]).map(row => ({
+        id: null,
         nomSite: row['site bts'],
         codeOCI: row['code oci'],
         longitude: parseFloat(row['longitude']),

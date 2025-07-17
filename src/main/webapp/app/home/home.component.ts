@@ -8,18 +8,12 @@ import { NotificationExtendedService } from 'app/entities/notification/service/n
 import { DegradationService } from 'app/entities/degradation/service/degradation.service';
 import { IDegradation } from 'app/entities/degradation/degradation.model';
 import { MapService, MapLocation } from 'app/services/map.service';
-
 import * as d3 from 'd3';
-(window as any).d3 = d3; // 👉 rendre d3 global avant cal-heatmap
-
-// @ts-ignore: cal-heatmap est un module CommonJS
-const CalHeatMap = require('cal-heatmap');
-
-// Leaflet Fullscreen
 import 'leaflet.fullscreen';
-
 import dayjs from 'dayjs';
 import { ToastrModule } from 'ngx-toastr';
+
+(window as any).d3 = d3;
 
 @Component({
   selector: 'jhi-home',
@@ -127,6 +121,7 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  /** 🔄 Charge les dégradations et construit la carte + heatmap */
   private loadDegradations(): void {
     this.degradationSub = this.degradationService.query().subscribe({
       next: (res: HttpResponse<IDegradation[]>) => {
@@ -136,26 +131,69 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
         this.notifService.notifyDelaiAlertes(this.allDegradations);
         this.lastUpdate = new Date();
 
+        // 👉 Récupérer les dates d’apparition
         const dates = this.allDegradations.filter(d => !!d.dateDetection).map(d => dayjs(d.dateDetection).startOf('day').unix());
 
-        const data = dates.reduce((acc: Record<number, number>, ts) => {
+        const aggregated = dates.reduce((acc: Record<number, number>, ts) => {
           acc[ts] = (acc[ts] || 0) + 1;
           return acc;
         }, {});
 
-        const cal = new CalHeatMap();
-        cal.paint({
-          data,
-          domain: 'month',
-          subDomain: 'day',
-          range: 2,
-          itemSelector: '#calendar-heatmap',
+        // Transforme en tableau [{date, value}]
+        const heatmapData = Object.entries(aggregated).map(([ts, count]) => ({
+          date: new Date(Number(ts) * 1000),
+          value: count,
+        }));
+
+        // Nettoyer le conteneur
+        const container = document.getElementById('calendar-heatmap');
+        if (container) container.innerHTML = '';
+
+        // 📦 Importer CalHeatMap dynamiquement
+        import('cal-heatmap').then(({ default: CalHeatMap }) => {
+          const cal = new CalHeatMap();
+          cal.paint({
+            itemSelector: '#calendar-heatmap',
+            range: 3, // afficher 3 mois
+            domain: {
+              type: 'month',
+              gutter: 10,
+              label: {
+                text: 'MMM',
+                position: 'top',
+                height: 20,
+              },
+            },
+            subDomain: {
+              type: 'day',
+              width: 20,
+              height: 20,
+              gutter: 4,
+              radius: 4,
+            },
+            data: heatmapData,
+            scale: {
+              color: {
+                type: 'threshold',
+                domain: [1, 5, 10],
+                range: ['#16a34a', '#eab308', '#dc2626'], // vert → jaune → rouge
+              },
+            },
+            theme: 'light',
+            tooltip: {
+              enabled: true,
+              text: (date: Date, value: number) => `${date.toLocaleDateString()} : ${value || 0} dégradation(s)`,
+            },
+            legend: [1, 5, 10],
+            legendOrientation: 'horizontal',
+          });
         });
       },
       error: err => console.error('[HomeComponent] Erreur chargement dégradations :', err),
     });
   }
 
+  /** 🔄 Filtrage des dégradations */
   applyFilter(): void {
     this.markerGroup.clearLayers();
     const list = this.allDegradations.filter(d => {
@@ -167,6 +205,7 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     });
 
     list.forEach(d => this.addMarkerIfValid(d));
+
     const layers = this.markerGroup.getLayers();
     if (layers.length) {
       const bounds = (L.featureGroup(layers as L.Layer[]) as any).getBounds().pad(0.2);
@@ -175,10 +214,12 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     this.notifService.notifyDelaiAlertes(list);
   }
 
+  /** Ajoute un marqueur sur la carte */
   private addMarkerIfValid(d: IDegradation): void {
     const lat = this.parseCoord(d.site?.latitude);
     const lng = this.parseCoord(d.site?.longitude);
     if (lat === null || lng === null) return;
+
     const color = this.getColorByDelayStatus(d);
     const marker = L.circleMarker([lat, lng], {
       radius: 8,
@@ -192,6 +233,7 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     this.markerGroup.addLayer(marker);
   }
 
+  /** Ajoute un marqueur dynamique */
   private addDynamicMarker(loc: MapLocation): void {
     const color = this.getColorByPriority(loc.priorite?.toLowerCase());
     const marker = L.circleMarker([loc.latitude, loc.longitude], {
@@ -265,6 +307,7 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     this.acteurs = unique(this.allDegradations.map(d => d.porteur));
   }
 
+  // ✅ Getters stats
   get countVert(): number {
     return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#16a34a').length;
   }
@@ -287,6 +330,7 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     }, 300000);
   }
 
+  // ✅ Actions filtres
   setPriority(priority: string): void {
     this.selectedPriority = priority;
     this.applyFilter();

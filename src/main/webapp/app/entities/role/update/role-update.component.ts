@@ -40,7 +40,6 @@ export class RoleUpdateComponent implements OnInit {
       if (role) {
         this.updateForm(role);
       }
-
       this.loadRelationshipsOptions();
     });
   }
@@ -52,10 +51,12 @@ export class RoleUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const role = this.roleFormService.getRole(this.editForm);
+
     if (role.id !== null) {
       this.subscribeToSaveResponse(this.roleService.update(role));
     } else {
-      this.subscribeToSaveResponse(this.roleService.create(role));
+      const { id, ...newRole } = role;
+      this.subscribeToSaveResponse(this.roleService.create({ ...newRole, id: null }));
     }
   }
 

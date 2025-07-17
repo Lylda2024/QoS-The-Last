@@ -45,7 +45,7 @@ export class ExcelReaderService {
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
           const jsonData = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
 
-          resolve(jsonData);
+          resolve(jsonData as Record<string, any>[]);
         } catch (error) {
           reject(`Erreur lors de la lecture du fichier Excel : ${error}`);
         }

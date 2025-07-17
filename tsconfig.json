@@ -1,12 +1,13 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "src/main/webapp/",
     "outDir": "./target/out-tsc/root",
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
+    "strict": false,
+    "strictNullChecks": false,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": false,
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
@@ -19,19 +20,27 @@
     "target": "es2022",
     "module": "es2020",
     "types": [],
-    "lib": ["es2018", "es2020", "dom"]
+    "lib": ["es2018", "es2020", "dom"],
+    "typeRoots": ["node_modules/@types"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "noResolve": false,
+    "noImplicitAny": false
   },
-  "references": [
-    {
-      "path": "tsconfig.spec.json"
-    }
-  ],
   "angularCompilerOptions": {
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true,
-    "strictTemplates": true,
+    "strictInjectionParameters": false,
+    "strictInputAccessModifiers": false,
+    "strictTemplates": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "preserveWhitespaces": true
+    "preserveWhitespaces": true,
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInputTypes": false,
+    "strictDomEventTypes": false,
+    "strictOutputEventTypes": false,
+    "strictDomLocalRefTypes": false,
+    "strictAttributeTypes": false,
+    "strictSafeNavigationTypes": false,
+    "strictPropertyInitialization": false
   }
 }

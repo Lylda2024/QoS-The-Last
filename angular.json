@@ -6,14 +6,9 @@
     "code-stage": {
       "projectType": "application",
       "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        },
-        "@schematics/angular:application": {
-          "strict": true
-        }
+        "@schematics/angular:component": { "style": "scss" },
+        "@schematics/angular:application": { "strict": true }
       },
-
       "root": "",
       "sourceRoot": "src/main/webapp",
       "prefix": "jhi",
@@ -21,13 +16,11 @@
         "build": {
           "builder": "@angular-builders/custom-webpack:browser",
           "options": {
-            "customWebpackConfig": {
-              "path": "./webpack/webpack.custom.js"
-            },
+            "customWebpackConfig": { "path": "./webpack/webpack.custom.js" },
             "outputPath": "target/classes/static/",
             "index": "src/main/webapp/index.html",
             "main": "src/main/webapp/main.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": ["zone.js", "@angular/localize/init"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -48,7 +41,8 @@
               "node_modules/leaflet/dist/leaflet.css",
               "node_modules/leaflet.fullscreen/Control.FullScreen.css"
             ],
-            "scripts": ["node_modules/leaflet/dist/leaflet.js", "node_modules/leaflet.fullscreen/Control.FullScreen.js"]
+            "scripts": ["node_modules/leaflet/dist/leaflet.js", "node_modules/leaflet.fullscreen/Control.FullScreen.js"],
+            "allowedCommonJsDependencies": ["leaflet", "dayjs", "leaflet.fullscreen", "cal-heatmap"]
           },
           "configurations": {
             "production": {
@@ -62,16 +56,8 @@
               "serviceWorker": true,
               "ngswConfigPath": "ngsw-config.json",
               "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "3mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
-                }
+                { "type": "initial", "maximumWarning": "2mb", "maximumError": "3mb" },
+                { "type": "anyComponentStyle", "maximumWarning": "2kb", "maximumError": "4kb" }
               ]
             },
             "development": {
@@ -98,20 +84,14 @@
             "port": 4200
           },
           "configurations": {
-            "production": {
-              "buildTarget": "code-stage:build:production"
-            },
-            "development": {
-              "buildTarget": "code-stage:build:development"
-            }
+            "production": { "buildTarget": "code-stage:build:production" },
+            "development": { "buildTarget": "code-stage:build:development" }
           },
           "defaultConfiguration": "development"
         },
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "allowedCommonJsDependencies": ["leaflet", "dayjs", "leaflet.fullscreen", "cal-heatmap"],
-
             "configPath": "jest.conf.js",
             "tsConfig": "tsconfig.spec.json"
           }
@@ -120,11 +100,7 @@
     }
   },
   "cli": {
-    "cache": {
-      "enabled": true,
-      "path": "./target/angular/",
-      "environment": "all"
-    },
+    "cache": { "enabled": true, "path": "./target/angular/", "environment": "all" },
     "packageManager": "npm"
   }
 }

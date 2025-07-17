@@ -43,10 +43,12 @@ export class TypeUtilisateurUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const typeUtilisateur = this.typeUtilisateurFormService.getTypeUtilisateur(this.editForm);
+
     if (typeUtilisateur.id !== null) {
       this.subscribeToSaveResponse(this.typeUtilisateurService.update(typeUtilisateur));
     } else {
-      this.subscribeToSaveResponse(this.typeUtilisateurService.create(typeUtilisateur));
+      const { id, ...newEntity } = typeUtilisateur;
+      this.subscribeToSaveResponse(this.typeUtilisateurService.create({ ...newEntity, id: null }));
     }
   }
 

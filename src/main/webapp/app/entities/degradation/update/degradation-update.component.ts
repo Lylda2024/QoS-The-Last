@@ -5,7 +5,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
-
 import { Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
@@ -191,20 +190,12 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
     }
 
     this.isSaving = true;
-
     const degradation = this.degradationFormService.getDegradation(this.editForm);
 
-    console.log('✅ Dégradation à sauvegarder :', degradation);
-
     if (degradation.id != null) {
-      console.log('🔄 Mise à jour de la dégradation ID:', degradation.id);
       this.subscribeToSaveResponse(this.degradationService.update(degradation));
     } else {
-      const newDegradation: NewDegradation = {
-        ...degradation,
-        id: null,
-      };
-      console.log('➕ Création d’une nouvelle dégradation');
+      const newDegradation: NewDegradation = { ...degradation, id: null };
       this.subscribeToSaveResponse(this.degradationService.create(newDegradation));
     }
   }
@@ -223,7 +214,6 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
   protected onSaveError(error: any): void {
     this.isSaving = false;
     console.error('❌ Erreur lors de la sauvegarde :', error);
-
     if (error.status === 400) {
       alert('Erreur 400 : Requête invalide. Vérifiez les champs obligatoires.');
     } else if (error.status === 500) {
@@ -253,7 +243,13 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
       .pipe(
         map(res => res.body ?? []),
         map((utilisateurs: IUtilisateur[]) =>
-          this.utilisateurService.addUtilisateurToCollectionIfMissing(utilisateurs, this.degradation?.porteur as IUtilisateur | undefined),
+          this.utilisateurService.addUtilisateurToCollectionIfMissing(
+            utilisateurs,
+            this.degradation?.porteur
+              ? (utilisateurs.find(u => u.id === Number(this.degradation!.porteur)) ??
+                  (this.degradation!.porteur as unknown as IUtilisateur))
+              : undefined,
+          ),
         ),
       )
       .subscribe((utilisateurs: IUtilisateur[]) => (this.utilisateursSharedCollection = utilisateurs));

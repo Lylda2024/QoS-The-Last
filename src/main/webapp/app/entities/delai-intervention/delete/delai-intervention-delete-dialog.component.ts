@@ -4,17 +4,17 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
-import { IDelaiIntervention } from '../DelaiIntervention.model';
-import { DelaiInterventionService } from '../service/DelaiIntervention.service';
+import { IDelaiIntervention } from '../delai-intervention.model';
+import { DelaiInterventionService } from '../service/delai-intervention.service';
 
 @Component({
-  templateUrl: './DelaiIntervention-delete-dialog.component.html',
+  templateUrl: './delai-intervention-delete-dialog.component.html',
   imports: [SharedModule, FormsModule],
 })
 export class DelaiInterventionDeleteDialogComponent {
-  DelaiIntervention?: IDelaiIntervention;
+  delaiIntervention?: IDelaiIntervention;
 
-  protected DelaiInterventionService = inject(DelaiInterventionService);
+  protected delaiInterventionService = inject(DelaiInterventionService);
   protected activeModal = inject(NgbActiveModal);
 
   cancel(): void {
@@ -22,7 +22,7 @@ export class DelaiInterventionDeleteDialogComponent {
   }
 
   confirmDelete(id: number): void {
-    this.DelaiInterventionService.delete(id).subscribe(() => {
+    this.delaiInterventionService.delete(id).subscribe(() => {
       this.activeModal.close(ITEM_DELETED_EVENT);
     });
   }

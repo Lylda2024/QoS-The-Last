@@ -3,25 +3,26 @@
   height: 100%;
 }
 
-// Corrections pour les marqueurs Leaflet
+/* ✅ Fix pour les marqueurs Leaflet */
 ::ng-deep .custom-marker,
 ::ng-deep .custom-degradation-marker {
   background: transparent !important;
   border: none !important;
 }
 
-// Style pour les popups
+/* ✅ Style des popups Leaflet */
 ::ng-deep .leaflet-popup-content {
   font-family: Arial, sans-serif;
   font-size: 14px;
   line-height: 1.4;
 }
 
-// Fix pour les icônes par défaut si nécessaire
+/* ✅ Icône par défaut Leaflet */
 ::ng-deep .leaflet-default-icon-path {
   background-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png');
 }
 
+/* ✅ Filtre priorité */
 #priorityFilter {
   font-size: 0.95rem;
   padding: 0.5rem 1rem;
@@ -32,7 +33,6 @@
     border-color 0.2s ease-in-out,
     box-shadow 0.2s ease-in-out;
 }
-
 #priorityFilter:focus {
   border-color: #0d6efd;
   outline: none;
@@ -49,6 +49,8 @@
   font-size: 0.95rem;
   color: #495057;
 }
+
+/* ✅ Infobox flottante sur la carte */
 .leaflet-infobox {
   position: absolute;
   top: 10px;
@@ -57,4 +59,54 @@
   width: 220px;
   background: white;
   border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* ✅ Conteneur du calendrier (fond clair + ombre) */
+#calendar-heatmap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+  padding: 15px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  min-height: 120px;
+}
+
+/* ✅ Mois (domaines) */
+.ch-domain {
+  font-size: 12px;
+  font-weight: bold;
+  fill: #4b5563;
+}
+
+/* ✅ Cases des jours (gris clair par défaut) */
+.ch-subdomain {
+  stroke: #e5e7eb;
+  fill: #f3f4f6 !important; /* visible même sans donnée */
+  transition: all 0.2s ease;
+}
+.ch-subdomain:hover {
+  stroke: #111827;
+  transform: scale(1.05);
+}
+
+/* ✅ Tooltip clair */
+.ch-tooltip {
+  background: #111827 !important;
+  color: #f9fafb !important;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* ✅ Légende en bas du calendrier */
+.ch-legend {
+  margin-top: 8px;
+  font-size: 12px;
+  text-align: center;
+  color: #4b5563;
 }

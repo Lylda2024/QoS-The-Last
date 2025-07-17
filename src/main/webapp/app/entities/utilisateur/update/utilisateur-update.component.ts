@@ -12,7 +12,7 @@ import { TypeUtilisateurService } from 'app/entities/type-utilisateur/service/ty
 import { IRole } from 'app/entities/role/role.model';
 import { RoleService } from 'app/entities/role/service/role.service';
 import { UtilisateurService } from '../service/utilisateur.service';
-import { IUtilisateur } from '../utilisateur.model';
+import { IUtilisateur, NewUtilisateur } from '../utilisateur.model';
 import { UtilisateurFormGroup, UtilisateurFormService } from './utilisateur-form.service';
 
 @Component({
@@ -33,7 +33,6 @@ export class UtilisateurUpdateComponent implements OnInit {
   protected roleService = inject(RoleService);
   protected activatedRoute = inject(ActivatedRoute);
 
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: UtilisateurFormGroup = this.utilisateurFormService.createUtilisateurFormGroup();
 
   compareTypeUtilisateur = (o1: ITypeUtilisateur | null, o2: ITypeUtilisateur | null): boolean =>
@@ -47,7 +46,6 @@ export class UtilisateurUpdateComponent implements OnInit {
       if (utilisateur) {
         this.updateForm(utilisateur);
       }
-
       this.loadRelationshipsOptions();
     });
   }
@@ -59,10 +57,12 @@ export class UtilisateurUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const utilisateur = this.utilisateurFormService.getUtilisateur(this.editForm);
+
     if (utilisateur.id !== null) {
       this.subscribeToSaveResponse(this.utilisateurService.update(utilisateur));
     } else {
-      this.subscribeToSaveResponse(this.utilisateurService.create(utilisateur));
+      const { id, ...newUtilisateur } = utilisateur;
+      this.subscribeToSaveResponse(this.utilisateurService.create({ ...newUtilisateur, id: null } as NewUtilisateur));
     }
   }
 
@@ -78,7 +78,7 @@ export class UtilisateurUpdateComponent implements OnInit {
   }
 
   protected onSaveError(): void {
-    // Api for inheritance.
+    // Api for inheritance
   }
 
   protected onSaveFinalize(): void {

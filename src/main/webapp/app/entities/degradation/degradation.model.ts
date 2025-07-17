@@ -5,8 +5,7 @@ import { FormControl, FormGroup } from '@angular/forms';
  * Interface principale Degradation
  */
 export interface IDegradation {
-  id: number;
-
+  id: number; // <-- Ajoute cette ligne obligatoire
   localite?: string | null;
   contactTemoin?: string | null;
   typeAnomalie?: string | null;

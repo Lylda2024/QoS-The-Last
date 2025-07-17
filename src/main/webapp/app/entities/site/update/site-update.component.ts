@@ -52,7 +52,8 @@ export class SiteUpdateComponent implements OnInit {
     if (site.id !== null) {
       this.subscribeToSaveResponse(this.siteService.update(site));
     } else {
-      this.subscribeToSaveResponse(this.siteService.create(site));
+      const { id, ...newSite } = site;
+      this.subscribeToSaveResponse(this.siteService.create({ ...newSite, id: null } as NewSite));
     }
   }
 
@@ -80,27 +81,22 @@ export class SiteUpdateComponent implements OnInit {
     this.siteFormService.resetForm(this.editForm, site);
   }
 
-  // Gestion import Excel
   onFileChange(event: any): void {
-    const target: DataTransfer = <DataTransfer>event.target;
-    if (target.files.length !== 1) {
+    const target: DataTransfer = event.target as DataTransfer;
+    if (target.files?.length !== 1) {
       console.error('⚠️ Un seul fichier à la fois.');
       return;
     }
-
     this.fileName = target.files[0].name;
-
     const reader: FileReader = new FileReader();
-    reader.onload = (e: any) => {
-      const bstr: string = e.target.result;
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      const bstr: string = e.target?.result as string;
       const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
-
       const sheetName = wb.SheetNames[0];
       const ws: XLSX.WorkSheet = wb.Sheets[sheetName];
-      const data = XLSX.utils.sheet_to_json(ws);
-
+      const data = XLSX.utils.sheet_to_json<any>(ws);
       this.importedSites = data
-        .map((row: any) => ({
+        .map(row => ({
           nomSite: row['Nom du site']?.toString().trim() ?? '',
           codeOCI: row['Code']?.toString().trim() ?? '',
           latitude: parseFloat(row['Latitude']) || null,
@@ -110,37 +106,26 @@ export class SiteUpdateComponent implements OnInit {
         }))
         .filter(site => site.nomSite && site.codeOCI);
     };
-
     reader.readAsBinaryString(target.files[0]);
   }
 
   saveImportedSites(): void {
     this.isLoading = true;
-
-    // 🛠️ On convertit chaque site importé vers le type attendu (ISite), avec un id par défaut
-    const sitesToCreate: ISite[] = this.importedSites.map(site => ({
-      ...site,
-      id: 0, // valeur temporaire, elle sera ignorée par le backend
-    }));
-
-    this.siteService.createMany(sitesToCreate).subscribe({
+    const sitesToCreate = this.importedSites.map(site => ({ ...site, id: null }));
+    this.siteService.createMany?.(sitesToCreate)?.subscribe({
       next: () => {
         this.isLoading = false;
         this.importedSites = [];
-        this.fileName = '';
-        // ✅ Affichage succès ou autre logique ici
+        this.fileName = null;
       },
       error: () => {
         this.isLoading = false;
-        // ❌ Affichage erreur ou gestion ici
       },
     });
   }
+
   cancelImport(): void {
-    this.fileName = '';
+    this.fileName = null;
     this.importedSites = [];
-    // Si tu veux vider aussi le champ input file, tu peux utiliser un ViewChild
-    // Exemple :
-    // this.fileInput.nativeElement.value = null;
   }
 }
