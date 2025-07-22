@@ -25,30 +25,27 @@ public class DegradationService {
     private static final Logger LOG = LoggerFactory.getLogger(DegradationService.class);
 
     private final DegradationRepository degradationRepository;
-
     private final DegradationMapper degradationMapper;
-
     private final DelaiInterventionRepository delaiInterventionRepository;
-
     private final DelaiInterventionMapper delaiInterventionMapper;
+    private final DelaiInterventionService delaiInterventionService;
 
     public DegradationService(
         DegradationRepository degradationRepository,
         DegradationMapper degradationMapper,
         DelaiInterventionRepository delaiInterventionRepository,
-        DelaiInterventionMapper delaiInterventionMapper
+        DelaiInterventionMapper delaiInterventionMapper,
+        DelaiInterventionService delaiInterventionService
     ) {
         this.degradationRepository = degradationRepository;
         this.degradationMapper = degradationMapper;
         this.delaiInterventionRepository = delaiInterventionRepository;
         this.delaiInterventionMapper = delaiInterventionMapper;
+        this.delaiInterventionService = delaiInterventionService;
     }
 
     /**
-     * Save a degradation.
-     *
-     * @param degradationDTO the entity to save.
-     * @return the persisted entity.
+     * Sauvegarde une dégradation simple.
      */
     public DegradationDTO save(DegradationDTO degradationDTO) {
         LOG.debug("Request to save Degradation : {}", degradationDTO);
@@ -58,10 +55,7 @@ public class DegradationService {
     }
 
     /**
-     * Update a degradation.
-     *
-     * @param degradationDTO the entity to save.
-     * @return the persisted entity.
+     * Mise à jour complète.
      */
     public DegradationDTO update(DegradationDTO degradationDTO) {
         LOG.debug("Request to update Degradation : {}", degradationDTO);
@@ -71,10 +65,7 @@ public class DegradationService {
     }
 
     /**
-     * Partially update a degradation.
-     *
-     * @param degradationDTO the entity to update partially.
-     * @return the persisted entity.
+     * Mise à jour partielle.
      */
     public Optional<DegradationDTO> partialUpdate(DegradationDTO degradationDTO) {
         LOG.debug("Request to partially update Degradation : {}", degradationDTO);
@@ -90,21 +81,31 @@ public class DegradationService {
     }
 
     /**
-     * Get one degradation by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
+     * Récupère une dégradation avec ses délais enrichis.
      */
     @Transactional(readOnly = true)
     public Optional<DegradationDTO> findOne(Long id) {
         LOG.debug("Request to get Degradation : {}", id);
-        return degradationRepository.findById(id).map(degradationMapper::toDto);
+
+        return degradationRepository
+            .findById(id)
+            .map(degradation -> {
+                DegradationDTO dto = degradationMapper.toDto(degradation);
+
+                // On charge les délais associés et on les enrichit avec leur couleur
+                List<DelaiInterventionDTO> delais = delaiInterventionRepository
+                    .findByDegradationId(degradation.getId())
+                    .stream()
+                    .map(delai -> delaiInterventionMapper.toDtoWithEtatCouleur(delai))
+                    .collect(Collectors.toList());
+
+                dto.setDelais(delais);
+                return dto;
+            });
     }
 
     /**
-     * Delete the degradation by id.
-     *
-     * @param id the id of the entity.
+     * Supprime une dégradation.
      */
     public void delete(Long id) {
         LOG.debug("Request to delete Degradation : {}", id);
@@ -112,11 +113,34 @@ public class DegradationService {
     }
 
     /**
+     * Récupère toutes les dégradations avec leurs délais enrichis.
+     */
+    @Transactional(readOnly = true)
+    public List<DegradationDTO> findAllWithDelai() {
+        LOG.debug("Request to get all Degradations enriched with delays");
+
+        return degradationRepository
+            .findAll()
+            .stream()
+            .map(degradation -> {
+                DegradationDTO dto = degradationMapper.toDto(degradation);
+
+                // On enrichit chaque délai avec son état couleur
+                List<DelaiInterventionDTO> delais = delaiInterventionRepository
+                    .findByDegradationId(degradation.getId())
+                    .stream()
+                    .map(delai -> delaiInterventionMapper.toDtoWithEtatCouleur(delai))
+                    .collect(Collectors.toList());
+
+                dto.setDelais(delais);
+                return dto;
+            })
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Retourne la liste des délais d'intervention liés à une dégradation,
      * avec calcul de la couleur d'état pour chaque délai.
-     *
-     * @param degradationId l'id de la dégradation
-     * @return liste des DTO délai avec état couleur
      */
     @Transactional(readOnly = true)
     public List<DelaiInterventionDTO> findDelaisByDegradationId(Long degradationId) {
@@ -124,7 +148,16 @@ public class DegradationService {
         return delaiInterventionRepository
             .findByDegradationId(degradationId)
             .stream()
-            .map(delai -> delaiInterventionMapper.toDtoWithEtatCouleur(delai)) // correction ici : lambda, pas méthode référence
+            .map(delai -> delaiInterventionMapper.toDtoWithEtatCouleur(delai))
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Récupère toutes les dégradations avec leurs sites uniquement.
+     */
+    @Transactional(readOnly = true)
+    public List<DegradationDTO> findAllWithSite() {
+        LOG.debug("Request to get all Degradations with Site");
+        return degradationRepository.findAllWithSite().stream().map(degradationMapper::toDto).collect(Collectors.toList());
     }
 }

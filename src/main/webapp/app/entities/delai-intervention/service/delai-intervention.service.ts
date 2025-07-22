@@ -136,7 +136,7 @@ export class DelaiInterventionService {
 
   getDelaisByDegradationId(degradationId: number): Observable<IDelaiIntervention[]> {
     return this.http
-      .get<RestDelaiIntervention[]>(`${this.resourceUrl}/by-degradation/${degradationId}`)
+      .get<RestDelaiIntervention[]>(`/api/degradations/${degradationId}/delais`)
       .pipe(map((res: RestDelaiIntervention[]) => res.map(r => this.convertDateFromServer(r))));
   }
 

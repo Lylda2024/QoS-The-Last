@@ -7,15 +7,8 @@ import { IDelaiIntervention, NewDelaiIntervention, StatutDelaiIntervention } fro
 export class DelaiInterventionFormService {
   constructor(private fb: FormBuilder) {}
 
-  /**
-   * Création du formulaire
-   */
   createDelaiInterventionFormGroup(delai?: IDelaiIntervention | NewDelaiIntervention): FormGroup {
-    const delaiRawValue = {
-      ...this.getFormDefaults(),
-      ...delai,
-    };
-
+    const delaiRawValue = { ...this.getFormDefaults(), ...delai };
     return this.fb.group({
       id: [delaiRawValue.id],
       dateDebut: [delaiRawValue.dateDebut ? dayjs(delaiRawValue.dateDebut).format('YYYY-MM-DDTHH:mm') : null, Validators.required],
@@ -23,33 +16,25 @@ export class DelaiInterventionFormService {
       commentaire: [delaiRawValue.commentaire, [Validators.required, Validators.minLength(5)]],
       statut: [delaiRawValue.statut ?? StatutDelaiIntervention.EN_COURS],
       acteur: [delaiRawValue.acteur, Validators.required],
+      degradation: [delaiRawValue.degradation ?? null], // contrôle caché
     });
   }
 
-  /**
-   * Récupération de l'objet depuis le formulaire
-   */
   getDelaiIntervention(form: FormGroup): IDelaiIntervention | NewDelaiIntervention {
-    const rawValue = form.getRawValue();
+    const raw = form.getRawValue();
     return {
-      id: rawValue.id ?? null,
-      dateDebut: rawValue.dateDebut ? dayjs(rawValue.dateDebut) : undefined,
-      dateLimite: rawValue.dateLimite ? dayjs(rawValue.dateLimite) : undefined,
-      commentaire: rawValue.commentaire ?? null,
-      statut: rawValue.statut ?? StatutDelaiIntervention.EN_COURS,
-      acteur: rawValue.acteur ?? null,
+      id: raw.id ?? null,
+      dateDebut: raw.dateDebut ? dayjs(raw.dateDebut) : undefined,
+      dateLimite: raw.dateLimite ? dayjs(raw.dateLimite) : undefined,
+      commentaire: raw.commentaire ?? null,
+      statut: raw.statut ?? StatutDelaiIntervention.EN_COURS,
+      acteur: raw.acteur ?? null,
+      degradation: raw.degradation ?? null,
     };
   }
 
-  /**
-   * Réinitialisation du formulaire avec de nouvelles données
-   */
   resetForm(form: FormGroup, delai: IDelaiIntervention | NewDelaiIntervention): void {
-    const delaiRawValue = {
-      ...this.getFormDefaults(),
-      ...delai,
-    };
-
+    const delaiRawValue = { ...this.getFormDefaults(), ...delai };
     form.reset({
       id: delaiRawValue.id ?? null,
       dateDebut: delaiRawValue.dateDebut ? dayjs(delaiRawValue.dateDebut).format('YYYY-MM-DDTHH:mm') : null,
@@ -57,12 +42,10 @@ export class DelaiInterventionFormService {
       commentaire: delaiRawValue.commentaire ?? '',
       statut: delaiRawValue.statut ?? StatutDelaiIntervention.EN_COURS,
       acteur: delaiRawValue.acteur ?? null,
+      degradation: delaiRawValue.degradation ?? null,
     });
   }
 
-  /**
-   * Valeurs par défaut pour la création
-   */
   private getFormDefaults(): NewDelaiIntervention {
     return {
       id: null,
@@ -71,6 +54,7 @@ export class DelaiInterventionFormService {
       commentaire: '',
       statut: StatutDelaiIntervention.EN_COURS,
       acteur: null,
+      degradation: null,
     };
   }
 }

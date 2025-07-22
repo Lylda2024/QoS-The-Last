@@ -6,6 +6,9 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
+/**
+ * DTO pour l'entité DelaiIntervention
+ */
 public class DelaiInterventionDTO implements Serializable {
 
     private Long id;
@@ -20,14 +23,15 @@ public class DelaiInterventionDTO implements Serializable {
 
     private StatutDelai statut;
 
+    // On ne met pas toute la DegradationDTO ici dans toString pour éviter récursion infinie
     private DegradationDTO degradation;
 
     private UtilisateurDTO utilisateur;
 
-    // ✅ Nouveau champ ajouté
+    // Champ supplémentaire indiquant l'état couleur (ex: VERT, JAUNE, ROUGE, GRIS, BLANC)
     private String etatCouleur;
 
-    // --- Getters & Setters ---
+    // Getters & Setters
 
     public Long getId() {
         return id;
@@ -93,6 +97,8 @@ public class DelaiInterventionDTO implements Serializable {
         this.etatCouleur = etatCouleur;
     }
 
+    // equals et hashCode basés sur id
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -106,6 +112,7 @@ public class DelaiInterventionDTO implements Serializable {
         return Objects.hash(id);
     }
 
+    // toString avec une version simplifiée pour éviter récursion
     @Override
     public String toString() {
         return (
@@ -124,10 +131,10 @@ public class DelaiInterventionDTO implements Serializable {
             ", etatCouleur='" +
             etatCouleur +
             '\'' +
-            ", degradation=" +
-            degradation +
-            ", utilisateur=" +
-            utilisateur +
+            ", degradationId=" +
+            (degradation != null ? degradation.getId() : null) +
+            ", utilisateurId=" +
+            (utilisateur != null ? utilisateur.getId() : null) +
             '}'
         );
     }

@@ -27,7 +27,7 @@
     <include file="config/liquibase/changelog/20250620135447_added_entity_constraints_Notification.xml" relativeToChangelogFile="false"/>
   <include file="config/liquibase/changelog/2025-07-03-add-site-columns.xml" relativeToChangelogFile="false"/>
   <include file="config/liquibase/changelog/2025-07-03-fix-site-id-autoincrement.xml" relativeToChangelogFile="false"/>
-  <include file="config/liquibase/changelog/2025/07-added-fields-degradation.xml" relativeToChangelogFile="false"/>
+  <include file="config/liquibase/changelog/2025-07-added-fields-degradation.xml" relativeToChangelogFile="false"/>
 
   <include file="config/liquibase/changelog/20250709151731_added_entity_constraints_DelaiIntervention.xml" relativeToChangelogFile="false"/>
   <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->

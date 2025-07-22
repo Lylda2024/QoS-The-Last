@@ -6,7 +6,6 @@ import com.orange.qos.service.DelaiInterventionQueryService;
 import com.orange.qos.service.DelaiInterventionService;
 import com.orange.qos.service.criteria.DelaiInterventionCriteria;
 import com.orange.qos.service.dto.DelaiInterventionDTO;
-import com.orange.qos.service.mapper.DelaiInterventionMapper;
 import com.orange.qos.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -15,6 +14,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,9 +28,6 @@ import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
-/**
- * REST controller for managing {@link com.orange.qos.domain.DelaiIntervention}.
- */
 @RestController
 @RequestMapping("/api/delai-interventions")
 public class DelaiInterventionResource {
@@ -44,28 +41,25 @@ public class DelaiInterventionResource {
     private final DelaiInterventionService delaiInterventionService;
     private final DelaiInterventionRepository delaiInterventionRepository;
     private final DelaiInterventionQueryService delaiInterventionQueryService;
-    private final DelaiInterventionMapper delaiInterventionMapper;
 
     public DelaiInterventionResource(
         DelaiInterventionService delaiInterventionService,
         DelaiInterventionRepository delaiInterventionRepository,
-        DelaiInterventionQueryService delaiInterventionQueryService,
-        DelaiInterventionMapper delaiInterventionMapper
+        DelaiInterventionQueryService delaiInterventionQueryService
     ) {
         this.delaiInterventionService = delaiInterventionService;
         this.delaiInterventionRepository = delaiInterventionRepository;
         this.delaiInterventionQueryService = delaiInterventionQueryService;
-        this.delaiInterventionMapper = delaiInterventionMapper;
     }
 
-    @PostMapping("")
-    public ResponseEntity<DelaiInterventionDTO> createDelaiIntervention(@Valid @RequestBody DelaiInterventionDTO delaiInterventionDTO)
+    @PostMapping
+    public ResponseEntity<DelaiInterventionDTO> createDelaiIntervention(@Valid @RequestBody DelaiInterventionDTO dto)
         throws URISyntaxException {
-        LOG.debug("REST request to save DelaiIntervention : {}", delaiInterventionDTO);
-        if (delaiInterventionDTO.getId() != null) {
+        LOG.debug("REST request to save DelaiIntervention : {}", dto);
+        if (dto.getId() != null) {
             throw new BadRequestAlertException("A new delaiIntervention cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        DelaiInterventionDTO result = delaiInterventionService.save(delaiInterventionDTO);
+        DelaiInterventionDTO result = delaiInterventionService.save(dto);
         return ResponseEntity.created(new URI("/api/delai-interventions/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -73,51 +67,48 @@ public class DelaiInterventionResource {
 
     @PutMapping("/{id}")
     public ResponseEntity<DelaiInterventionDTO> updateDelaiIntervention(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody DelaiInterventionDTO delaiInterventionDTO
+        @PathVariable Long id,
+        @Valid @RequestBody DelaiInterventionDTO dto
     ) throws URISyntaxException {
-        LOG.debug("REST request to update DelaiIntervention : {}, {}", id, delaiInterventionDTO);
-        if (delaiInterventionDTO.getId() == null) {
+        LOG.debug("REST request to update DelaiIntervention : {}, {}", id, dto);
+        if (dto.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, delaiInterventionDTO.getId())) {
+        if (!Objects.equals(id, dto.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
         if (!delaiInterventionRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
-
-        DelaiInterventionDTO result = delaiInterventionService.update(delaiInterventionDTO);
+        DelaiInterventionDTO result = delaiInterventionService.update(dto);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, dto.getId().toString()))
             .body(result);
     }
 
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<DelaiInterventionDTO> partialUpdateDelaiIntervention(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody DelaiInterventionDTO delaiInterventionDTO
+        @PathVariable Long id,
+        @NotNull @RequestBody DelaiInterventionDTO dto
     ) throws URISyntaxException {
-        LOG.debug("REST request to partial update DelaiIntervention : {}, {}", id, delaiInterventionDTO);
-        if (delaiInterventionDTO.getId() == null) {
+        LOG.debug("REST request to partial update DelaiIntervention : {}, {}", id, dto);
+        if (dto.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, delaiInterventionDTO.getId())) {
+        if (!Objects.equals(id, dto.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
         if (!delaiInterventionRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
-
-        Optional<DelaiInterventionDTO> result = delaiInterventionService.partialUpdate(delaiInterventionDTO);
-
+        Optional<DelaiInterventionDTO> result = delaiInterventionService.partialUpdate(dto);
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, delaiInterventionDTO.getId().toString())
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, dto.getId().toString())
         );
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<List<DelaiInterventionDTO>> getAllDelaiInterventions(
         DelaiInterventionCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -135,14 +126,14 @@ public class DelaiInterventionResource {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DelaiInterventionDTO> getDelaiIntervention(@PathVariable("id") Long id) {
+    public ResponseEntity<DelaiInterventionDTO> getDelaiIntervention(@PathVariable Long id) {
         LOG.debug("REST request to get DelaiIntervention : {}", id);
-        Optional<DelaiInterventionDTO> delaiInterventionDTO = delaiInterventionService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(delaiInterventionDTO);
+        Optional<DelaiInterventionDTO> dto = delaiInterventionService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(dto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDelaiIntervention(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteDelaiIntervention(@PathVariable Long id) {
         LOG.debug("REST request to delete DelaiIntervention : {}", id);
         delaiInterventionService.delete(id);
         return ResponseEntity.noContent()
@@ -150,24 +141,11 @@ public class DelaiInterventionResource {
             .build();
     }
 
-    /**
-     * GET  /delai-interventions/delais/degradation/{degradationId} : Get all delays by degradation ID via service
-     */
+    // Méthode clé : récupère tous les délais d’une dégradation avec couleur calculée dans le service
     @GetMapping("/delais/degradation/{degradationId}")
     public ResponseEntity<List<DelaiInterventionDTO>> getDelaisByDegradationId(@PathVariable Long degradationId) {
-        LOG.debug("REST request to get DelaiIntervention by degradation id (via service) : {}", degradationId);
-        List<DelaiInterventionDTO> delais = delaiInterventionService.findByDegradationId(degradationId);
+        LOG.debug("REST request to get DelaiIntervention by degradation id : {}", degradationId);
+        List<DelaiInterventionDTO> delais = delaiInterventionService.findDelaisByDegradationId(degradationId);
         return ResponseEntity.ok(delais);
-    }
-
-    /**
-     * GET /delai-interventions/by-degradation/{degradationId} : Get all delays by degradation ID via repository
-     */
-    @GetMapping("/by-degradation/{degradationId}")
-    public ResponseEntity<List<DelaiInterventionDTO>> getByDegradation(@PathVariable Long degradationId) {
-        LOG.debug("REST request to get DelaiIntervention by degradationId (via repository) : {}", degradationId);
-        List<DelaiIntervention> entityList = delaiInterventionRepository.findByDegradationId(degradationId);
-        List<DelaiInterventionDTO> dtoList = entityList.stream().map(delaiInterventionMapper::toDtoWithEtatCouleur).toList();
-        return ResponseEntity.ok(dtoList);
     }
 }

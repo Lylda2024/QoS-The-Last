@@ -12,7 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 /**
- * Utility repository to load bag relationships based on https://vladmihalcea.com/hibernate-multiplebagfetchexception/
+ * Implémentation pour charger les relations de type "bag" (collections)
+ * afin d'éviter LazyInitializationException et MultipleBagFetchException.
+ *
+ * Basé sur la stratégie recommandée par Vlad Mihalcea :
+ * https://vladmihalcea.com/hibernate-multiplebagfetchexception/
  */
 public class UtilisateurRepositoryWithBagRelationshipsImpl implements UtilisateurRepositoryWithBagRelationships {
 
@@ -22,11 +26,17 @@ public class UtilisateurRepositoryWithBagRelationshipsImpl implements Utilisateu
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * Charge les rôles (ManyToMany) pour un seul utilisateur.
+     */
     @Override
     public Optional<Utilisateur> fetchBagRelationships(Optional<Utilisateur> utilisateur) {
         return utilisateur.map(this::fetchRoles);
     }
 
+    /**
+     * Charge les rôles pour une page d'utilisateurs.
+     */
     @Override
     public Page<Utilisateur> fetchBagRelationships(Page<Utilisateur> utilisateurs) {
         return new PageImpl<>(
@@ -36,32 +46,55 @@ public class UtilisateurRepositoryWithBagRelationshipsImpl implements Utilisateu
         );
     }
 
+    /**
+     * Charge les rôles pour une liste d'utilisateurs.
+     */
     @Override
     public List<Utilisateur> fetchBagRelationships(List<Utilisateur> utilisateurs) {
         return Optional.of(utilisateurs).map(this::fetchRoles).orElse(Collections.emptyList());
     }
 
-    Utilisateur fetchRoles(Utilisateur result) {
+    /**
+     * 🔹 Fetch pour un seul utilisateur
+     */
+    private Utilisateur fetchRoles(Utilisateur utilisateur) {
         return entityManager
             .createQuery(
-                "select utilisateur from Utilisateur utilisateur left join fetch utilisateur.roles where utilisateur.id = :id",
+                "SELECT u FROM Utilisateur u " +
+                "LEFT JOIN FETCH u.roles " +
+                "LEFT JOIN FETCH u.typeUtilisateur " + // On peut aussi fetch ManyToOne
+                "WHERE u.id = :id",
                 Utilisateur.class
             )
-            .setParameter(ID_PARAMETER, result.getId())
+            .setParameter(ID_PARAMETER, utilisateur.getId())
             .getSingleResult();
     }
 
-    List<Utilisateur> fetchRoles(List<Utilisateur> utilisateurs) {
+    /**
+     * 🔹 Fetch pour plusieurs utilisateurs (batch)
+     */
+    private List<Utilisateur> fetchRoles(List<Utilisateur> utilisateurs) {
+        if (utilisateurs.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Conserver l'ordre initial
         HashMap<Object, Integer> order = new HashMap<>();
-        IntStream.range(0, utilisateurs.size()).forEach(index -> order.put(utilisateurs.get(index).getId(), index));
+        IntStream.range(0, utilisateurs.size()).forEach(i -> order.put(utilisateurs.get(i).getId(), i));
+
         List<Utilisateur> result = entityManager
             .createQuery(
-                "select utilisateur from Utilisateur utilisateur left join fetch utilisateur.roles where utilisateur in :utilisateurs",
+                "SELECT DISTINCT u FROM Utilisateur u " +
+                "LEFT JOIN FETCH u.roles " +
+                "LEFT JOIN FETCH u.typeUtilisateur " +
+                "WHERE u IN :utilisateurs",
                 Utilisateur.class
             )
             .setParameter(UTILISATEURS_PARAMETER, utilisateurs)
             .getResultList();
-        Collections.sort(result, (o1, o2) -> Integer.compare(order.get(o1.getId()), order.get(o2.getId())));
+
+        // Réordonner comme la liste d'entrée
+        result.sort((u1, u2) -> Integer.compare(order.get(u1.getId()), order.get(u2.getId())));
         return result;
     }
 }

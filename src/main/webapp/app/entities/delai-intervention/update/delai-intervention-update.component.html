@@ -31,13 +31,12 @@
       <option *ngFor="let s of statutOptions" [value]="s">{{ s }}</option>
     </select>
   </div>
+  <!-- 1. Champ caché qui reçoit automatiquement la dégradation -->
+  <input type="hidden" formControlName="degradation" />
 
   <div class="form-group">
     <label for="acteur">Acteur</label>
-    <select id="acteur" class="form-control" formControlName="acteur" [compareWith]="compareUtilisateurs">
-      <option [ngValue]="null">-- Choisir un acteur --</option>
-      <option *ngFor="let user of utilisateurs" [ngValue]="user">{{ user.nom }} {{ user.prenom }} ({{ user.email }})</option>
-    </select>
+    <input id="acteur" type="text" class="form-control" formControlName="acteur" />
     <div class="text-danger" *ngIf="editForm.get('acteur')?.invalid && editForm.get('acteur')?.touched">L’acteur est requis.</div>
   </div>
 

@@ -1,7 +1,8 @@
+// delai-intervention-update.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import dayjs from 'dayjs';
 
 import { DelaiInterventionFormService } from './delai-intervention-form.service';
@@ -21,13 +22,11 @@ import { IDelaiIntervention, NewDelaiIntervention, StatutDelaiIntervention } fro
 export class DelaiInterventionUpdateComponent implements OnInit {
   editForm = this.formService.createDelaiInterventionFormGroup();
   isSaving = false;
-  compareUtilisateurs(u1: any, u2: any): boolean {
-    return u1 && u2 ? u1.id === u2.id : u1 === u2;
-  }
 
-  degradations: IDegradation[] = [];
   utilisateurs: IUtilisateur[] = [];
   statutOptions = Object.values(StatutDelaiIntervention);
+
+  compareUtilisateurs = (u1: any, u2: any): boolean => (u1 && u2 ? u1.id === u2.id : u1 === u2);
 
   constructor(
     private formService: DelaiInterventionFormService,
@@ -35,71 +34,53 @@ export class DelaiInterventionUpdateComponent implements OnInit {
     private degradationService: DegradationService,
     private utilisateurService: UtilisateurService,
     private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      const idDegradation = params['idDegradation'];
-
-      if (idDegradation) {
-        // Cas création avec une dégradation fournie
-        this.degradationService.find(idDegradation).subscribe(res => {
-          const degradation = res.body;
-
+      const degradationId = params['degradationId'];
+      if (degradationId) {
+        this.degradationService.find(degradationId).subscribe(res => {
           this.editForm = this.formService.createDelaiInterventionFormGroup({
-            id: null, // création : id masqué
-            dateDebut: dayjs(), // date par défaut
+            id: null,
+            dateDebut: dayjs(),
+            degradation: res.body,
           });
-
-          // Empêche modification manuelle
           this.editForm.get('degradation')?.disable();
         });
       } else {
-        // cas édition ou création normale
         this.route.data.subscribe(({ delaiIntervention }) => {
           this.editForm = this.formService.createDelaiInterventionFormGroup(delaiIntervention);
         });
       }
-
       this.loadUtilisateurs();
     });
   }
 
-  loadDegradations(): void {
-    this.degradationService.query().subscribe(res => (this.degradations = res.body ?? []));
-  }
-
   loadUtilisateurs(): void {
-    this.utilisateurService.queryActeurs().subscribe(res => {
-      this.utilisateurs = res.body ?? [];
-    });
+    this.utilisateurService.queryActeurs().subscribe(res => (this.utilisateurs = res.body ?? []));
   }
 
   save(): void {
-    this.editForm.markAllAsTouched(); // ✅ important
-    if (this.editForm.invalid) {
-      return;
-    }
+    this.editForm.markAllAsTouched();
+    if (this.editForm.invalid) return;
 
     this.isSaving = true;
     const entity = this.createFromForm();
 
-    if (entity.id === null) {
-      this.service.create(entity as NewDelaiIntervention).subscribe({
-        next: () => this.onSaveSuccess(),
-        error: () => this.onSaveError(),
-      });
-    } else {
-      this.service.update(entity as IDelaiIntervention).subscribe({
-        next: () => this.onSaveSuccess(),
-        error: () => this.onSaveError(),
-      });
-    }
+    const req =
+      entity.id === null ? this.service.create(entity as NewDelaiIntervention) : this.service.update(entity as IDelaiIntervention);
+
+    req.subscribe({
+      next: () => this.onSaveSuccess(),
+      error: () => this.onSaveError(),
+    });
   }
 
   protected onSaveSuccess(): void {
     this.isSaving = false;
-    this.previousState();
+    this.router.navigate(['/delai-intervention']);
   }
 
   protected onSaveError(): void {
@@ -111,28 +92,15 @@ export class DelaiInterventionUpdateComponent implements OnInit {
   }
 
   protected createFromForm(): IDelaiIntervention | NewDelaiIntervention {
-    const rawValue = this.editForm.getRawValue();
-
-    const statut: StatutDelaiIntervention | undefined = rawValue.statut ?? undefined;
-
-    if (rawValue.id === null || rawValue.id === undefined) {
-      return {
-        id: null, // corrigé ici
-        dateDebut: rawValue.dateDebut ?? undefined,
-        dateLimite: rawValue.dateLimite ?? undefined,
-        commentaire: rawValue.commentaire ?? undefined,
-        statut: statut,
-        acteur: rawValue.acteur ?? null,
-      };
-    } else {
-      return {
-        id: rawValue.id,
-        dateDebut: rawValue.dateDebut ?? undefined,
-        dateLimite: rawValue.dateLimite ?? undefined,
-        commentaire: rawValue.commentaire ?? undefined,
-        statut: statut,
-        acteur: rawValue.acteur ?? null,
-      };
-    }
+    const raw = this.editForm.getRawValue();
+    return {
+      id: raw.id ?? null,
+      dateDebut: raw.dateDebut ? dayjs(raw.dateDebut) : undefined,
+      dateLimite: raw.dateLimite ? dayjs(raw.dateLimite) : undefined,
+      commentaire: raw.commentaire ?? undefined,
+      statut: raw.statut ?? undefined,
+      acteur: raw.acteur ?? null,
+      degradation: raw.degradation ?? null,
+    };
   }
 }

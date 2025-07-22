@@ -1,12 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core';
-
-import dayjs from 'dayjs/esm';
+import dayjs, { Dayjs } from 'dayjs/esm';
 
 @Pipe({
   name: 'formatMediumDatetime',
+  standalone: true,
 })
-export default class FormatMediumDatetimePipe implements PipeTransform {
-  transform(day: dayjs.Dayjs | null | undefined): string {
-    return day ? day.format('D MMM YYYY HH:mm:ss') : '';
+export class FormatMediumDateTimePipe implements PipeTransform {
+  transform(value: Dayjs | null | undefined): string {
+    const d = value ? dayjs(value) : null;
+    return d?.isValid() ? d.format('D MMM YYYY HH:mm:ss') : '';
   }
 }

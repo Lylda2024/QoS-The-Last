@@ -14,10 +14,14 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public abstract class DelaiInterventionMapper implements EntityMapper<DelaiInterventionDTO, DelaiIntervention> {
 
+    /**
+     * Mapping standard → copie tous les champs utiles, y compris dateLimite et statut.
+     */
     @Named("toDto")
-    @Mapping(target = "etatCouleur", ignore = true)
+    @Mapping(target = "etatCouleur", ignore = true) // on le calcule après
     @Mapping(target = "degradation", source = "degradation", qualifiedByName = "degradationId")
     @Mapping(target = "utilisateur", source = "utilisateur", qualifiedByName = "utilisateurId")
+    // ⚠️ Ici, on s’assure que dateLimite et statut sont bien mappés automatiquement
     public abstract DelaiInterventionDTO toDto(DelaiIntervention entity);
 
     @Named("degradationId")
@@ -34,24 +38,28 @@ public abstract class DelaiInterventionMapper implements EntityMapper<DelaiInter
     public abstract List<DelaiInterventionDTO> toDto(List<DelaiIntervention> entityList);
 
     /**
-     * Appelé automatiquement après `toDto` pour calculer et fixer la couleur d’état.
+     * Appelé automatiquement après `toDto()` pour calculer la couleur d’état en fonction du délai.
      */
     @AfterMapping
     protected void setEtatCouleur(@MappingTarget DelaiInterventionDTO dto, DelaiIntervention entity) {
-        if (dto.getDateLimite() != null && dto.getStatut() != null) {
+        Instant dateLimite = entity.getDateLimite(); // mieux d’utiliser l’entity
+        String statut = entity.getStatut() != null ? entity.getStatut().name() : null; // si c’est un enum
+
+        if (dateLimite != null && statut != null) {
             Instant now = Instant.now();
-            long daysBetween = ChronoUnit.DAYS.between(now, dto.getDateLimite());
+            long daysBetween = ChronoUnit.DAYS.between(now, dateLimite);
 
             String couleur;
-            switch (dto.getStatut()) {
-                case TERMINE:
+
+            switch (statut) {
+                case "TERMINE":
                     couleur = "gris";
                     break;
-                case ANNULE:
+                case "ANNULE":
                     couleur = "blanc";
                     break;
-                case EN_COURS:
-                case TRANSFERE:
+                case "EN_COURS":
+                case "TRANSFERE":
                 default:
                     if (daysBetween > 2) {
                         couleur = "vert";
@@ -62,16 +70,18 @@ public abstract class DelaiInterventionMapper implements EntityMapper<DelaiInter
                     }
                     break;
             }
+
             dto.setEtatCouleur(couleur);
         } else {
+            // Si pas de date ou pas de statut → couleur par défaut
             dto.setEtatCouleur("blanc");
         }
     }
 
     /**
-     * Appelle le mapping standard et applique le calcul de la couleur d’état.
+     * Appelle le mapping standard et applique automatiquement le calcul de la couleur d’état.
      */
     public DelaiInterventionDTO toDtoWithEtatCouleur(DelaiIntervention delai) {
-        return toDto(delai); // déclenche aussi @AfterMapping -> setEtatCouleur
+        return toDto(delai); // déclenche aussi @AfterMapping -> setEtatCouleur()
     }
 }

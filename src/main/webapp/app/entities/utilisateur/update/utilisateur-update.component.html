@@ -1,102 +1,96 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-utilisateur-heading"
-        data-cy="UtilisateurCreateUpdateHeading"
-        jhiTranslate="codeStageApp.utilisateur.home.createOrEditLabel"
+<div class="container mt-3" *ngIf="editForm">
+  <h2 jhiTranslate="utilisateur.home.createOrEditLabel">Créer ou modifier un Utilisateur</h2>
+
+  <!-- ✅ Gestion des erreurs -->
+  <jhi-alert-error></jhi-alert-error>
+
+  <!-- ✅ Formulaire principal -->
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+    <!-- Champ Nom -->
+    <div class="form-group mb-3">
+      <label for="field_nom" jhiTranslate="utilisateur.nom">Nom</label>
+      <input type="text" id="field_nom" class="form-control" formControlName="nom" placeholder="Entrez le nom" />
+      <div *ngIf="editForm.get('nom')?.invalid && (editForm.get('nom')?.dirty || editForm.get('nom')?.touched)" class="text-danger">
+        Le nom est requis.
+      </div>
+    </div>
+
+    <!-- Champ Prénom -->
+    <div class="form-group mb-3">
+      <label for="field_prenom" jhiTranslate="utilisateur.prenom">Prénom</label>
+      <input type="text" id="field_prenom" class="form-control" formControlName="prenom" placeholder="Entrez le prénom" />
+      <div
+        *ngIf="editForm.get('prenom')?.invalid && (editForm.get('prenom')?.dirty || editForm.get('prenom')?.touched)"
+        class="text-danger"
       >
-        Créer ou éditer un Utilisateur
-      </h2>
-
-      <div>
-        <jhi-alert-error></jhi-alert-error>
-
-        <!-- Afficher ID si existant -->
-        <div *ngIf="editForm.controls.id.value !== null" class="mb-3">
-          <label class="form-label" for="field_id" jhiTranslate="codeStageApp.utilisateur.id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" readonly />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_nom" jhiTranslate="codeStageApp.utilisateur.nom">Nom</label>
-          <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_prenom" jhiTranslate="codeStageApp.utilisateur.prenom">Prenom</label>
-          <input type="text" class="form-control" name="prenom" id="field_prenom" data-cy="prenom" formControlName="prenom" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_email" jhiTranslate="codeStageApp.utilisateur.email">Email</label>
-          <input type="text" class="form-control" name="email" id="field_email" data-cy="email" formControlName="email" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_motDePasse" jhiTranslate="codeStageApp.utilisateur.motDePasse">Mot De Passe</label>
-          <input
-            type="text"
-            class="form-control"
-            name="motDePasse"
-            id="field_motDePasse"
-            data-cy="motDePasse"
-            formControlName="motDePasse"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_typeUtilisateur" jhiTranslate="codeStageApp.utilisateur.typeUtilisateur"
-            >Type Utilisateur</label
-          >
-          <select
-            class="form-control"
-            id="field_typeUtilisateur"
-            data-cy="typeUtilisateur"
-            name="typeUtilisateur"
-            formControlName="typeUtilisateur"
-            [compareWith]="compareTypeUtilisateur"
-          >
-            <option [ngValue]="null"></option>
-            <option *ngFor="let typeUtilisateurOption of typeUtilisateursSharedCollection" [ngValue]="typeUtilisateurOption">
-              {{ typeUtilisateurOption.id }}
-            </option>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label for="field_roles" jhiTranslate="codeStageApp.utilisateur.role">Role</label>
-          <select
-            class="form-control"
-            id="field_roles"
-            data-cy="role"
-            multiple
-            name="roles"
-            formControlName="roles"
-            [compareWith]="compareRole"
-          >
-            <option *ngFor="let roleOption of rolesSharedCollection" [ngValue]="roleOption">
-              {{ roleOption.id }}
-            </option>
-          </select>
-        </div>
+        Le prénom est requis.
       </div>
+    </div>
 
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
-        </button>
+    <!-- Champ Email -->
+    <div class="form-group mb-3">
+      <label for="field_email" jhiTranslate="utilisateur.email">Email</label>
+      <input type="email" id="field_email" class="form-control" formControlName="email" placeholder="exemple@mail.com" />
+      <div *ngIf="editForm.get('email')?.invalid && (editForm.get('email')?.dirty || editForm.get('email')?.touched)" class="text-danger">
+        Veuillez entrer un email valide.
       </div>
-    </form>
-  </div>
+    </div>
+
+    <!-- Champ Mot de passe -->
+    <div class="form-group mb-3">
+      <label for="field_mdp" jhiTranslate="utilisateur.motDePasse">Mot de passe</label>
+      <input type="password" id="field_mdp" class="form-control" formControlName="motDePasse" placeholder="********" />
+      <div
+        *ngIf="editForm.get('motDePasse')?.invalid && (editForm.get('motDePasse')?.dirty || editForm.get('motDePasse')?.touched)"
+        class="text-danger"
+      >
+        Le mot de passe est requis.
+      </div>
+    </div>
+
+    <!-- Sélection du Type d'utilisateur -->
+    <div class="form-group mb-3">
+      <label for="field_typeUtilisateur" jhiTranslate="utilisateur.typeUtilisateur">Type d'utilisateur</label>
+      <select id="field_typeUtilisateur" class="form-select" formControlName="typeUtilisateur" [compareWith]="compareTypeUtilisateur">
+        <option [ngValue]="null">-- Sélectionnez un type --</option>
+        <option *ngFor="let type of typeUtilisateursSharedCollection" [ngValue]="type">
+          {{ type.nom }}
+        </option>
+      </select>
+      <div
+        *ngIf="
+          editForm.get('typeUtilisateur')?.invalid && (editForm.get('typeUtilisateur')?.dirty || editForm.get('typeUtilisateur')?.touched)
+        "
+        class="text-danger"
+      >
+        Le type d'utilisateur est requis.
+      </div>
+    </div>
+
+    <!-- Sélection des Rôles -->
+    <div class="form-group mb-3">
+      <label for="field_roles" jhiTranslate="utilisateur.roles">Rôles</label>
+      <select id="field_roles" class="form-select" multiple formControlName="roles" [compareWith]="compareRole">
+        <option *ngFor="let role of rolesSharedCollection" [ngValue]="role">
+          {{ role.nom }}
+        </option>
+      </select>
+      <small class="form-text text-muted">Maintenez CTRL ou CMD pour sélectionner plusieurs rôles.</small>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="mt-4">
+      <button type="button" class="btn btn-secondary" (click)="previousState()">
+        <fa-icon icon="ban"></fa-icon>
+        &nbsp;
+        <span jhiTranslate="entity.action.cancel">Annuler</span>
+      </button>
+
+      <button type="submit" class="btn btn-primary" [disabled]="isSaving || editForm.invalid">
+        <fa-icon icon="save"></fa-icon>
+        &nbsp;
+        <span jhiTranslate="entity.action.save">Sauvegarder</span>
+      </button>
+    </div>
+  </form>
 </div>

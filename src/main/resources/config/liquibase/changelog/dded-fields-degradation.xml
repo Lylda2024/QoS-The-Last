@@ -1,7 +1,0 @@
-<changeSet id="add-new-fields-to-degradation" author="lili">
-  <addColumn tableName="degradation">
-    <column name="porteur2" type="varchar(255)" />
-    <column name="next_step" type="varchar(255)" />
-    <column name="ticket_oceane" type="varchar(255)" />
-  </addColumn>
-</changeSet>

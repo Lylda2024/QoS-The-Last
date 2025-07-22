@@ -1,11 +1,12 @@
 import { ISite } from 'app/entities/site/site.model';
+import { IDelaiIntervention } from 'app/entities/delai-intervention/delai-intervention.model';
 import { FormControl, FormGroup } from '@angular/forms';
 
 /**
  * Interface principale Degradation
  */
 export interface IDegradation {
-  id: number; // <-- Ajoute cette ligne obligatoire
+  id: number;
   localite?: string | null;
   contactTemoin?: string | null;
   typeAnomalie?: string | null;
@@ -15,27 +16,21 @@ export interface IDegradation {
   statut?: string | null;
   actionsEffectuees?: string | null;
   dateDetection?: Date | null;
-  dateLimite?: string; // <== Ajoute cette ligne
+  dateLimite?: string | null;
   commentaire?: string | null;
   nextStep?: string | null;
   ticketOceane?: string | null;
 
   site?: ISite | null;
+
+  /** ✅ Relation en lecture seule, NON incluse dans le formulaire */
+  delais?: IDelaiIntervention[] | null;
 }
 
-/**
- * Nouveau modèle utilisé pour les créations (id = null)
- */
 export type NewDegradation = Omit<IDegradation, 'id'> & { id: null };
 
-/**
- * Utilisé comme type d'entrée du formulaire
- */
 export type DegradationFormGroupInput = IDegradation | Partial<NewDegradation>;
 
-/**
- * Structure du FormGroup Angular avec les bons types
- */
 export type DegradationFormGroupContent = {
   id: FormControl<IDegradation['id'] | null>;
 
@@ -51,11 +46,9 @@ export type DegradationFormGroupContent = {
   commentaire: FormControl<IDegradation['commentaire'] | null>;
   nextStep: FormControl<IDegradation['nextStep'] | null>;
   ticketOceane: FormControl<IDegradation['ticketOceane'] | null>;
-
   site: FormControl<IDegradation['site'] | null>;
+
+  /** ❌ SUPPRIMÉ : pas de FormControl pour delais */
 };
 
-/**
- * FormGroup typé pour Degradation
- */
 export type DegradationFormGroup = FormGroup<DegradationFormGroupContent>;

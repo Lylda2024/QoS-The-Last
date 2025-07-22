@@ -14,18 +14,24 @@ public class UtilisateurDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
+    @NotNull(message = "Le nom ne peut pas être null")
+    @Size(min = 1, max = 50, message = "Le nom doit contenir entre 1 et 50 caractères")
     private String nom;
 
-    @NotNull
+    @NotNull(message = "Le prénom ne peut pas être null")
+    @Size(min = 1, max = 50, message = "Le prénom doit contenir entre 1 et 50 caractères")
     private String prenom;
 
-    @NotNull
+    @NotNull(message = "L'email ne peut pas être null")
+    @Email(message = "L'email doit être valide")
+    @Size(max = 100, message = "L'email ne peut pas dépasser 100 caractères")
     private String email;
 
-    @NotNull
+    @NotNull(message = "Le mot de passe ne peut pas être null")
+    @Size(min = 4, max = 100, message = "Le mot de passe doit contenir entre 4 et 100 caractères")
     private String motDePasse;
 
+    @NotNull(message = "Le type d'utilisateur ne peut pas être null")
     private TypeUtilisateurDTO typeUtilisateur;
 
     private Set<RoleDTO> roles = new HashSet<>();
@@ -107,17 +113,29 @@ public class UtilisateurDTO implements Serializable {
         return Objects.hash(this.id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "UtilisateurDTO{" +
-            "id=" + getId() +
-            ", nom='" + getNom() + "'" +
-            ", prenom='" + getPrenom() + "'" +
-            ", email='" + getEmail() + "'" +
-            ", motDePasse='" + getMotDePasse() + "'" +
-            ", typeUtilisateur=" + getTypeUtilisateur() +
-            ", roles=" + getRoles() +
-            "}";
+        return (
+            "UtilisateurDTO{" +
+            "id=" +
+            getId() +
+            ", nom='" +
+            getNom() +
+            "'" +
+            ", prenom='" +
+            getPrenom() +
+            "'" +
+            ", email='" +
+            getEmail() +
+            "'" +
+            ", motDePasse='" +
+            (getMotDePasse() != null ? "*****" : null) +
+            "'" +
+            ", typeUtilisateur=" +
+            getTypeUtilisateur() +
+            ", roles=" +
+            getRoles() +
+            "}"
+        );
     }
 }

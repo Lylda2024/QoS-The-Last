@@ -2,6 +2,7 @@ package com.orange.qos.service.dto;
 
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -34,6 +35,14 @@ public class DegradationDTO implements Serializable {
     private UtilisateurDTO utilisateur;
 
     private SiteDTO site;
+
+    /**
+     * ✅ Liste des délais liés à cette dégradation
+     * (chaque délai contient sa date limite + état couleur calculé)
+     */
+    private List<DelaiInterventionDTO> delais;
+
+    // ================== GETTERS / SETTERS ==================
 
     public Long getId() {
         return id;
@@ -115,20 +124,22 @@ public class DegradationDTO implements Serializable {
         this.site = site;
     }
 
+    public List<DelaiInterventionDTO> getDelais() {
+        return delais;
+    }
+
+    public void setDelais(List<DelaiInterventionDTO> delais) {
+        this.delais = delais;
+    }
+
+    // ================== EQUALS / HASHCODE ==================
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof DegradationDTO)) {
-            return false;
-        }
-
-        DegradationDTO degradationDTO = (DegradationDTO) o;
-        if (this.id == null) {
-            return false;
-        }
-        return Objects.equals(this.id, degradationDTO.id);
+        if (this == o) return true;
+        if (!(o instanceof DegradationDTO)) return false;
+        DegradationDTO that = (DegradationDTO) o;
+        return id != null && Objects.equals(id, that.id);
     }
 
     @Override
@@ -136,20 +147,42 @@ public class DegradationDTO implements Serializable {
         return Objects.hash(this.id);
     }
 
-    // prettier-ignore
+    // ================== TOSTRING ==================
+
     @Override
     public String toString() {
-        return "DegradationDTO{" +
-            "id=" + getId() +
-            ", localite='" + getLocalite() + "'" +
-            ", contactTemoin='" + getContactTemoin() + "'" +
-            ", typeAnomalie='" + getTypeAnomalie() + "'" +
-            ", priorite='" + getPriorite() + "'" +
-            ", porteur='" + getPorteur() + "'" +
-            ", actionsEffectuees='" + getActionsEffectuees() + "'" +
-            ", statut='" + getStatut() + "'" +
-            ", utilisateur=" + getUtilisateur() +
-            ", site=" + getSite() +
-            "}";
+        return (
+            "DegradationDTO{" +
+            "id=" +
+            id +
+            ", localite='" +
+            localite +
+            '\'' +
+            ", contactTemoin='" +
+            contactTemoin +
+            '\'' +
+            ", typeAnomalie='" +
+            typeAnomalie +
+            '\'' +
+            ", priorite='" +
+            priorite +
+            '\'' +
+            ", porteur='" +
+            porteur +
+            '\'' +
+            ", actionsEffectuees='" +
+            actionsEffectuees +
+            '\'' +
+            ", statut='" +
+            statut +
+            '\'' +
+            ", utilisateur=" +
+            utilisateur +
+            ", site=" +
+            site +
+            ", delais=" +
+            (delais != null ? delais.size() + " éléments" : "null") +
+            '}'
+        );
     }
 }

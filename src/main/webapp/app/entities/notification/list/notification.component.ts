@@ -6,7 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
-import { FormatMediumDatetimePipe } from 'app/shared/date';
+import { FormatMediumDateTimePipe } from 'app/shared/date';
 import { ItemCountComponent } from 'app/shared/pagination';
 import { FormsModule } from '@angular/forms';
 
@@ -19,7 +19,7 @@ import { NotificationDeleteDialogComponent } from '../delete/notification-delete
 @Component({
   selector: 'jhi-notification',
   templateUrl: './notification.component.html',
-  imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective, FormatMediumDatetimePipe, ItemCountComponent],
+  imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective, FormatMediumDateTimePipe, ItemCountComponent],
 })
 export class NotificationComponent implements OnInit {
   subscription: Subscription | null = null;

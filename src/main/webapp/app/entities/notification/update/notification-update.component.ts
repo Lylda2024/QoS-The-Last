@@ -4,19 +4,32 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
-import SharedModule from 'app/shared/shared.module';
+import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
+import { AlertErrorComponent } from 'app/shared/alert/alert-error.component';
 
 import { IDegradation } from 'app/entities/degradation/degradation.model';
 import { DegradationService } from 'app/entities/degradation/service/degradation.service';
+
 import { INotification } from '../notification.model';
 import { NotificationService } from '../service/notification.service';
+
 import { NotificationFormGroup, NotificationFormService } from './notification-form.service';
 
 @Component({
   selector: 'jhi-notification-update',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FontAwesomeModule,
+    AlertErrorComponent, // CORRECTION ICI
+  ],
   templateUrl: './notification-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule],
 })
 export class NotificationUpdateComponent implements OnInit {
   isSaving = false;
@@ -29,7 +42,6 @@ export class NotificationUpdateComponent implements OnInit {
   protected degradationService = inject(DegradationService);
   protected activatedRoute = inject(ActivatedRoute);
 
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: NotificationFormGroup = this.notificationFormService.createNotificationFormGroup();
 
   compareDegradation = (o1: IDegradation | null, o2: IDegradation | null): boolean => this.degradationService.compareDegradation(o1, o2);
@@ -40,7 +52,6 @@ export class NotificationUpdateComponent implements OnInit {
       if (notification) {
         this.updateForm(notification);
       }
-
       this.loadRelationshipsOptions();
     });
   }
@@ -52,11 +63,15 @@ export class NotificationUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const notification = this.notificationFormService.getNotification(this.editForm);
+
+    let saveObservable: Observable<HttpResponse<INotification>>;
     if (notification.id !== null) {
-      this.subscribeToSaveResponse(this.notificationService.update(notification));
+      saveObservable = this.notificationService.update(notification);
     } else {
-      this.subscribeToSaveResponse(this.notificationService.create(notification));
+      saveObservable = this.notificationService.create(notification);
     }
+
+    this.subscribeToSaveResponse(saveObservable);
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<INotification>>): void {
@@ -71,7 +86,7 @@ export class NotificationUpdateComponent implements OnInit {
   }
 
   protected onSaveError(): void {
-    // Api for inheritance.
+    // méthode à overrider si besoin
   }
 
   protected onSaveFinalize(): void {
@@ -82,7 +97,7 @@ export class NotificationUpdateComponent implements OnInit {
     this.notification = notification;
     this.notificationFormService.resetForm(this.editForm, notification);
 
-    this.degradationsSharedCollection = this.degradationService.addDegradationToCollectionIfMissing<IDegradation>(
+    this.degradationsSharedCollection = this.degradationService.addDegradationToCollectionIfMissing(
       this.degradationsSharedCollection,
       notification.degradation,
     );
@@ -94,7 +109,7 @@ export class NotificationUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IDegradation[]>) => res.body ?? []))
       .pipe(
         map((degradations: IDegradation[]) =>
-          this.degradationService.addDegradationToCollectionIfMissing<IDegradation>(degradations, this.notification?.degradation),
+          this.degradationService.addDegradationToCollectionIfMissing(degradations, this.notification?.degradation),
         ),
       )
       .subscribe((degradations: IDegradation[]) => (this.degradationsSharedCollection = degradations));
