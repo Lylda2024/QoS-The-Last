@@ -99,11 +99,9 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     legend.onAdd = () => {
       const div = L.DomUtil.create('div', 'info legend');
       const items = [
-        { label: 'P1 (Critique)', color: '#dc2626' },
-        { label: 'P2 (Élevée)', color: '#ea580c' },
-        { label: 'P3 (Moyenne)', color: '#ca8a04' },
-        { label: 'Sans délai', color: '#f9fafb' },
-        { label: 'Terminé', color: '#6b7280' },
+        { label: 'Sans délai (P1)', color: '#dc2626' },
+        { label: 'Sans délai (P2)', color: '#eab308' },
+        { label: 'Sans délai (P3)', color: '#16a34a' },
       ];
       div.innerHTML =
         '<strong>Légende priorité / délai</strong><br/>' +
@@ -187,14 +185,29 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     const now = new Date();
     const dateLimite = degradation.dateLimite ? new Date(degradation.dateLimite) : null;
     const statut = degradation.statut?.toLowerCase();
+    const priorite = degradation.priorite?.toUpperCase(); // Normalise pour éviter p1 vs P1
 
     if (statut === 'terminée' || statut === 'clôturée') return '#6b7280';
-    if (!dateLimite) return '#f9fafb';
 
+    // Si pas de dateLimite, on colore selon la priorité
+    if (!dateLimite) {
+      switch (priorite) {
+        case 'P1':
+          return '#dc2626'; // rouge
+        case 'P2':
+          return '#eab308'; // jaune
+        case 'P3':
+          return '#16a34a'; // vert
+        default:
+          return '#6b7280'; // gris par défaut si pas de priorité
+      }
+    }
+
+    // Si une dateLimite existe, on calcule le délai restant
     const diffDays = Math.ceil((dateLimite.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) return '#dc2626'; // rouge
-    if (diffDays <= 2) return '#eab308'; // jaune
-    return '#16a34a'; // vert
+    if (diffDays < 0) return '#dc2626'; // rouge (retard)
+    if (diffDays <= 2) return '#eab308'; // jaune (bientôt en retard)
+    return '#16a34a'; // vert (dans les délais)
   }
 
   private parseCoord(val?: string | number | null): number | null {
@@ -296,8 +309,8 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#dc2626').length;
   }
 
-  get countBlanc(): number {
-    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#f9fafb').length;
+  get countSansDateLimite(): number {
+    return this.allDegradations.filter(d => !d.dateLimite).length;
   }
 
   get countGris(): number {
