@@ -1,7 +1,6 @@
 package com.orange.qos.service;
 
 import com.orange.qos.domain.Degradation;
-import com.orange.qos.domain.DelaiIntervention;
 import com.orange.qos.domain.enumeration.StatutDelai;
 import com.orange.qos.repository.DegradationRepository;
 import com.orange.qos.repository.DelaiInterventionRepository;
@@ -10,7 +9,6 @@ import com.orange.qos.service.dto.DelaiInterventionDTO;
 import com.orange.qos.service.mapper.DegradationMapper;
 import com.orange.qos.service.mapper.DelaiInterventionMapper;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -46,23 +44,24 @@ public class DegradationService {
         this.delaiInterventionService = delaiInterventionService;
     }
 
-    /**
-     * Sauvegarde une dégradation ET crée automatiquement son premier délai.
-     */
     public DegradationDTO save(DegradationDTO degradationDTO) {
         LOG.debug("Request to save Degradation : {}", degradationDTO);
 
+        // Sauvegarde de la dégradation
         Degradation degradation = degradationMapper.toEntity(degradationDTO);
         degradation = degradationRepository.save(degradation);
 
-        // 1ᵉʳ délai automatique
-        DelaiInterventionDTO premierDelai = creerPremierDelai(degradation);
-        premierDelai = delaiInterventionService.save(premierDelai);
+        // Création du premier délai (DTO)
+        DelaiInterventionDTO premierDelaiDTO = creerPremierDelai(degradation);
 
-        // Retourne le DTO enrichi avec le délai créé
-        DegradationDTO dto = degradationMapper.toDto(degradation);
-        dto.setDelais(List.of(delaiInterventionMapper.toDtoWithEtatCouleur(delaiInterventionMapper.toEntity(premierDelai))));
-        return dto;
+        // Sauvegarde du délai via le service (DTO → DTO)
+        DelaiInterventionDTO savedDelaiDTO = delaiInterventionService.save(premierDelaiDTO);
+
+        // Ajout au DTO de retour
+        DegradationDTO result = degradationMapper.toDto(degradation);
+        result.setDelais(List.of(savedDelaiDTO));
+
+        return result;
     }
 
     private DelaiInterventionDTO creerPremierDelai(Degradation degradation) {
@@ -82,10 +81,9 @@ public class DegradationService {
         dto.setCommentaire("Délai initial généré automatiquement");
         dto.setResponsable(degradation.getPorteur());
         dto.setDegradationId(degradation.getId());
+
         return dto;
     }
-
-    /* ==== AUTRES MÉTHODES RESTANTES (inchangées) ==== */
 
     public DegradationDTO update(DegradationDTO degradationDTO) {
         LOG.debug("Request to update Degradation : {}", degradationDTO);

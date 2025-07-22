@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.Objects;
 
 /**
- * DTO pour l'entité DelaiIntervention
+ * DTO pour l'entité DelaiIntervention.
  */
 public class DelaiInterventionDTO implements Serializable {
 
@@ -23,13 +23,15 @@ public class DelaiInterventionDTO implements Serializable {
 
     private StatutDelai statut;
 
-    // On ne met pas toute la DegradationDTO ici dans toString pour éviter récursion infinie
     private DegradationDTO degradation;
 
     private UtilisateurDTO utilisateur;
 
-    // Champ supplémentaire indiquant l'état couleur (ex: VERT, JAUNE, ROUGE, GRIS, BLANC)
     private String etatCouleur;
+
+    private String responsable;
+
+    private Long degradationId;
 
     // Getters & Setters
 
@@ -97,6 +99,22 @@ public class DelaiInterventionDTO implements Serializable {
         this.etatCouleur = etatCouleur;
     }
 
+    public String getResponsable() {
+        return responsable;
+    }
+
+    public void setResponsable(String responsable) {
+        this.responsable = responsable;
+    }
+
+    public Long getDegradationId() {
+        return degradationId;
+    }
+
+    public void setDegradationId(Long degradationId) {
+        this.degradationId = degradationId;
+    }
+
     // equals et hashCode basés sur id
 
     @Override
@@ -112,7 +130,8 @@ public class DelaiInterventionDTO implements Serializable {
         return Objects.hash(id);
     }
 
-    // toString avec une version simplifiée pour éviter récursion
+    // toString (sans détails objets liés pour éviter récursivité)
+
     @Override
     public String toString() {
         return (
@@ -131,22 +150,14 @@ public class DelaiInterventionDTO implements Serializable {
             ", etatCouleur='" +
             etatCouleur +
             '\'' +
+            ", responsable='" +
+            responsable +
+            '\'' +
             ", degradationId=" +
-            (degradation != null ? degradation.getId() : null) +
+            (degradation != null ? degradation.getId() : degradationId) +
             ", utilisateurId=" +
             (utilisateur != null ? utilisateur.getId() : null) +
             '}'
         );
-    }
-
-    private String responsable;
-    private Long degradationId;
-
-    public void setResponsable(String responsable) {
-        this.responsable = responsable;
-    }
-
-    public void setDegradationId(Long degradationId) {
-        this.degradationId = degradationId;
     }
 }

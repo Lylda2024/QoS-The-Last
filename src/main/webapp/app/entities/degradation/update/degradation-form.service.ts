@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import dayjs from 'dayjs';
+
 import { IDegradation, NewDegradation, DegradationFormGroupInput, DegradationFormGroup } from '../degradation.model';
+
 import { Observable } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { ISite, NewSite } from 'app/entities/site/site.model';
@@ -17,18 +20,16 @@ export class DegradationFormService {
   createDegradationFormGroup(degradation: DegradationFormGroupInput = { id: null }): DegradationFormGroup {
     return this.formBuilder.group({
       id: this.formBuilder.control({ value: degradation.id, disabled: true }, { nonNullable: true, validators: [Validators.required] }),
-
       localite: this.formBuilder.control(degradation.localite ?? '', [Validators.required]),
       contactTemoin: this.formBuilder.control(degradation.contactTemoin ?? '', [Validators.required]),
       typeAnomalie: this.formBuilder.control(degradation.typeAnomalie ?? '', [Validators.required]),
       priorite: this.formBuilder.control(degradation.priorite ?? '', [Validators.required]),
       porteur: this.formBuilder.control(degradation.porteur ?? '', [Validators.required]),
       actionsEffectuees: this.formBuilder.control(degradation.actionsEffectuees ?? '', [Validators.required]),
-      dateDetection: this.formBuilder.control(degradation.dateDetection ?? '', [Validators.required]),
-      dateLimite: this.formBuilder.control(degradation.dateLimite ?? ''), // ✅ added
+      dateDetection: this.formBuilder.control(degradation.dateDetection ?? null, [Validators.required]), // <-- important : null ou Dayjs
+      dateLimite: this.formBuilder.control(degradation.dateLimite ?? null),
       commentaire: this.formBuilder.control(degradation.commentaire ?? ''),
       site: this.formBuilder.control(degradation.site ?? null, [Validators.required]),
-
       porteur2: this.formBuilder.control(degradation.porteur2 ?? ''),
       nextStep: this.formBuilder.control(degradation.nextStep ?? ''),
       ticketOceane: this.formBuilder.control(degradation.ticketOceane ?? ''),
@@ -40,8 +41,8 @@ export class DegradationFormService {
     const raw = form.getRawValue();
     return {
       ...raw,
-      dateDetection: raw.dateDetection ? new Date(raw.dateDetection).toISOString() : null,
-      dateLimite: raw.dateLimite ? new Date(raw.dateLimite).toISOString() : null,
+      dateDetection: raw.dateDetection ? dayjs(raw.dateDetection) : null,
+      dateLimite: raw.dateLimite ? dayjs(raw.dateLimite) : null,
     };
   }
 
@@ -49,6 +50,8 @@ export class DegradationFormService {
     form.reset({
       ...degradation,
       id: { value: degradation.id, disabled: true },
+      dateDetection: degradation.dateDetection ? degradation.dateDetection.format('YYYY-MM-DD') : '',
+      dateLimite: degradation.dateLimite ? degradation.dateLimite.format('YYYY-MM-DD') : '',
     } as any);
   }
 

@@ -3,6 +3,7 @@ import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from './notification.service';
 import { IDegradation } from '../../degradation/degradation.model';
+import dayjs from 'dayjs';
 
 @Injectable({
   providedIn: 'root',
@@ -42,7 +43,8 @@ export class NotificationExtendedService extends NotificationService {
 
   private getColorByDelayStatus(d: IDegradation): string {
     const now = new Date();
-    const dateLimite = d.dateLimite ? new Date(d.dateLimite) : null;
+    // Ici on convertit dayjs en Date natif avec toDate()
+    const dateLimite = d.dateLimite ? d.dateLimite.toDate() : null;
     const statut = d.statut?.toLowerCase();
 
     if (statut === 'terminée' || statut === 'clôturée') return '#6b7280';

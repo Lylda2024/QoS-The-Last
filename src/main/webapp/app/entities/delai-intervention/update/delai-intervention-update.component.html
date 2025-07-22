@@ -36,7 +36,10 @@
 
   <div class="form-group">
     <label for="acteur">Acteur</label>
-    <input id="acteur" type="text" class="form-control" formControlName="acteur" />
+    <select id="acteur" class="form-control" formControlName="acteur" required>
+      <option [ngValue]="null">-- Sélectionner un acteur --</option>
+      <option *ngFor="let u of utilisateurs" [ngValue]="u">{{ u.nom }}</option>
+    </select>
     <div class="text-danger" *ngIf="editForm.get('acteur')?.invalid && editForm.get('acteur')?.touched">L’acteur est requis.</div>
   </div>
 

@@ -14,15 +14,21 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public abstract class DelaiInterventionMapper implements EntityMapper<DelaiInterventionDTO, DelaiIntervention> {
 
-    /**
-     * Mapping standard → copie tous les champs utiles, y compris dateLimite et statut.
-     */
     @Named("toDto")
-    @Mapping(target = "etatCouleur", ignore = true) // on le calcule après
+    @Mapping(target = "etatCouleur", ignore = true) // Calculé après mapping
     @Mapping(target = "degradation", source = "degradation", qualifiedByName = "degradationId")
     @Mapping(target = "utilisateur", source = "utilisateur", qualifiedByName = "utilisateurId")
-    // ⚠️ Ici, on s’assure que dateLimite et statut sont bien mappés automatiquement
     public abstract DelaiInterventionDTO toDto(DelaiIntervention entity);
+
+    @IterableMapping(qualifiedByName = "toDto", elementTargetType = DelaiInterventionDTO.class)
+    public abstract List<DelaiInterventionDTO> toDto(List<DelaiIntervention> entityList);
+
+    // Pour la conversion inverse, map chaque DTO vers entité sans IterableMapping (optionnel)
+    public abstract List<DelaiIntervention> toEntity(List<DelaiInterventionDTO> dtoList);
+
+    @Mapping(target = "degradation", ignore = true) // à gérer dans le service si besoin
+    @Mapping(target = "utilisateur", ignore = true) // idem
+    public abstract DelaiIntervention toEntity(DelaiInterventionDTO dto);
 
     @Named("degradationId")
     @BeanMapping(ignoreByDefault = true)
@@ -34,16 +40,10 @@ public abstract class DelaiInterventionMapper implements EntityMapper<DelaiInter
     @Mapping(target = "id", source = "id")
     public abstract UtilisateurDTO toDtoUtilisateurId(Utilisateur utilisateur);
 
-    @IterableMapping(qualifiedByName = "toDto")
-    public abstract List<DelaiInterventionDTO> toDto(List<DelaiIntervention> entityList);
-
-    /**
-     * Appelé automatiquement après `toDto()` pour calculer la couleur d’état en fonction du délai.
-     */
     @AfterMapping
     protected void setEtatCouleur(@MappingTarget DelaiInterventionDTO dto, DelaiIntervention entity) {
-        Instant dateLimite = entity.getDateLimite(); // mieux d’utiliser l’entity
-        String statut = entity.getStatut() != null ? entity.getStatut().name() : null; // si c’est un enum
+        Instant dateLimite = entity.getDateLimite();
+        String statut = entity.getStatut() != null ? entity.getStatut().name() : null;
 
         if (dateLimite != null && statut != null) {
             Instant now = Instant.now();
@@ -73,14 +73,10 @@ public abstract class DelaiInterventionMapper implements EntityMapper<DelaiInter
 
             dto.setEtatCouleur(couleur);
         } else {
-            // Si pas de date ou pas de statut → couleur par défaut
             dto.setEtatCouleur("blanc");
         }
     }
 
-    /**
-     * Appelle le mapping standard et applique automatiquement le calcul de la couleur d’état.
-     */
     public DelaiInterventionDTO toDtoWithEtatCouleur(DelaiIntervention delai) {
         return toDto(delai); // déclenche aussi @AfterMapping -> setEtatCouleur()
     }

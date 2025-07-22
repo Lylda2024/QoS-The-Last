@@ -38,7 +38,8 @@ public class DelaiIntervention implements Serializable {
     @Column(name = "statut")
     private StatutDelai statut;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "degradation_id", unique = true, nullable = false)
     @JsonIgnoreProperties(value = { "utilisateur", "site" }, allowSetters = true)
     private Degradation degradation;
 

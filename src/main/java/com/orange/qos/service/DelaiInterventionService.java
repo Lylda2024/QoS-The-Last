@@ -5,6 +5,7 @@ import com.orange.qos.domain.enumeration.StatutDelai;
 import com.orange.qos.repository.DelaiInterventionRepository;
 import com.orange.qos.service.dto.DelaiInterventionDTO;
 import com.orange.qos.service.mapper.DelaiInterventionMapper;
+import com.orange.qos.web.rest.errors.BadRequestAlertException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -51,12 +52,25 @@ public class DelaiInterventionService {
     }
 
     public DelaiInterventionDTO save(DelaiInterventionDTO dto) {
-        LOG.debug("Request to save DelaiIntervention : {}", dto);
+        LOG.debug("Request to save DelaiIntervention DTO : {}", dto);
+
+        Long degradationId = dto.getDegradationId();
+        if (degradationId == null) {
+            throw new BadRequestAlertException("L'identifiant de la dégradation est requis.", "delaiIntervention", "degradationIdManquant");
+        }
+
+        boolean exists = delaiInterventionRepository.existsByDegradationIdAndStatutNot(degradationId, StatutDelai.TERMINE);
+        if (exists) {
+            throw new BadRequestAlertException(
+                "Une dégradation ne peut avoir qu’un seul délai actif.",
+                "delaiIntervention",
+                "delaiActifExiste"
+            );
+        }
+
         DelaiIntervention entity = delaiInterventionMapper.toEntity(dto);
         entity = delaiInterventionRepository.save(entity);
-        DelaiInterventionDTO result = delaiInterventionMapper.toDto(entity);
-        result.setEtatCouleur(calculerEtatCouleur(entity.getDateLimite(), entity.getStatut()));
-        return result;
+        return delaiInterventionMapper.toDto(entity);
     }
 
     public DelaiInterventionDTO update(DelaiInterventionDTO dto) {
@@ -113,5 +127,33 @@ public class DelaiInterventionService {
                 return dto;
             })
             .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public DelaiIntervention getOrCreateActiveDelai(com.orange.qos.domain.Degradation degradation) {
+        Optional<DelaiIntervention> actif = delaiInterventionRepository.findFirstByDegradationIdAndStatutNotOrderByDateDebutDesc(
+            degradation.getId(),
+            StatutDelai.TERMINE
+        );
+
+        if (actif.isPresent()) {
+            return actif.get();
+        }
+
+        int jours =
+            switch (degradation.getPriorite()) {
+                case "P1" -> 5;
+                case "P2" -> 10;
+                case "P3" -> 20;
+                default -> 10;
+            };
+
+        DelaiIntervention auto = new DelaiIntervention();
+        auto.setDegradation(degradation);
+        auto.setDateDebut(Instant.now());
+        auto.setDateLimite(Instant.now().plus(jours, ChronoUnit.DAYS));
+        auto.setStatut(StatutDelai.EN_COURS);
+
+        return delaiInterventionRepository.save(auto);
     }
 }

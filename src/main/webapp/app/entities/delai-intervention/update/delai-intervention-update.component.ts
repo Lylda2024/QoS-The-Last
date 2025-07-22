@@ -64,17 +64,27 @@ export class DelaiInterventionUpdateComponent implements OnInit {
 
   save(): void {
     this.editForm.markAllAsTouched();
-    if (this.editForm.invalid) return;
+
+    if (this.editForm.invalid) {
+      console.warn('Formulaire invalide', this.editForm.value);
+      return;
+    }
 
     this.isSaving = true;
+
     const entity = this.createFromForm();
+
+    console.log('Entité à sauvegarder:', entity);
 
     const req =
       entity.id === null ? this.service.create(entity as NewDelaiIntervention) : this.service.update(entity as IDelaiIntervention);
 
     req.subscribe({
       next: () => this.onSaveSuccess(),
-      error: () => this.onSaveError(),
+      error: err => {
+        console.error('Erreur lors de la sauvegarde:', err);
+        this.onSaveError();
+      },
     });
   }
 
@@ -93,6 +103,7 @@ export class DelaiInterventionUpdateComponent implements OnInit {
 
   protected createFromForm(): IDelaiIntervention | NewDelaiIntervention {
     const raw = this.editForm.getRawValue();
+    const degradation = this.editForm.get('degradation')?.value ?? null;
     return {
       id: raw.id ?? null,
       dateDebut: raw.dateDebut ? dayjs(raw.dateDebut) : undefined,
@@ -100,7 +111,7 @@ export class DelaiInterventionUpdateComponent implements OnInit {
       commentaire: raw.commentaire ?? undefined,
       statut: raw.statut ?? undefined,
       acteur: raw.acteur ?? null,
-      degradation: raw.degradation ?? null,
+      degradation: degradation,
     };
   }
 }

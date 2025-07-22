@@ -1,8 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AlertErrorComponent } from 'app/shared/alert/alert-error.component';
-import { AlertComponent } from 'app/shared/alert/alert.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import dayjs from 'dayjs';
 
@@ -14,7 +12,7 @@ import { DelaiInterventionService } from 'app/entities/delai-intervention/servic
   selector: 'jhi-degradation-detail',
   standalone: true,
   templateUrl: './degradation-detail.component.html',
-  imports: [CommonModule, RouterModule, AlertErrorComponent, AlertComponent, FontAwesomeModule],
+  imports: [CommonModule, RouterModule, FontAwesomeModule],
 })
 export class DegradationDetailComponent implements OnChanges {
   @Input() degradation: IDegradation | null = null;
@@ -59,7 +57,13 @@ export class DegradationDetailComponent implements OnChanges {
       return null;
     }
 
-    const dateBase = new Date(this.degradation.dateDetection);
+    // Convertir dateDetection en dayjs
+    const dateDetectionDayjs = dayjs(this.degradation.dateDetection);
+    if (!dateDetectionDayjs.isValid()) {
+      return null;
+    }
+
+    const dateBase = dateDetectionDayjs.toDate();
 
     // 1) Si un délai existe → on l’utilise
     if (this.delais.length > 0) {
@@ -84,12 +88,30 @@ export class DegradationDetailComponent implements OnChanges {
         jours = 20;
         break;
       default:
-        // Toute autre valeur → on ne calcule pas
         return null;
     }
 
     const dateLimite = new Date(dateBase);
     dateLimite.setDate(dateLimite.getDate() + jours);
     return dateLimite.toLocaleDateString();
+  }
+
+  /** Getter corrigé pour dateDetection */
+  get dateDetectionDate(): Date | null {
+    if (!this.degradation?.dateDetection) return null;
+    return dayjs(this.degradation.dateDetection).toDate();
+  }
+
+  /** Getter générique pour convertir n'importe quelle date en objet Date */
+  getDate(date: any): Date | null {
+    return date ? dayjs(date).toDate() : null;
+  }
+
+  prolongerDelai(delai: IDelaiIntervention): void {
+    console.log('Prolonger délai', delai);
+  }
+
+  transfererDelai(delai: IDelaiIntervention): void {
+    console.log('Transférer délai', delai);
   }
 }

@@ -1,6 +1,7 @@
 package com.orange.qos.repository;
 
 import com.orange.qos.domain.DelaiIntervention;
+import com.orange.qos.domain.enumeration.StatutDelai;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.*;
@@ -16,4 +17,8 @@ public interface DelaiInterventionRepository extends JpaRepository<DelaiInterven
 
     // Méthode pour récupérer le délai le plus récent (par dateDebut décroissante) pour une dégradation
     Optional<DelaiIntervention> findTopByDegradationIdOrderByDateDebutDesc(Long degradationId);
+
+    boolean existsByDegradationIdAndStatutNot(Long degradationId, StatutDelai statut);
+
+    Optional<DelaiIntervention> findFirstByDegradationIdAndStatutNotOrderByDateDebutDesc(Long degradationId, StatutDelai statut);
 }

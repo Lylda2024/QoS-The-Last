@@ -8,6 +8,8 @@ import { HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
+import { IDelaiIntervention } from 'app/entities/delai-intervention/delai-intervention.model';
+
 import { IDegradation, NewDegradation, DegradationFormGroup } from '../degradation.model';
 import { DegradationService } from '../service/degradation.service';
 import { DegradationFormService } from './degradation-form.service';
@@ -33,7 +35,6 @@ import { Statut } from 'app/entities/enumerations/statut.model';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule],
 })
 export class DegradationUpdateComponent implements OnInit, AfterViewInit {
-  /* --- variables --- */
   communes: string[] = [];
   filteredCommunes: string[] = [];
   suggestionsVisible = false;
@@ -50,9 +51,8 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
   utilisateursSharedCollection: IUtilisateur[] = [];
   filteredSites: ISite[] = [];
 
-  siteNom = ''; // simple property, no getter
+  siteNom = '';
 
-  /* --- injections --- */
   private degradationService = inject(DegradationService);
   private degradationFormService = inject(DegradationFormService);
   private siteService = inject(SiteService);
@@ -62,10 +62,8 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
   private excelService = inject(ExcelLoaderService);
   private cd = inject(ChangeDetectorRef);
 
-  /* --- form --- */
   editForm: DegradationFormGroup = this.degradationFormService.createDegradationFormGroup();
 
-  /* --- lifecycle --- */
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ degradation }) => {
       this.degradation = degradation;
@@ -81,14 +79,12 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
     setTimeout(() => this.cd.detectChanges());
   }
 
-  /* --- communes --- */
   private loadCommunes(): void {
     this.excelService.loadCommunesFromExcel().then(communes => {
       this.communes = communes;
     });
   }
 
-  /* --- navigation --- */
   goToStep(step: number): void {
     if (step === 2 && this.partie1FormIsValid()) {
       this.currentStep = 2;
@@ -114,7 +110,6 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
     return !!(control && control.invalid && (control.dirty || control.touched));
   }
 
-  /* --- site autocomplete --- */
   handleSiteInput(value: string): void {
     this.siteNom = value;
     this.onSiteInputChange(value);
@@ -135,7 +130,6 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
     this.siteNom = site.nomSite ?? '';
   }
 
-  /* --- localite autocomplete --- */
   onLocaliteInput(value: string): void {
     const val = value.toLowerCase();
     this.filteredCommunes = this.communes.filter(c => c.toLowerCase().includes(val));
@@ -229,18 +223,25 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
     this.isSaving = false;
   }
 
-  private updateForm(degradation: IDegradation): void {
-    this.degradation = degradation;
-    this.degradationFormService.resetForm(this.editForm, {
-      ...degradation,
-      dateDetection: degradation.dateDetection ? new Date(degradation.dateDetection).toISOString().substring(0, 10) : '',
-      dateLimite: degradation.dateLimite ? new Date(degradation.dateLimite).toISOString().substring(0, 10) : '',
-      nextStep: degradation.nextStep ?? '',
-      ticketOceane: degradation.ticketOceane ?? '',
-      commentaire: degradation.commentaire ?? '',
-      statut: degradation.statut ?? '',
-      site: degradation.site ?? null,
+  protected updateForm(degradation: IDegradation): void {
+    this.editForm.patchValue({
+      id: degradation.id,
+      typeAnomalie: degradation.typeAnomalie,
+      statut: degradation.statut,
+      priorite: degradation.priorite,
+      dateDetection: degradation.dateDetection ?? null,
+      dateLimite: degradation.dateLimite ?? null,
+      commentaire: degradation.commentaire,
+      site: degradation.site,
+      porteur: degradation.porteur,
+      porteur2: degradation.porteur2,
+      contactTemoin: degradation.contactTemoin,
+      actionsEffectuees: degradation.actionsEffectuees,
+      nextStep: degradation.nextStep,
+      ticketOceane: degradation.ticketOceane,
+      localite: degradation.localite,
     });
+    this.siteNom = degradation.site?.nomSite ?? '';
   }
 
   private loadRelationshipsOptions(): void {
@@ -256,13 +257,20 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
         map((utilisateurs: IUtilisateur[]) =>
           this.utilisateurService.addUtilisateurToCollectionIfMissing(
             utilisateurs,
-            this.degradation?.porteur
-              ? (utilisateurs.find(u => u.id === Number(this.degradation!.porteur)) ??
-                  (this.degradation!.porteur as unknown as IUtilisateur))
-              : undefined,
+            this.degradation?.porteur ? utilisateurs.find(u => u.id === Number(this.degradation!.porteur)) : undefined,
           ),
         ),
       )
       .subscribe((utilisateurs: IUtilisateur[]) => (this.utilisateursSharedCollection = utilisateurs));
+  }
+
+  getActiveDelai(): IDelaiIntervention | null {
+    if (!this.degradation || !this.degradation.delais) return null;
+
+    return (
+      this.degradation.delais
+        .filter(d => d.statut !== 'TERMINE')
+        .sort((a, b) => (b.dateDebut?.toDate().getTime() ?? 0) - (a.dateDebut?.toDate().getTime() ?? 0))[0] ?? null
+    );
   }
 }

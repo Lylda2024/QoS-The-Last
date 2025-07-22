@@ -3,7 +3,6 @@
 
   <div *ngIf="degradation" class="card p-3 shadow rounded">
     <div class="row">
-      <!-- Champs existants -->
       <div class="col-md-6 mb-2"><strong>Nom du site :</strong> {{ degradation.site?.nomSite }}</div>
       <div class="col-md-6 mb-2"><strong>Localité :</strong> {{ degradation.localite }}</div>
       <div class="col-md-6 mb-2"><strong>Type d’anomalie :</strong> {{ degradation.typeAnomalie }}</div>
@@ -11,10 +10,9 @@
       <div class="col-md-6 mb-2"><strong>Priorité :</strong> {{ degradation.priorite }}</div>
       <div class="col-md-6 mb-2">
         <strong>Date de détection :</strong>
-        {{ degradation.dateDetection ? (degradation.dateDetection | date: 'mediumDate') : 'N/A' }}
+        {{ dateDetectionDate ? (dateDetectionDate | date: 'mediumDate') : 'N/A' }}
       </div>
 
-      <!-- Champs ajoutés -->
       <div class="col-md-6 mb-2"><strong>Contact Témoin :</strong> {{ degradation.contactTemoin ?? 'N/A' }}</div>
       <div class="col-md-6 mb-2"><strong>Porteur :</strong> {{ degradation.porteur ?? 'N/A' }}</div>
       <div class="col-md-6 mb-2"><strong>Ticket Océane :</strong> {{ degradation.ticketOceane ?? 'N/A' }}</div>
@@ -53,8 +51,8 @@
         </thead>
         <tbody>
           <tr *ngFor="let delai of delais">
-            <td>{{ delai.dateDebut ? (delai.dateDebut | date: 'shortDate') : 'N/A' }}</td>
-            <td>{{ delai.dateLimite ? (delai.dateLimite | date: 'shortDate') : 'N/A' }}</td>
+            <td>{{ getDate(delai.dateDebut) | date: 'shortDate' }}</td>
+            <td>{{ getDate(delai.dateLimite) | date: 'shortDate' }}</td>
             <td>{{ getDuree(delai) ?? 'Non défini' }}</td>
             <td>{{ delai.statut }}</td>
             <td>{{ delai.acteur?.nom ?? 'N/A' }}</td>
