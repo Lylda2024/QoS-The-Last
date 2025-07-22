@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+  <!-- 🔧 Only the missing columns -->
+  <changeSet id="2025-07-22-add-missing-fields" author="you">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="degradation" columnName="date_limite"/>
+      </not>
+    </preConditions>
+
+    <addColumn tableName="degradation">
+      <column name="date_limite"    type="timestamp"/>
+      <column name="commentaire"    type="varchar(1000)"/>
+      <column name="ticket_oceane"  type="varchar(255)"/>
+      <column name="next_step"      type="varchar(255)"/>
+      <column name="porteur2"       type="varchar(255)"/>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>

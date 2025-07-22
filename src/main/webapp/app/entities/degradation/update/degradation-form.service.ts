@@ -16,13 +16,7 @@ export class DegradationFormService {
 
   createDegradationFormGroup(degradation: DegradationFormGroupInput = { id: null }): DegradationFormGroup {
     return this.formBuilder.group({
-      id: this.formBuilder.control(
-        { value: degradation.id, disabled: true },
-        {
-          nonNullable: true,
-          validators: [Validators.required],
-        },
-      ),
+      id: this.formBuilder.control({ value: degradation.id, disabled: true }, { nonNullable: true, validators: [Validators.required] }),
 
       localite: this.formBuilder.control(degradation.localite ?? '', [Validators.required]),
       contactTemoin: this.formBuilder.control(degradation.contactTemoin ?? '', [Validators.required]),
@@ -31,6 +25,7 @@ export class DegradationFormService {
       porteur: this.formBuilder.control(degradation.porteur ?? '', [Validators.required]),
       actionsEffectuees: this.formBuilder.control(degradation.actionsEffectuees ?? '', [Validators.required]),
       dateDetection: this.formBuilder.control(degradation.dateDetection ?? '', [Validators.required]),
+      dateLimite: this.formBuilder.control(degradation.dateLimite ?? ''), // ✅ added
       commentaire: this.formBuilder.control(degradation.commentaire ?? ''),
       site: this.formBuilder.control(degradation.site ?? null, [Validators.required]),
 
@@ -45,7 +40,8 @@ export class DegradationFormService {
     const raw = form.getRawValue();
     return {
       ...raw,
-      dateDetection: raw.dateDetection ? new Date(raw.dateDetection) : null,
+      dateDetection: raw.dateDetection ? new Date(raw.dateDetection).toISOString() : null,
+      dateLimite: raw.dateLimite ? new Date(raw.dateLimite).toISOString() : null,
     };
   }
 

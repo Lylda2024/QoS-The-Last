@@ -15,15 +15,15 @@ export interface IDegradation {
   porteur2?: string | null;
   statut?: string | null;
   actionsEffectuees?: string | null;
-  dateDetection?: Date | null;
-  dateLimite?: string | null;
+  dateDetection?: string | null;
+  dateLimite?: string | null; // ✅ ajouté
   commentaire?: string | null;
   nextStep?: string | null;
   ticketOceane?: string | null;
 
   site?: ISite | null;
 
-  /** ✅ Relation en lecture seule, NON incluse dans le formulaire */
+  /** Relation en lecture seule, NON incluse dans le formulaire */
   delais?: IDelaiIntervention[] | null;
 }
 
@@ -43,12 +43,11 @@ export type DegradationFormGroupContent = {
   statut: FormControl<IDegradation['statut'] | null>;
   actionsEffectuees: FormControl<IDegradation['actionsEffectuees'] | null>;
   dateDetection: FormControl<IDegradation['dateDetection'] | null>;
+  dateLimite: FormControl<IDegradation['dateLimite'] | null>; // ✅ ajouté
   commentaire: FormControl<IDegradation['commentaire'] | null>;
   nextStep: FormControl<IDegradation['nextStep'] | null>;
   ticketOceane: FormControl<IDegradation['ticketOceane'] | null>;
   site: FormControl<IDegradation['site'] | null>;
-
-  /** ❌ SUPPRIMÉ : pas de FormControl pour delais */
 };
 
 export type DegradationFormGroup = FormGroup<DegradationFormGroupContent>;

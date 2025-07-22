@@ -10,7 +10,6 @@ import { IDegradation } from 'app/entities/degradation/degradation.model';
 import { MapService, MapLocation } from 'app/services/map.service';
 import * as d3 from 'd3';
 import 'leaflet.fullscreen';
-import dayjs from 'dayjs';
 import { ToastrModule } from 'ngx-toastr';
 
 (window as any).d3 = d3;
@@ -33,7 +32,7 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
   private map!: L.Map;
   markerGroup: L.LayerGroup = L.layerGroup();
 
-  priorities: string[] = ['Critique', 'Élevée', 'Moyenne', 'Faible'];
+  priorities: string[] = ['P1', 'P2', 'P3'];
   selectedPriority = '';
   allDegradations: IDegradation[] = [];
 
@@ -53,24 +52,19 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.fixLeafletIcons();
-
-    // Sécurité hauteur carte
     const el = this.mapContainer.nativeElement;
     if (!el.offsetHeight) {
       el.style.height = '70vh';
       el.style.minHeight = '400px';
     }
-
     this.initMap();
     this.loadDegradations();
-
     this.locationSub = this.mapService.location$.subscribe(loc => {
       if (loc) {
         this.addDynamicMarker(loc);
         this.mapService.clearLocation();
       }
     });
-
     this.checkDelaiNotifications();
     setTimeout(() => this.cdRef.detectChanges(), 0);
   }
@@ -96,6 +90,7 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     (L.control as any).fullscreen({ position: 'topleft' }).addTo(this.map);
     this.markerGroup.addTo(this.map);
     this.addLegend();
+
     setTimeout(() => this.map.invalidateSize(), 200);
   }
 
@@ -103,15 +98,15 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     const legend = new L.Control({ position: 'bottomright' });
     legend.onAdd = () => {
       const div = L.DomUtil.create('div', 'info legend');
-      const items: { label: string; color: string }[] = [
-        { label: 'Délai respecté', color: '#16a34a' },
-        { label: 'Délai proche (≤ 2j)', color: '#eab308' },
-        { label: 'Délai dépassé', color: '#dc2626' },
-        { label: 'Pas de délai', color: '#f9fafb' },
-        { label: 'Terminée', color: '#6b7280' },
+      const items = [
+        { label: 'P1 (Critique)', color: '#dc2626' },
+        { label: 'P2 (Élevée)', color: '#ea580c' },
+        { label: 'P3 (Moyenne)', color: '#ca8a04' },
+        { label: 'Sans délai', color: '#f9fafb' },
+        { label: 'Terminé', color: '#6b7280' },
       ];
       div.innerHTML =
-        '<strong>Statut délai</strong><br/>' +
+        '<strong>Légende priorité / délai</strong><br/>' +
         items
           .map(i => `<i style="background:${i.color};width:12px;height:12px;display:inline-block;margin-right:6px;"></i>${i.label}`)
           .join('<br/>');
@@ -133,62 +128,10 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     this.degradationSub = this.degradationService.query().subscribe({
       next: (res: HttpResponse<IDegradation[]>) => {
         this.allDegradations = res.body ?? [];
-        console.log('Dégradations reçues :', this.allDegradations);
-
         this.extractFilterOptions();
         this.applyFilter();
         this.notifService.notifyDelaiAlertes(this.allDegradations);
         this.lastUpdate = new Date();
-
-        // Données heatmap
-        const dates = this.allDegradations.filter(d => !!d.dateDetection).map(d => dayjs(d.dateDetection).startOf('day').unix());
-
-        const aggregated = dates.reduce((acc: Record<number, number>, ts) => {
-          acc[ts] = (acc[ts] || 0) + 1;
-          return acc;
-        }, {});
-
-        const heatmapData = Object.entries(aggregated).map(([ts, count]) => ({
-          date: new Date(Number(ts) * 1000),
-          value: count,
-        }));
-
-        const container = document.getElementById('calendar-heatmap');
-        if (container) container.innerHTML = '';
-
-        import('cal-heatmap').then(({ default: CalHeatMap }) => {
-          new CalHeatMap().paint({
-            itemSelector: '#calendar-heatmap',
-            range: 3,
-            domain: {
-              type: 'month',
-              gutter: 10,
-              label: { text: 'MMM', position: 'top', height: 20 },
-            },
-            subDomain: {
-              type: 'day',
-              width: 20,
-              height: 20,
-              gutter: 4,
-              radius: 4,
-            },
-            data: heatmapData,
-            scale: {
-              color: {
-                type: 'threshold',
-                domain: [1, 5, 10],
-                range: ['#16a34a', '#eab308', '#dc2626'],
-              },
-            },
-            theme: 'light',
-            tooltip: {
-              enabled: true,
-              text: (date: Date, value: number) => `${date.toLocaleDateString()} : ${value || 0} dégradation(s)`,
-            },
-            legend: [1, 5, 10],
-            legendOrientation: 'horizontal',
-          });
-        });
       },
       error: err => console.error('[HomeComponent] Erreur chargement dégradations :', err),
     });
@@ -197,13 +140,12 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
   applyFilter(): void {
     this.markerGroup.clearLayers();
     const list = this.allDegradations.filter(d => {
-      const matchPriority = this.selectedPriority ? d.priorite?.toLowerCase() === this.selectedPriority.toLowerCase() : true;
+      const matchPriority = this.selectedPriority ? d.priorite === this.selectedPriority : true;
       const matchStatut = this.selectedStatut ? d.statut?.toLowerCase() === this.selectedStatut.toLowerCase() : true;
       const matchLocalite = this.selectedLocalite ? d.localite === this.selectedLocalite : true;
       const matchActeur = this.selectedActeur ? d.porteur === this.selectedActeur : true;
       return matchPriority && matchStatut && matchLocalite && matchActeur;
     });
-
     list.forEach(d => this.addMarkerIfValid(d));
 
     const layers = this.markerGroup.getLayers();
@@ -217,10 +159,7 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
   private addMarkerIfValid(d: IDegradation): void {
     const lat = this.parseCoord(d.site?.latitude);
     const lng = this.parseCoord(d.site?.longitude);
-    if (lat === null || lng === null) {
-      console.warn(`❌ Dégradation #${d.id} ignorée (pas de coordonnées)`);
-      return;
-    }
+    if (lat === null || lng === null) return;
 
     const color = this.getColorByDelayStatus(d);
     const marker = L.circleMarker([lat, lng], {
@@ -229,34 +168,19 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
       fillColor: color,
       fillOpacity: 0.85,
     });
+
     marker.bindPopup(
-      `<strong>ID #${d.id ?? '?'}</strong><br/>Localité : ${d.localite ?? '-'}<br/>Type : ${d.typeAnomalie ?? '-'}<br/>Priorité : <b>${d.priorite ?? '-'}</b><br/>Statut : ${d.statut ?? '-'}<br/>Date limite : ${d.dateLimite ? new Date(d.dateLimite).toLocaleDateString() : '-'}<br/>Responsable : ${d.porteur ?? '-'}<br/><a href="/degradation/${d.id}" target="_blank">🔎 Voir fiche</a>`,
+      `<strong>ID #${d.id ?? '?'}</strong><br/>
+       Localité : ${d.localite ?? '-'}<br/>
+       Type : ${d.typeAnomalie ?? '-'}<br/>
+       Priorité : <b>${d.priorite ?? '-'}</b><br/>
+       Statut : ${d.statut ?? '-'}<br/>
+       Date limite : ${d.dateLimite ? new Date(d.dateLimite).toLocaleDateString() : '-'}<br/>
+       Responsable : ${d.porteur ?? '-'}<br/>
+       <a href="/degradation/${d.id}" target="_blank">🔎 Voir fiche</a>`,
     );
-    this.markerGroup.addLayer(marker);
-  }
 
-  private addDynamicMarker(loc: MapLocation): void {
-    const color = this.getColorByPriority(loc.priorite?.toLowerCase());
-    const marker = L.circleMarker([loc.latitude, loc.longitude], {
-      radius: 10,
-      color,
-      fillColor: color,
-      fillOpacity: 0.9,
-    }).bindPopup(
-      `<strong>Nouvelle dégradation</strong><br/>Priorité : <b>${loc.priorite ?? '-'}</b><br/><small>Lat : ${loc.latitude}, Lng : ${loc.longitude}</small>`,
-    );
     this.markerGroup.addLayer(marker);
-    this.map.flyTo([loc.latitude, loc.longitude], 15);
-  }
-
-  private getColorByPriority(priority?: string | null): string {
-    const colors: Record<string, string> = {
-      critique: '#dc2626',
-      élevée: '#ea580c',
-      moyenne: '#ca8a04',
-      faible: '#16a34a',
-    };
-    return priority ? (colors[priority] ?? '#3b82f6') : '#3b82f6';
   }
 
   private getColorByDelayStatus(degradation: IDegradation): string {
@@ -267,19 +191,23 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     if (statut === 'terminée' || statut === 'clôturée') return '#6b7280';
     if (!dateLimite) return '#f9fafb';
 
-    const diffMs = dateLimite.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) return '#dc2626';
-    if (diffDays <= 2) return '#eab308';
-    return '#16a34a';
+    const diffDays = Math.ceil((dateLimite.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return '#dc2626'; // rouge
+    if (diffDays <= 2) return '#eab308'; // jaune
+    return '#16a34a'; // vert
   }
 
   private parseCoord(val?: string | number | null): number | null {
-    if (val === null || val === undefined) return null;
-    let str = typeof val === 'number' ? val.toString() : val;
-    str = str.replace(',', '.').trim();
-    const n = parseFloat(str);
-    return !isFinite(n) ? null : n;
+    if (val == null) return null;
+    const n = parseFloat(String(val).replace(',', '.'));
+    return isFinite(n) ? n : null;
+  }
+
+  private extractFilterOptions(): void {
+    const unique = <T>(arr: (T | null | undefined)[]) => [...new Set(arr.filter(v => v != null))].sort() as T[];
+    this.statuts = unique(this.allDegradations.map(d => d.statut));
+    this.localites = unique(this.allDegradations.map(d => d.localite));
+    this.acteurs = unique(this.allDegradations.map(d => d.porteur));
   }
 
   clearFilter(): void {
@@ -301,51 +229,78 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private extractFilterOptions(): void {
-    const unique = <T>(arr: (T | null | undefined)[]) => [...new Set(arr.filter((v): v is T => !!v))].sort();
-    this.statuts = unique(this.allDegradations.map(d => d.statut));
-    this.localites = unique(this.allDegradations.map(d => d.localite));
-    this.acteurs = unique(this.allDegradations.map(d => d.porteur));
-  }
-
-  // Getters stats
-  get countVert(): number {
-    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#16a34a').length;
-  }
-  get countJaune(): number {
-    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#eab308').length;
-  }
-  get countRouge(): number {
-    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#dc2626').length;
-  }
-  get countBlanc(): number {
-    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#f9fafb').length;
-  }
-  get countGris(): number {
-    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#6b7280').length;
-  }
-
   private checkDelaiNotifications(): void {
     this.notificationIntervalId = setInterval(() => {
       this.notifService.notifyDelaiAlertes(this.allDegradations);
-    }, 300000);
+    }, 300000); // toutes les 5 min
   }
 
-  // Actions filtres
-  setPriority(priority: string): void {
-    this.selectedPriority = priority;
+  /* 🔄 Liaison filtre UI */
+  setPriority(p: string): void {
+    this.selectedPriority = p;
     this.applyFilter();
   }
-  setStatut(statut: string): void {
-    this.selectedStatut = statut;
+
+  setStatut(s: string): void {
+    this.selectedStatut = s;
     this.applyFilter();
   }
-  setLocalite(localite: string): void {
-    this.selectedLocalite = localite;
+
+  setLocalite(l: string): void {
+    this.selectedLocalite = l;
     this.applyFilter();
   }
-  setActeur(acteur: string): void {
-    this.selectedActeur = acteur;
+
+  setActeur(a: string): void {
+    this.selectedActeur = a;
     this.applyFilter();
+  }
+
+  private addDynamicMarker(loc: MapLocation): void {
+    const color = this.getColorByPriority(loc.priorite);
+    const marker = L.circleMarker([loc.latitude, loc.longitude], {
+      radius: 10,
+      color,
+      fillColor: color,
+      fillOpacity: 0.9,
+    }).bindPopup(
+      `<strong>Nouvelle dégradation</strong><br/>Priorité : <b>${loc.priorite ?? '-'}</b><br/><small>Lat : ${loc.latitude}, Lng : ${loc.longitude}</small>`,
+    );
+    this.markerGroup.addLayer(marker);
+    this.map.flyTo([loc.latitude, loc.longitude], 15);
+  }
+
+  private getColorByPriority(priority?: string | null): string {
+    switch (priority) {
+      case 'P1':
+        return '#dc2626';
+      case 'P2':
+        return '#ea580c';
+      case 'P3':
+        return '#ca8a04';
+      default:
+        return '#3b82f6';
+    }
+  }
+
+  /* 🧮 Stats pour affichage */
+  get countVert(): number {
+    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#16a34a').length;
+  }
+
+  get countJaune(): number {
+    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#eab308').length;
+  }
+
+  get countRouge(): number {
+    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#dc2626').length;
+  }
+
+  get countBlanc(): number {
+    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#f9fafb').length;
+  }
+
+  get countGris(): number {
+    return this.allDegradations.filter(d => this.getColorByDelayStatus(d) === '#6b7280').length;
   }
 }

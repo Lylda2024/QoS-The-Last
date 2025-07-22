@@ -3,8 +3,8 @@
 
   <div *ngIf="degradation" class="card p-3 shadow rounded">
     <div class="row">
-      <div class="col-md-6 mb-2"><strong>Numéro :</strong> {{ degradation.numero }}</div>
-      <div class="col-md-6 mb-2"><strong>Nom du site :</strong> {{ degradation.nomSite }}</div>
+      <!-- Champs existants -->
+      <div class="col-md-6 mb-2"><strong>Nom du site :</strong> {{ degradation.site?.nomSite }}</div>
       <div class="col-md-6 mb-2"><strong>Localité :</strong> {{ degradation.localite }}</div>
       <div class="col-md-6 mb-2"><strong>Type d’anomalie :</strong> {{ degradation.typeAnomalie }}</div>
       <div class="col-md-6 mb-2"><strong>Statut :</strong> {{ degradation.statut }}</div>
@@ -13,9 +13,25 @@
         <strong>Date de détection :</strong>
         {{ degradation.dateDetection ? (degradation.dateDetection | date: 'mediumDate') : 'N/A' }}
       </div>
+
+      <!-- Champs ajoutés -->
+      <div class="col-md-6 mb-2"><strong>Contact Témoin :</strong> {{ degradation.contactTemoin ?? 'N/A' }}</div>
+      <div class="col-md-6 mb-2"><strong>Porteur :</strong> {{ degradation.porteur ?? 'N/A' }}</div>
+      <div class="col-md-6 mb-2"><strong>Ticket Océane :</strong> {{ degradation.ticketOceane ?? 'N/A' }}</div>
+
+      <div class="col-md-12 mb-2">
+        <strong>Analyse / Actions effectuées :</strong>
+        <p>{{ degradation.actionsEffectuees ?? 'N/A' }}</p>
+      </div>
+
+      <div class="col-md-12 mb-2">
+        <strong>Next Step :</strong>
+        <p>{{ degradation.nextStep ?? 'N/A' }}</p>
+      </div>
+
       <div class="col-md-12 mb-2">
         <strong>Commentaire :</strong>
-        <p>{{ degradation.commentaire }}</p>
+        <p>{{ degradation.commentaire ?? 'N/A' }}</p>
       </div>
     </div>
 

@@ -103,4 +103,11 @@ public class DegradationResource {
         Optional<DegradationDTO> degradationDTO = degradationService.findOne(id);
         return ResponseUtil.wrapOrNotFound(degradationDTO);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DegradationDTO> updateDegradation(@PathVariable Long id, @Valid @RequestBody DegradationDTO dto) {
+        LOG.debug("REST request to update Degradation : {}, {}", id, dto);
+        dto.setId(id);
+        return ResponseEntity.ok(degradationService.update(dto));
+    }
 }

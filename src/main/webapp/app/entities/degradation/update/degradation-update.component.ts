@@ -33,6 +33,7 @@ import { Statut } from 'app/entities/enumerations/statut.model';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule],
 })
 export class DegradationUpdateComponent implements OnInit, AfterViewInit {
+  /* --- variables --- */
   communes: string[] = [];
   filteredCommunes: string[] = [];
   suggestionsVisible = false;
@@ -49,18 +50,22 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
   utilisateursSharedCollection: IUtilisateur[] = [];
   filteredSites: ISite[] = [];
 
-  protected degradationService = inject(DegradationService);
-  protected degradationFormService = inject(DegradationFormService);
-  protected siteService = inject(SiteService);
-  protected utilisateurService = inject(UtilisateurService);
-  protected activatedRoute = inject(ActivatedRoute);
-  protected mapService = inject(MapService);
-  protected excelService = inject(ExcelLoaderService);
+  siteNom = ''; // simple property, no getter
 
+  /* --- injections --- */
+  private degradationService = inject(DegradationService);
+  private degradationFormService = inject(DegradationFormService);
+  private siteService = inject(SiteService);
+  private utilisateurService = inject(UtilisateurService);
+  private activatedRoute = inject(ActivatedRoute);
+  private mapService = inject(MapService);
+  private excelService = inject(ExcelLoaderService);
+  private cd = inject(ChangeDetectorRef);
+
+  /* --- form --- */
   editForm: DegradationFormGroup = this.degradationFormService.createDegradationFormGroup();
 
-  constructor(private cd: ChangeDetectorRef) {}
-
+  /* --- lifecycle --- */
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ degradation }) => {
       this.degradation = degradation;
@@ -69,7 +74,6 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
       }
       this.loadRelationshipsOptions();
     });
-
     this.loadCommunes();
   }
 
@@ -77,17 +81,14 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
     setTimeout(() => this.cd.detectChanges());
   }
 
+  /* --- communes --- */
   private loadCommunes(): void {
     this.excelService.loadCommunesFromExcel().then(communes => {
       this.communes = communes;
     });
   }
 
-  get siteNom(): string {
-    const site = this.editForm.get('site')?.value;
-    return typeof site === 'object' && site?.nomSite ? site.nomSite : '';
-  }
-
+  /* --- navigation --- */
   goToStep(step: number): void {
     if (step === 2 && this.partie1FormIsValid()) {
       this.currentStep = 2;
@@ -97,13 +98,14 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
   }
 
   partie1FormIsValid(): boolean {
-    return (
-      this.editForm.get('priorite')?.valid === true &&
-      this.editForm.get('localite')?.valid === true &&
-      this.editForm.get('contactTemoin')?.valid === true &&
-      this.editForm.get('typeAnomalie')?.valid === true &&
-      this.editForm.get('actionsEffectuees')?.valid === true &&
-      this.editForm.get('dateDetection')?.valid === true
+    const f = this.editForm.controls;
+    return !!(
+      f.localite?.valid &&
+      f.contactTemoin?.valid &&
+      f.typeAnomalie?.valid &&
+      f.priorite?.valid &&
+      f.actionsEffectuees?.valid &&
+      f.dateDetection?.valid
     );
   }
 
@@ -112,9 +114,10 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
     return !!(control && control.invalid && (control.dirty || control.touched));
   }
 
-  handleSiteInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.onSiteInputChange(input.value);
+  /* --- site autocomplete --- */
+  handleSiteInput(value: string): void {
+    this.siteNom = value;
+    this.onSiteInputChange(value);
   }
 
   onSiteInputChange(value: string): void {
@@ -122,7 +125,6 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
       this.filteredSites = [];
       return;
     }
-
     const searchTerm = value.toLowerCase();
     this.filteredSites = this.sitesSharedCollection.filter(site => site.nomSite?.toLowerCase().includes(searchTerm));
   }
@@ -130,12 +132,13 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
   selectSiteSuggestion(site: ISite): void {
     this.editForm.get('site')?.setValue(site);
     this.filteredSites = [];
+    this.siteNom = site.nomSite ?? '';
   }
 
-  onLocaliteInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const val = input?.value ?? '';
-    this.filteredCommunes = this.communes.filter(c => c.toLowerCase().includes(val.toLowerCase()));
+  /* --- localite autocomplete --- */
+  onLocaliteInput(value: string): void {
+    const val = value.toLowerCase();
+    this.filteredCommunes = this.communes.filter(c => c.toLowerCase().includes(val));
     this.suggestionsVisible = true;
   }
 
@@ -149,30 +152,31 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
   }
 
   showSuggestions(): void {
-    const input = this.editForm.get('localite')?.value || '';
-    this.filteredCommunes = this.communes.filter(c => c.toLowerCase().includes(input.toLowerCase()));
+    const val = this.editForm.get('localite')?.value || '';
+    this.filteredCommunes = this.communes.filter(c => c.toLowerCase().includes(val.toLowerCase()));
     this.suggestionsVisible = true;
   }
 
   onLocaliteClicked(): void {
     const site = this.editForm.get('site')?.value;
     const priorite = this.editForm.get('priorite')?.value;
-
     if (!site) {
       console.warn('Site manquant');
       return;
     }
-
     const lat = site.latitude;
     const lng = site.longitude;
-
     if (lat != null && lng != null && !isNaN(lat) && !isNaN(lng)) {
       this.mapService.setLocation({
         latitude: lat,
         longitude: lng,
         priorite: priorite ?? undefined,
       });
-      console.log('📍 Localisation envoyée au MapService :', { lat, lng, priorite });
+      console.log('📍 Localisation envoyée au MapService :', {
+        lat,
+        lng,
+        priorite,
+      });
     } else {
       console.warn('⚠️ Coordonnées invalides pour le site');
     }
@@ -188,10 +192,8 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
       alert('❌ Veuillez remplir tous les champs obligatoires.');
       return;
     }
-
     this.isSaving = true;
     const degradation = this.degradationFormService.getDegradation(this.editForm);
-
     if (degradation.id != null) {
       this.subscribeToSaveResponse(this.degradationService.update(degradation));
     } else {
@@ -200,39 +202,48 @@ export class DegradationUpdateComponent implements OnInit, AfterViewInit {
     }
   }
 
-  protected subscribeToSaveResponse(result: Observable<HttpResponse<IDegradation>>): void {
+  private subscribeToSaveResponse(result: Observable<HttpResponse<IDegradation>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
       next: () => this.onSaveSuccess(),
       error: err => this.onSaveError(err),
     });
   }
 
-  protected onSaveSuccess(): void {
+  private onSaveSuccess(): void {
     this.previousState();
   }
 
-  protected onSaveError(error: any): void {
+  private onSaveError(error: any): void {
     this.isSaving = false;
     console.error('❌ Erreur lors de la sauvegarde :', error);
     if (error.status === 400) {
-      alert('Erreur 400 : Requête invalide. Vérifiez les champs obligatoires.');
+      alert('Erreur 400 : Requête invalide.');
     } else if (error.status === 500) {
-      alert('Erreur 500 : Erreur interne du serveur.');
+      alert('Erreur 500 : Erreur interne.');
     } else {
-      alert('Erreur inconnue lors de la sauvegarde.');
+      alert('Erreur inconnue.');
     }
   }
 
-  protected onSaveFinalize(): void {
+  private onSaveFinalize(): void {
     this.isSaving = false;
   }
 
-  protected updateForm(degradation: IDegradation): void {
+  private updateForm(degradation: IDegradation): void {
     this.degradation = degradation;
-    this.degradationFormService.resetForm(this.editForm, degradation);
+    this.degradationFormService.resetForm(this.editForm, {
+      ...degradation,
+      dateDetection: degradation.dateDetection ? new Date(degradation.dateDetection).toISOString().substring(0, 10) : '',
+      dateLimite: degradation.dateLimite ? new Date(degradation.dateLimite).toISOString().substring(0, 10) : '',
+      nextStep: degradation.nextStep ?? '',
+      ticketOceane: degradation.ticketOceane ?? '',
+      commentaire: degradation.commentaire ?? '',
+      statut: degradation.statut ?? '',
+      site: degradation.site ?? null,
+    });
   }
 
-  protected loadRelationshipsOptions(): void {
+  private loadRelationshipsOptions(): void {
     this.siteService
       .getAllWithoutPagination()
       .pipe(map((sites: ISite[]) => this.siteService.addSiteToCollectionIfMissing(sites, this.degradation?.site)))

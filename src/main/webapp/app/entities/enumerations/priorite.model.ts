@@ -1,6 +1,5 @@
 export enum Priorite {
-  FAIBLE = 'FAIBLE',
-  MOYENNE = 'MOYENNE',
-  ELEVEE = 'ELEVEE',
-  CRITIQUE = 'CRITIQUE',
+  P1 = 'P1',
+  P2 = 'P2',
+  P3 = 'P3',
 }

@@ -1,12 +1,17 @@
 package com.orange.qos.service;
 
 import com.orange.qos.domain.Degradation;
+import com.orange.qos.domain.DelaiIntervention;
+import com.orange.qos.domain.enumeration.StatutDelai;
 import com.orange.qos.repository.DegradationRepository;
 import com.orange.qos.repository.DelaiInterventionRepository;
 import com.orange.qos.service.dto.DegradationDTO;
 import com.orange.qos.service.dto.DelaiInterventionDTO;
 import com.orange.qos.service.mapper.DegradationMapper;
 import com.orange.qos.service.mapper.DelaiInterventionMapper;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,9 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service Implementation for managing {@link com.orange.qos.domain.Degradation}.
- */
 @Service
 @Transactional
 public class DegradationService {
@@ -45,18 +47,46 @@ public class DegradationService {
     }
 
     /**
-     * Sauvegarde une dégradation simple.
+     * Sauvegarde une dégradation ET crée automatiquement son premier délai.
      */
     public DegradationDTO save(DegradationDTO degradationDTO) {
         LOG.debug("Request to save Degradation : {}", degradationDTO);
+
         Degradation degradation = degradationMapper.toEntity(degradationDTO);
         degradation = degradationRepository.save(degradation);
-        return degradationMapper.toDto(degradation);
+
+        // 1ᵉʳ délai automatique
+        DelaiInterventionDTO premierDelai = creerPremierDelai(degradation);
+        premierDelai = delaiInterventionService.save(premierDelai);
+
+        // Retourne le DTO enrichi avec le délai créé
+        DegradationDTO dto = degradationMapper.toDto(degradation);
+        dto.setDelais(List.of(delaiInterventionMapper.toDtoWithEtatCouleur(delaiInterventionMapper.toEntity(premierDelai))));
+        return dto;
     }
 
-    /**
-     * Mise à jour complète.
-     */
+    private DelaiInterventionDTO creerPremierDelai(Degradation degradation) {
+        DelaiInterventionDTO dto = new DelaiInterventionDTO();
+        dto.setDateDebut(Instant.now());
+        dto.setStatut(StatutDelai.EN_COURS);
+
+        long days =
+            switch (degradation.getPriorite()) {
+                case "P1" -> 5;
+                case "P2" -> 10;
+                case "P3" -> 20;
+                default -> 10;
+            };
+
+        dto.setDateLimite(Instant.now().plus(days, ChronoUnit.DAYS));
+        dto.setCommentaire("Délai initial généré automatiquement");
+        dto.setResponsable(degradation.getPorteur());
+        dto.setDegradationId(degradation.getId());
+        return dto;
+    }
+
+    /* ==== AUTRES MÉTHODES RESTANTES (inchangées) ==== */
+
     public DegradationDTO update(DegradationDTO degradationDTO) {
         LOG.debug("Request to update Degradation : {}", degradationDTO);
         Degradation degradation = degradationMapper.toEntity(degradationDTO);
@@ -64,100 +94,74 @@ public class DegradationService {
         return degradationMapper.toDto(degradation);
     }
 
-    /**
-     * Mise à jour partielle.
-     */
     public Optional<DegradationDTO> partialUpdate(DegradationDTO degradationDTO) {
         LOG.debug("Request to partially update Degradation : {}", degradationDTO);
-
         return degradationRepository
             .findById(degradationDTO.getId())
-            .map(existingDegradation -> {
-                degradationMapper.partialUpdate(existingDegradation, degradationDTO);
-                return existingDegradation;
+            .map(existing -> {
+                degradationMapper.partialUpdate(existing, degradationDTO);
+                return existing;
             })
             .map(degradationRepository::save)
             .map(degradationMapper::toDto);
     }
 
-    /**
-     * Récupère une dégradation avec ses délais enrichis.
-     */
     @Transactional(readOnly = true)
     public Optional<DegradationDTO> findOne(Long id) {
         LOG.debug("Request to get Degradation : {}", id);
-
         return degradationRepository
             .findById(id)
             .map(degradation -> {
                 DegradationDTO dto = degradationMapper.toDto(degradation);
-
-                // On charge les délais associés et on les enrichit avec leur couleur
-                List<DelaiInterventionDTO> delais = delaiInterventionRepository
-                    .findByDegradationId(degradation.getId())
-                    .stream()
-                    .map(delai -> delaiInterventionMapper.toDtoWithEtatCouleur(delai))
-                    .collect(Collectors.toList());
-
-                dto.setDelais(delais);
+                dto.setDelais(
+                    delaiInterventionRepository
+                        .findByDegradationId(degradation.getId())
+                        .stream()
+                        .map(delaiInterventionMapper::toDtoWithEtatCouleur)
+                        .collect(Collectors.toList())
+                );
                 return dto;
             });
     }
 
-    /**
-     * Supprime une dégradation.
-     */
     public void delete(Long id) {
         LOG.debug("Request to delete Degradation : {}", id);
         degradationRepository.deleteById(id);
     }
 
-    /**
-     * Récupère toutes les dégradations avec leurs délais enrichis.
-     */
     @Transactional(readOnly = true)
     public List<DegradationDTO> findAllWithDelai() {
         LOG.debug("Request to get all Degradations enriched with delays");
-
         return degradationRepository
             .findAll()
             .stream()
             .map(degradation -> {
                 DegradationDTO dto = degradationMapper.toDto(degradation);
-
-                // On enrichit chaque délai avec son état couleur
-                List<DelaiInterventionDTO> delais = delaiInterventionRepository
-                    .findByDegradationId(degradation.getId())
-                    .stream()
-                    .map(delai -> delaiInterventionMapper.toDtoWithEtatCouleur(delai))
-                    .collect(Collectors.toList());
-
-                dto.setDelais(delais);
+                dto.setDelais(
+                    delaiInterventionRepository
+                        .findByDegradationId(degradation.getId())
+                        .stream()
+                        .map(delaiInterventionMapper::toDtoWithEtatCouleur)
+                        .collect(Collectors.toList())
+                );
                 return dto;
             })
             .collect(Collectors.toList());
     }
 
-    /**
-     * Retourne la liste des délais d'intervention liés à une dégradation,
-     * avec calcul de la couleur d'état pour chaque délai.
-     */
+    @Transactional(readOnly = true)
+    public List<DegradationDTO> findAllWithSite() {
+        LOG.debug("Request to get all Degradations with Site");
+        return degradationRepository.findAllWithSite().stream().map(degradationMapper::toDto).collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public List<DelaiInterventionDTO> findDelaisByDegradationId(Long degradationId) {
         LOG.debug("Request to get delays by degradation id : {}", degradationId);
         return delaiInterventionRepository
             .findByDegradationId(degradationId)
             .stream()
-            .map(delai -> delaiInterventionMapper.toDtoWithEtatCouleur(delai))
+            .map(delaiInterventionMapper::toDtoWithEtatCouleur)
             .collect(Collectors.toList());
-    }
-
-    /**
-     * Récupère toutes les dégradations avec leurs sites uniquement.
-     */
-    @Transactional(readOnly = true)
-    public List<DegradationDTO> findAllWithSite() {
-        LOG.debug("Request to get all Degradations with Site");
-        return degradationRepository.findAllWithSite().stream().map(degradationMapper::toDto).collect(Collectors.toList());
     }
 }

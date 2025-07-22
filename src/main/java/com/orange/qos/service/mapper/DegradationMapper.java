@@ -10,11 +10,23 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface DegradationMapper {
     /* ---------- DTO → Entity ---------- */
+    @Mapping(target = "dateDetection", source = "dateDetection")
+    @Mapping(target = "dateLimite", source = "dateLimite")
+    @Mapping(target = "commentaire", source = "commentaire")
+    @Mapping(target = "ticketOceane", source = "ticketOceane")
+    @Mapping(target = "nextStep", source = "nextStep")
+    @Mapping(target = "porteur2", source = "porteur2")
     @Mapping(target = "utilisateur", source = "utilisateur")
     @Mapping(target = "site", source = "site")
     Degradation toEntity(DegradationDTO dto);
 
     /* ---------- Entity → DTO ---------- */
+    @Mapping(target = "dateDetection", source = "dateDetection")
+    @Mapping(target = "dateLimite", source = "dateLimite")
+    @Mapping(target = "commentaire", source = "commentaire")
+    @Mapping(target = "ticketOceane", source = "ticketOceane")
+    @Mapping(target = "nextStep", source = "nextStep")
+    @Mapping(target = "porteur2", source = "porteur2")
     @Mapping(target = "utilisateur", source = "utilisateur", qualifiedByName = "utilisateurId")
     @Mapping(target = "site.id", source = "site.id")
     @Mapping(target = "site.latitude", source = "site.latitude")

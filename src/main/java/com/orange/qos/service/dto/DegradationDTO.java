@@ -2,6 +2,7 @@ package com.orange.qos.service.dto;
 
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,6 +11,8 @@ import java.util.Objects;
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class DegradationDTO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Long id;
 
@@ -28,21 +31,29 @@ public class DegradationDTO implements Serializable {
     @NotNull
     private String porteur;
 
+    private String porteur2;
+
     private String actionsEffectuees;
 
     private String statut;
 
-    private UtilisateurDTO utilisateur;
+    private String commentaire;
 
+    private String ticketOceane;
+
+    private String nextStep;
+
+    @NotNull
+    private Instant dateDetection;
+
+    private Instant dateLimite;
+
+    private UtilisateurDTO utilisateur;
     private SiteDTO site;
 
-    /**
-     * ✅ Liste des délais liés à cette dégradation
-     * (chaque délai contient sa date limite + état couleur calculé)
-     */
     private List<DelaiInterventionDTO> delais;
 
-    // ================== GETTERS / SETTERS ==================
+    // ============ Getters / Setters ============
 
     public Long getId() {
         return id;
@@ -92,6 +103,14 @@ public class DegradationDTO implements Serializable {
         this.porteur = porteur;
     }
 
+    public String getPorteur2() {
+        return porteur2;
+    }
+
+    public void setPorteur2(String porteur2) {
+        this.porteur2 = porteur2;
+    }
+
     public String getActionsEffectuees() {
         return actionsEffectuees;
     }
@@ -106,6 +125,46 @@ public class DegradationDTO implements Serializable {
 
     public void setStatut(String statut) {
         this.statut = statut;
+    }
+
+    public String getCommentaire() {
+        return commentaire;
+    }
+
+    public void setCommentaire(String commentaire) {
+        this.commentaire = commentaire;
+    }
+
+    public String getTicketOceane() {
+        return ticketOceane;
+    }
+
+    public void setTicketOceane(String ticketOceane) {
+        this.ticketOceane = ticketOceane;
+    }
+
+    public String getNextStep() {
+        return nextStep;
+    }
+
+    public void setNextStep(String nextStep) {
+        this.nextStep = nextStep;
+    }
+
+    public Instant getDateDetection() {
+        return dateDetection;
+    }
+
+    public void setDateDetection(Instant dateDetection) {
+        this.dateDetection = dateDetection;
+    }
+
+    public Instant getDateLimite() {
+        return dateLimite;
+    }
+
+    public void setDateLimite(Instant dateLimite) {
+        this.dateLimite = dateLimite;
     }
 
     public UtilisateurDTO getUtilisateur() {
@@ -132,7 +191,7 @@ public class DegradationDTO implements Serializable {
         this.delais = delais;
     }
 
-    // ================== EQUALS / HASHCODE ==================
+    // ============ equals / hashCode ============
 
     @Override
     public boolean equals(Object o) {
@@ -144,10 +203,10 @@ public class DegradationDTO implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id);
+        return Objects.hash(id);
     }
 
-    // ================== TOSTRING ==================
+    // ============ toString ============
 
     @Override
     public String toString() {
@@ -170,12 +229,28 @@ public class DegradationDTO implements Serializable {
             ", porteur='" +
             porteur +
             '\'' +
+            ", porteur2='" +
+            porteur2 +
+            '\'' +
             ", actionsEffectuees='" +
             actionsEffectuees +
             '\'' +
             ", statut='" +
             statut +
             '\'' +
+            ", commentaire='" +
+            commentaire +
+            '\'' +
+            ", ticketOceane='" +
+            ticketOceane +
+            '\'' +
+            ", nextStep='" +
+            nextStep +
+            '\'' +
+            ", dateDetection=" +
+            dateDetection +
+            ", dateLimite=" +
+            dateLimite +
             ", utilisateur=" +
             utilisateur +
             ", site=" +

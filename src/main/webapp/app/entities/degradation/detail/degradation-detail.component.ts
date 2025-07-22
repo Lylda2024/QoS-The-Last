@@ -41,7 +41,7 @@ export class DegradationDetailComponent implements OnChanges {
     window.history.back();
   }
 
-  // Calcul de la durée en jours entre dateDebut et dateLimite pour un délai
+  /** Durée en jours entre dateDebut et dateLimite d’un délai */
   getDuree(delai: IDelaiIntervention): number | null {
     if (delai.dateDebut && delai.dateLimite) {
       const debut = dayjs(delai.dateDebut);
@@ -53,7 +53,7 @@ export class DegradationDetailComponent implements OnChanges {
     return null;
   }
 
-  // Calcul de la date limite d’intervention à afficher
+  /** Date limite d’intervention (P1 / P2 / P3 uniquement) */
   getDateLimiteIntervention(): string | null {
     if (!this.degradation?.dateDetection || !this.degradation?.priorite) {
       return null;
@@ -61,7 +61,7 @@ export class DegradationDetailComponent implements OnChanges {
 
     const dateBase = new Date(this.degradation.dateDetection);
 
-    // Si un délai existe, on prend le premier délai et calcule la date limite via sa durée
+    // 1) Si un délai existe → on l’utilise
     if (this.delais.length > 0) {
       const duree = this.getDuree(this.delais[0]);
       if (duree !== null) {
@@ -71,24 +71,25 @@ export class DegradationDetailComponent implements OnChanges {
       }
     }
 
-    // Sinon, durée par défaut selon priorité
-    let joursParPriorite = 0;
+    // 2) Sinon, règles P1 / P2 / P3 uniquement
+    let jours = 0;
     switch (this.degradation.priorite) {
-      case 'ELEVEE':
-        joursParPriorite = 5;
+      case 'P1':
+        jours = 5;
         break;
-      case 'MOYENNE':
-        joursParPriorite = 10;
+      case 'P2':
+        jours = 10;
         break;
-      case 'FAIBLE':
-        joursParPriorite = 20;
+      case 'P3':
+        jours = 20;
         break;
       default:
-        joursParPriorite = 7;
+        // Toute autre valeur → on ne calcule pas
+        return null;
     }
 
     const dateLimite = new Date(dateBase);
-    dateLimite.setDate(dateLimite.getDate() + joursParPriorite);
+    dateLimite.setDate(dateLimite.getDate() + jours);
     return dateLimite.toLocaleDateString();
   }
 }

@@ -1,7 +1,9 @@
 <div class="container mt-4">
   <div class="card shadow-sm p-4">
     <h2 class="text-center mb-4" *ngIf="degradation?.id; else creationTitle">Modifier la Dégradation</h2>
-    <ng-template #creationTitle><h2 class="text-center mb-4">Créer une Dégradation</h2></ng-template>
+    <ng-template #creationTitle>
+      <h2 class="text-center mb-4">Créer une Dégradation</h2>
+    </ng-template>
 
     <!-- Étapes -->
     <div class="d-flex justify-content-center align-items-center mb-4 stepper">
@@ -11,7 +13,7 @@
     </div>
 
     <form [formGroup]="editForm" (ngSubmit)="save()">
-      <!-- ÉTAPE 1 : Informations de base -->
+      <!-- ÉTAPE 1 -->
       <div *ngIf="currentStep === 1" class="form-step">
         <h5 class="mb-3 text-muted">Informations Générales</h5>
         <div class="row g-3">
@@ -60,7 +62,7 @@
             <div *ngIf="isInvalid('contactTemoin')" class="invalid-feedback">Champ requis</div>
           </div>
 
-          <!-- Type d'anomalie -->
+          <!-- Type d’anomalie -->
           <div class="col-md-6">
             <label for="typeAnomalie" class="form-label">Type d’anomalie *</label>
             <select
@@ -75,7 +77,7 @@
             <div *ngIf="isInvalid('typeAnomalie')" class="invalid-feedback">Champ requis</div>
           </div>
 
-          <!-- Analyse ou Actions -->
+          <!-- Analyse / Actions effectuées -->
           <div class="col-md-12">
             <label for="actionsEffectuees" class="form-label">Analyse / Actions effectuées *</label>
             <textarea
@@ -103,7 +105,7 @@
         </div>
       </div>
 
-      <!-- ÉTAPE 2 : Informations avancées -->
+      <!-- ÉTAPE 2 -->
       <div *ngIf="currentStep === 2" class="form-step mt-4">
         <h5 class="mb-3 text-muted">Détails supplémentaires</h5>
         <div class="row g-3">
@@ -120,10 +122,10 @@
             <div *ngIf="isInvalid('porteur')" class="invalid-feedback">Champ requis</div>
           </div>
 
-          <!-- Étape suivante -->
+          <!-- Prochaine étape -->
           <div class="col-md-6">
-            <label for="nextStep" class="form-label">Prochaine étape</label>
-            <input id="nextStep" type="text" class="form-control" formControlName="nextStep" />
+            <label for="nextStep" class="form-label">Next Step</label>
+            <textarea id="nextStep" class="form-control" rows="4" placeholder="Next Step..." formControlName="nextStep"> </textarea>
           </div>
 
           <!-- Ticket Océane -->
@@ -132,6 +134,19 @@
             <input id="ticketOceane" type="text" class="form-control" formControlName="ticketOceane" />
           </div>
 
+          <!-- Commentaire (textarea) -->
+          <div class="col-md-12">
+            <label for="commentaire" class="form-label">Commentaire</label>
+            <textarea
+              id="commentaire"
+              class="form-control"
+              formControlName="commentaire"
+              rows="4"
+              placeholder="Ajoutez vos observations ici..."
+            ></textarea>
+          </div>
+
+          <!-- Site -->
           <!-- Site -->
           <div class="col-md-6 position-relative">
             <label for="siteInput" class="form-label">Site BTS *</label>
@@ -139,13 +154,13 @@
               id="siteInput"
               type="text"
               class="form-control"
-              formControlName="site"
-              [value]="siteNom"
-              (input)="handleSiteInput($event)"
-              required
+              placeholder="Tapez pour chercher..."
+              [ngModel]="siteNom"
+              (ngModelChange)="handleSiteInput($event)"
+              [ngModelOptions]="{ standalone: true }"
             />
-            <ul *ngIf="filteredSites.length > 0" class="autocomplete-list">
-              <li *ngFor="let s of filteredSites" (click)="selectSiteSuggestion(s)">
+            <ul *ngIf="filteredSites.length" class="autocomplete-list">
+              <li *ngFor="let s of filteredSites" (mousedown)="selectSiteSuggestion(s)">
                 {{ s.nomSite }}
               </li>
             </ul>
@@ -154,7 +169,7 @@
         </div>
       </div>
 
-      <!-- Boutons d'action -->
+      <!-- Boutons de navigation -->
       <div class="mt-4 d-flex justify-content-between">
         <button type="button" (click)="previousState()" class="btn btn-outline-secondary">Annuler</button>
         <div class="d-flex gap-2">

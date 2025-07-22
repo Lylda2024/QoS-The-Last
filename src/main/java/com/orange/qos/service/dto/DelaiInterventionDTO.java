@@ -138,4 +138,15 @@ public class DelaiInterventionDTO implements Serializable {
             '}'
         );
     }
+
+    private String responsable;
+    private Long degradationId;
+
+    public void setResponsable(String responsable) {
+        this.responsable = responsable;
+    }
+
+    public void setDegradationId(Long degradationId) {
+        this.degradationId = degradationId;
+    }
 }
