@@ -1,8 +1,11 @@
-import { Component, NgZone, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
-import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Data, ParamMap, Router } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { SearchBarComponent } from 'app/shared/search-bar/search-bar.component';
+import { RouterModule } from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
@@ -17,13 +20,16 @@ import { RoleDeleteDialogComponent } from '../delete/role-delete-dialog.componen
 
 @Component({
   selector: 'jhi-role',
+  standalone: true,
   templateUrl: './role.component.html',
-  imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective, ItemCountComponent],
+  imports: [FormsModule, RouterModule, SharedModule, SortDirective, SortByDirective, ItemCountComponent, SearchBarComponent],
 })
 export class RoleComponent implements OnInit {
   subscription: Subscription | null = null;
   roles = signal<IRole[]>([]);
+  selectedRoles: Set<number> = new Set();
   isLoading = false;
+  searchQuery: string = '';
 
   sortState = sortStateSignal({});
 
@@ -36,7 +42,6 @@ export class RoleComponent implements OnInit {
   protected readonly activatedRoute = inject(ActivatedRoute);
   protected readonly sortService = inject(SortService);
   protected modalService = inject(NgbModal);
-  protected ngZone = inject(NgZone);
 
   trackId = (item: IRole): number => this.roleService.getRoleIdentifier(item);
 
@@ -52,13 +57,30 @@ export class RoleComponent implements OnInit {
   delete(role: IRole): void {
     const modalRef = this.modalService.open(RoleDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.role = role;
-    // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
         tap(() => this.load()),
       )
       .subscribe();
+  }
+
+  deleteSelected(): void {
+    if (confirm(`Voulez-vous vraiment supprimer les ${this.selectedRoles.size} rôles sélectionnés ?`)) {
+      this.selectedRoles.forEach(id => {
+        this.roleService.delete(id).subscribe({
+          next: () => {
+            alert(`Rôle #${id} supprimé avec succès.`);
+          },
+          error: err => {
+            console.error('Erreur lors de la suppression', err);
+            alert('Erreur lors de la suppression.');
+          },
+        });
+      });
+      this.selectedRoles.clear();
+      this.load();
+    }
   }
 
   load(): void {
@@ -107,6 +129,9 @@ export class RoleComponent implements OnInit {
       size: this.itemsPerPage,
       sort: this.sortService.buildSortParam(this.sortState()),
     };
+    if (this.searchQuery) {
+      queryObject['search'] = this.searchQuery;
+    }
     return this.roleService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
@@ -117,11 +142,23 @@ export class RoleComponent implements OnInit {
       sort: this.sortService.buildSortParam(sortState),
     };
 
-    this.ngZone.run(() => {
-      this.router.navigate(['./'], {
-        relativeTo: this.activatedRoute,
-        queryParams: queryParamsObj,
-      });
+    this.router.navigate(['./'], {
+      relativeTo: this.activatedRoute,
+      queryParams: queryParamsObj,
     });
+  }
+
+  onSearch(query: string): void {
+    this.searchQuery = query;
+    this.page = 1;
+    this.load();
+  }
+
+  toggleSelection(roleId: number): void {
+    if (this.selectedRoles.has(roleId)) {
+      this.selectedRoles.delete(roleId);
+    } else {
+      this.selectedRoles.add(roleId);
+    }
   }
 }

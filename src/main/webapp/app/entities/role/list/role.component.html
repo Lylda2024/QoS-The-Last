@@ -20,6 +20,8 @@
     </div>
   </h2>
 
+  <app-search-bar [placeholder]="'Rechercher un rôle...'" (search)="onSearch($event)"></app-search-bar>
+
   <jhi-alert-error />
 
   <jhi-alert />
@@ -29,6 +31,11 @@
       <span jhiTranslate="codeStageApp.role.home.notFound">Aucun Role trouvé</span>
     </div>
   } @else {
+    <div class="d-flex justify-content-between mb-3">
+      <button class="btn btn-danger" (click)="deleteSelected()" [disabled]="selectedRoles.size === 0">
+        <i class="fa fa-trash"></i> Supprimer sélectionnés
+      </button>
+    </div>
     <div class="table-responsive table-entities" id="entities">
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
@@ -36,21 +43,18 @@
             <th scope="col" jhiSortBy="id">
               <div class="d-flex">
                 <span jhiTranslate="global.field.id">ID</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="nom">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.role.nom">Nom</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="description">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.role.description">Description</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
@@ -60,6 +64,9 @@
         <tbody>
           @for (role of roles(); track trackId(role)) {
             <tr data-cy="entityTable">
+              <td>
+                <input type="checkbox" [checked]="selectedRoles.has(role.id)" (change)="toggleSelection(role.id)" />
+              </td>
               <td>
                 <a [routerLink]="['/role', role.id, 'view']">{{ role.id }}</a>
               </td>

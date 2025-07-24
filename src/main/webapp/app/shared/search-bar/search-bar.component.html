@@ -1,0 +1,16 @@
+<div class="input-group mb-3">
+  <input
+    type="text"
+    class="form-control"
+    placeholder="{{ placeholder }}"
+    aria-label="Recherche"
+    aria-describedby="basic-addon2"
+    [(ngModel)]="query"
+    (input)="onSearch()"
+  />
+  <div class="input-group-append">
+    <button class="btn btn-outline-secondary" type="button" (click)="onSearch()">
+      <i class="fa fa-search"></i>
+    </button>
+  </div>
+</div>

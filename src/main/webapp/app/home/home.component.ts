@@ -2,14 +2,17 @@ import { AfterViewInit, Component, ElementRef, ViewChild, ChangeDetectorRef, OnD
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
-import { getActiveDelai } from 'app/entities/degradation/degradation.model';
+
+import { IDegradation, getActiveDelai } from 'app/entities/degradation/degradation.model';
+import { IDelaiIntervention } from 'app/entities/delai-intervention/delai-intervention.model';
 
 import * as L from 'leaflet';
 import { Subscription } from 'rxjs';
+
 import { NotificationExtendedService } from 'app/entities/notification/service/notification-extended.service';
 import { DegradationService } from 'app/entities/degradation/service/degradation.service';
-import { IDegradation, IDelaiIntervention } from 'app/entities/degradation/degradation.model';
 import { MapService, MapLocation } from 'app/services/map.service';
+
 import * as d3 from 'd3';
 import 'leaflet.fullscreen';
 import { ToastrModule } from 'ngx-toastr';
@@ -55,20 +58,25 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.fixLeafletIcons();
+
     const el = this.mapContainer.nativeElement;
     if (!el.offsetHeight) {
       el.style.height = '70vh';
       el.style.minHeight = '400px';
     }
+
     this.initMap();
     this.loadDegradations();
+
     this.locationSub = this.mapService.location$.subscribe(loc => {
       if (loc) {
         this.addDynamicMarker(loc);
         this.mapService.clearLocation();
       }
     });
+
     this.checkDelaiNotifications();
+
     setTimeout(() => this.cdRef.detectChanges(), 0);
   }
 
@@ -123,7 +131,6 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
   private loadDegradations(): void {
     this.degradationSub = this.degradationService.query().subscribe({
       next: (res: HttpResponse<IDegradation[]>) => {
-        // Conversion des dates string en Dayjs pour éviter erreurs
         this.allDegradations = (res.body ?? []).map(d => ({
           ...d,
           dateDetection: d.dateDetection ? dayjs(d.dateDetection) : null,
@@ -217,7 +224,6 @@ export default class HomeComponent implements AfterViewInit, OnDestroy {
     } else {
       const jours = priorite === 'P1' ? 5 : priorite === 'P2' ? 10 : priorite === 'P3' ? 20 : null;
       if (jours !== null && degradation.dateDetection) {
-        // conversion sécurisée avec dayjs
         const detectionDayjs: Dayjs = dayjs(degradation.dateDetection);
         dateLimite = detectionDayjs.add(jours, 'day').toDate();
       }

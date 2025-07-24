@@ -52,34 +52,24 @@ public class DegradationResource {
         this.degradationQueryService = degradationQueryService;
     }
 
-    /* ---------- CRUD endpoints standard ---------- */
-
+    /**
+     * POST /api/degradations : Create a new degradation.
+     */
     @PostMapping("")
     public ResponseEntity<DegradationDTO> createDegradation(@Valid @RequestBody DegradationDTO degradationDTO) throws URISyntaxException {
         LOG.debug("REST request to save Degradation : {}", degradationDTO);
         if (degradationDTO.getId() != null) {
             throw new BadRequestAlertException("A new degradation cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        degradationDTO = degradationService.save(degradationDTO);
-        return ResponseEntity.created(new URI("/api/degradations/" + degradationDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, degradationDTO.getId().toString()))
-            .body(degradationDTO);
+        DegradationDTO result = degradationService.save(degradationDTO);
+        return ResponseEntity.created(new URI("/api/degradations/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
-
-    /* ---------- Endpoint principal (carte/Angular) ---------- */
 
     /**
-     * GET /api/degradations/all-with-site : toutes les dégradations
-     * avec leurs sites (latitude/longitude) en une seule requête.
+     * GET /api/degradations : get all degradations.
      */
-    @GetMapping("/all-with-site")
-    public ResponseEntity<List<DegradationDTO>> getAllWithSite() {
-        LOG.debug("REST request to get all Degradations with Site");
-        return ResponseEntity.ok(degradationService.findAllWithSite());
-    }
-
-    /* ---------- Endpoint JHipster paginé ---------- */
-
     @GetMapping("")
     public ResponseEntity<List<DegradationDTO>> getAllDegradations(
         DegradationCriteria criteria,
@@ -91,12 +81,9 @@ public class DegradationResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
-    @GetMapping("/{id}/delais")
-    public ResponseEntity<List<DelaiInterventionDTO>> getDelaisByDegradation(@PathVariable Long id) {
-        List<DelaiInterventionDTO> delais = degradationService.findDelaisByDegradationId(id);
-        return ResponseEntity.ok(delais);
-    }
-
+    /**
+     * GET /api/degradations/{id} : get the "id" degradation.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<DegradationDTO> getDegradation(@PathVariable Long id) {
         LOG.debug("REST request to get Degradation : {}", id);
@@ -104,10 +91,42 @@ public class DegradationResource {
         return ResponseUtil.wrapOrNotFound(degradationDTO);
     }
 
+    /**
+     * PUT /api/degradations/{id} : updates an existing degradation.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<DegradationDTO> updateDegradation(@PathVariable Long id, @Valid @RequestBody DegradationDTO dto) {
         LOG.debug("REST request to update Degradation : {}, {}", id, dto);
         dto.setId(id);
         return ResponseEntity.ok(degradationService.update(dto));
+    }
+
+    /**
+     * GET /api/degradations/{id}/delais : get all DelaiInterventions for a degradation.
+     */
+    @GetMapping("/{id}/delais")
+    public ResponseEntity<List<DelaiInterventionDTO>> getDelaisByDegradation(@PathVariable Long id) {
+        List<DelaiInterventionDTO> delais = degradationService.findDelaisByDegradationId(id);
+        return ResponseEntity.ok(delais);
+    }
+
+    /**
+     * PUT /api/degradations/{id}/delais : update a DelaiIntervention for a degradation.
+     */
+    @PutMapping("/{id}/delais")
+    public ResponseEntity<DelaiInterventionDTO> updateDelai(@PathVariable Long id, @Valid @RequestBody DelaiInterventionDTO delaiDTO) {
+        LOG.debug("REST request to update Delai : {}", delaiDTO);
+        DelaiInterventionDTO updatedDelai = degradationService.updateDelai(id, delaiDTO);
+        return ResponseEntity.ok(updatedDelai);
+    }
+
+    /**
+     * POST /api/degradations/{id}/delais : add a new DelaiIntervention for a degradation.
+     */
+    @PostMapping("/{id}/delais")
+    public ResponseEntity<DelaiInterventionDTO> addDelai(@PathVariable Long id, @Valid @RequestBody DelaiInterventionDTO delaiDTO) {
+        LOG.debug("REST request to add Delai : {}", delaiDTO);
+        DelaiInterventionDTO createdDelai = degradationService.addDelai(id, delaiDTO);
+        return ResponseEntity.ok(createdDelai);
     }
 }

@@ -1,8 +1,12 @@
-import { Component, NgZone, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
-import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Data, ParamMap, Router } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { SearchBarComponent } from 'app/shared/search-bar/search-bar.component';
+
+import { RouterModule } from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
@@ -18,13 +22,25 @@ import { SiteDeleteDialogComponent } from '../delete/site-delete-dialog.componen
 
 @Component({
   selector: 'jhi-site',
+  standalone: true,
   templateUrl: './site.component.html',
-  imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective, FormatMediumDatePipe, ItemCountComponent],
+  imports: [
+    FormsModule,
+    SharedModule,
+    SortDirective,
+    SortByDirective,
+    FormatMediumDatePipe,
+    ItemCountComponent,
+    SearchBarComponent,
+    RouterModule,
+  ],
 })
 export class SiteComponent implements OnInit {
   subscription: Subscription | null = null;
   sites = signal<ISite[]>([]);
+  selectedSites: Set<number> = new Set();
   isLoading = false;
+  searchQuery: string = '';
 
   sortState = sortStateSignal({});
 
@@ -37,7 +53,6 @@ export class SiteComponent implements OnInit {
   protected readonly activatedRoute = inject(ActivatedRoute);
   protected readonly sortService = inject(SortService);
   protected modalService = inject(NgbModal);
-  protected ngZone = inject(NgZone);
 
   trackId = (item: ISite): number => this.siteService.getSiteIdentifier(item);
 
@@ -53,13 +68,30 @@ export class SiteComponent implements OnInit {
   delete(site: ISite): void {
     const modalRef = this.modalService.open(SiteDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.site = site;
-    // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
         tap(() => this.load()),
       )
       .subscribe();
+  }
+
+  deleteSelected(): void {
+    if (confirm(`Voulez-vous vraiment supprimer les ${this.selectedSites.size} sites sélectionnés ?`)) {
+      this.selectedSites.forEach(id => {
+        this.siteService.delete(id).subscribe({
+          next: () => {
+            alert(`Site #${id} supprimé avec succès.`);
+          },
+          error: err => {
+            console.error('Erreur lors de la suppression', err);
+            alert('Erreur lors de la suppression.');
+          },
+        });
+      });
+      this.selectedSites.clear();
+      this.load();
+    }
   }
 
   load(): void {
@@ -108,6 +140,9 @@ export class SiteComponent implements OnInit {
       size: this.itemsPerPage,
       sort: this.sortService.buildSortParam(this.sortState()),
     };
+    if (this.searchQuery) {
+      queryObject['search'] = this.searchQuery;
+    }
     return this.siteService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
@@ -118,11 +153,23 @@ export class SiteComponent implements OnInit {
       sort: this.sortService.buildSortParam(sortState),
     };
 
-    this.ngZone.run(() => {
-      this.router.navigate(['./'], {
-        relativeTo: this.activatedRoute,
-        queryParams: queryParamsObj,
-      });
+    this.router.navigate(['./'], {
+      relativeTo: this.activatedRoute,
+      queryParams: queryParamsObj,
     });
+  }
+
+  onSearch(query: string): void {
+    this.searchQuery = query;
+    this.page = 1;
+    this.load();
+  }
+
+  toggleSelection(siteId: number): void {
+    if (this.selectedSites.has(siteId)) {
+      this.selectedSites.delete(siteId);
+    } else {
+      this.selectedSites.add(siteId);
+    }
   }
 }

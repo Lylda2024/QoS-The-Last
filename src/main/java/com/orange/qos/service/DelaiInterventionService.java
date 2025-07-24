@@ -156,4 +156,13 @@ public class DelaiInterventionService {
 
         return delaiInterventionRepository.save(auto);
     }
+
+    @Transactional(readOnly = true)
+    public List<DelaiInterventionDTO> findAllByDegradationId(Long degradationId) {
+        return delaiInterventionRepository
+            .findByDegradationId(degradationId)
+            .stream()
+            .map(delaiInterventionMapper::toDtoWithEtatCouleur)
+            .collect(Collectors.toList());
+    }
 }

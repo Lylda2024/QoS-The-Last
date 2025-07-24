@@ -4,6 +4,8 @@ import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/r
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
+import { SearchBarComponent } from 'app/shared/search-bar/search-bar.component';
+
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { ItemCountComponent } from 'app/shared/pagination';
@@ -17,13 +19,16 @@ import { UtilisateurDeleteDialogComponent } from '../delete/utilisateur-delete-d
 
 @Component({
   selector: 'jhi-utilisateur',
+  standalone: true,
   templateUrl: './utilisateur.component.html',
-  imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective, ItemCountComponent],
+  imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective, ItemCountComponent, SearchBarComponent],
 })
 export class UtilisateurComponent implements OnInit {
   subscription: Subscription | null = null;
   utilisateurs = signal<IUtilisateur[]>([]);
+  selectedUtilisateurs: Set<number> = new Set();
   isLoading = false;
+  searchQuery: string = '';
 
   sortState = sortStateSignal({});
 
@@ -52,13 +57,30 @@ export class UtilisateurComponent implements OnInit {
   delete(utilisateur: IUtilisateur): void {
     const modalRef = this.modalService.open(UtilisateurDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.utilisateur = utilisateur;
-    // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
         tap(() => this.load()),
       )
       .subscribe();
+  }
+
+  deleteSelected(): void {
+    if (confirm(`Voulez-vous vraiment supprimer les ${this.selectedUtilisateurs.size} utilisateurs sélectionnés ?`)) {
+      this.selectedUtilisateurs.forEach(id => {
+        this.utilisateurService.delete(id).subscribe({
+          next: () => {
+            alert(`Utilisateur #${id} supprimé avec succès.`);
+          },
+          error: err => {
+            console.error('Erreur lors de la suppression', err);
+            alert('Erreur lors de la suppression.');
+          },
+        });
+      });
+      this.selectedUtilisateurs.clear();
+      this.load();
+    }
   }
 
   load(): void {
@@ -124,5 +146,18 @@ export class UtilisateurComponent implements OnInit {
         queryParams: queryParamsObj,
       });
     });
+  }
+
+  onSearch(query: string): void {
+    this.searchQuery = query;
+    this.load();
+  }
+
+  toggleSelection(utilisateurId: number): void {
+    if (this.selectedUtilisateurs.has(utilisateurId)) {
+      this.selectedUtilisateurs.delete(utilisateurId);
+    } else {
+      this.selectedUtilisateurs.add(utilisateurId);
+    }
   }
 }

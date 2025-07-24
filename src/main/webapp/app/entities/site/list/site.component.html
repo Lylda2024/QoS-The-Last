@@ -20,6 +20,8 @@
     </div>
   </h2>
 
+  <app-search-bar [placeholder]="'Rechercher un site...'" (search)="onSearch($event)"></app-search-bar>
+
   <jhi-alert-error />
 
   <jhi-alert />
@@ -29,6 +31,11 @@
       <span jhiTranslate="codeStageApp.site.home.notFound">Aucun Site trouvé</span>
     </div>
   } @else {
+    <div class="d-flex justify-content-between mb-3">
+      <button class="btn btn-danger" (click)="deleteSelected()" [disabled]="selectedSites.size === 0">
+        <i class="fa fa-trash"></i> Supprimer sélectionnés
+      </button>
+    </div>
     <div class="table-responsive table-entities" id="entities">
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
@@ -36,119 +43,102 @@
             <th scope="col" jhiSortBy="id">
               <div class="d-flex">
                 <span jhiTranslate="global.field.id">ID</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="nomSite">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.nomSite">Nom Site</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="codeOCI">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.codeOCI">Code OCI</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="longitude">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.longitude">Longitude</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="latitude">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.latitude">Latitude</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="gestionnaire">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.gestionnaire">Gestionnaire</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="proprietaire">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.proprietaire">Proprietaire</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="equipementier">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.equipementier">Equipementier</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="typeSite">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.typeSite">Type Site</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="modeAntenne">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.modeAntenne">Mode Antenne</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="statut">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.statut">Statut</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="couche">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.couche">Couche</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="enService">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.enService">En Service</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="technologie">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.technologie">Technologie</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="dateMiseEnService">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.dateMiseEnService">Date Mise En Service</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="dateMes2G">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.dateMes2G">Date Mes 2 G</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="dateMes3G">
               <div class="d-flex">
                 <span jhiTranslate="codeStageApp.site.dateMes3G">Date Mes 3 G</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
@@ -158,6 +148,9 @@
         <tbody>
           @for (site of sites(); track trackId(site)) {
             <tr data-cy="entityTable">
+              <td>
+                <input type="checkbox" [checked]="selectedSites.has(site.id)" (change)="toggleSelection(site.id)" />
+              </td>
               <td>
                 <a [routerLink]="['/site', site.id, 'view']">{{ site.id }}</a>
               </td>

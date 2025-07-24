@@ -1,19 +1,27 @@
-<div>
-  <h2 id="page-heading" data-cy="DegradationHeading">
+<!-- 1.  Barre de recherche -->
+<app-search-bar [placeholder]="'Rechercher une dégradation...'" (search)="onSearch($event)"></app-search-bar>
+
+<!-- 2.  États de chargement / erreur -->
+<div *ngIf="isLoading" class="text-center my-3">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Chargement...</span>
+  </div>
+</div>
+
+<div *ngIf="errorLoading" class="alert alert-danger my-3">Erreur lors du chargement des dégradations.</div>
+
+<!-- 3.  Contenu principal -->
+<div *ngIf="!isLoading && !errorLoading">
+  <h2 id="page-heading" data-cy="DegradationHeading" class="mb-3">
     <span jhiTranslate="codeStageApp.degradation.home.title">Degradations</span>
 
-    <div class="d-flex justify-content-end">
+    <div class="d-flex justify-content-end mt-2">
       <button class="btn btn-info me-2" (click)="load()" [disabled]="loading">
         <fa-icon icon="sync" [animation]="loading ? 'spin' : undefined"></fa-icon>
-        <span jhiTranslate="codeStageApp.degradation.home.refreshListLabel">Actualiser la liste</span>
+        <span jhiTranslate="codeStageApp.degradation.home.refreshListLabel">Actualiser</span>
       </button>
 
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-degradation"
-        [routerLink]="['/degradation/new']"
-      >
+      <button id="jh-create-entity" data-cy="entityCreateButton" class="btn btn-primary" [routerLink]="['/degradation/new']">
         <fa-icon icon="plus"></fa-icon>
         <span jhiTranslate="codeStageApp.degradation.home.createLabel">Créer</span>
       </button>
@@ -23,71 +31,85 @@
   <jhi-alert-error></jhi-alert-error>
   <jhi-alert></jhi-alert>
 
-  <div *ngIf="degradations.length === 0; else tableBlock" class="alert alert-warning" id="no-result">
+  <div *ngIf="degradations.length === 0" class="alert alert-warning" id="no-result">
     <span jhiTranslate="codeStageApp.degradation.home.notFound">Aucune Degradation trouvée</span>
   </div>
 
-  <ng-template #tableBlock>
-    <div style="overflow-x: auto; width: 100%">
-      <div class="table-responsive">
-        <table class="table table-striped" aria-describedby="page-heading">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Localité</th>
-              <th>Contact</th>
-              <th>Type</th>
-              <th>Priorité</th>
-              <th>Porteur</th>
-              <th>Actions</th>
-              <th>Site</th>
-              <th class="text-end">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let degradation of degradations; trackBy: trackId" data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/degradation', degradation.id, 'view']">{{ degradation.id }}</a>
-              </td>
-              <td>{{ degradation.localite }}</td>
-              <td>{{ degradation.contactTemoin }}</td>
-              <td>{{ degradation.typeAnomalie }}</td>
-              <td>{{ degradation.priorite }}</td>
-              <td>{{ degradation.porteur }}</td>
-              <td>{{ degradation.actionsEffectuees }}</td>
-              <td>
-                <a *ngIf="degradation.site" [routerLink]="['/site', degradation.site.id, 'view']">
-                  {{ degradation.site.id }}
-                </a>
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/degradation', degradation.id, 'view']" class="btn btn-info btn-sm" title="Voir">
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
-                  </a>
-                  <a [routerLink]="['/degradation', degradation.id, 'edit']" class="btn btn-primary btn-sm" title="Editer">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
-                  </a>
-                  <button type="button" (click)="delete(degradation)" class="btn btn-danger btn-sm" title="Supprimer">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
-                  </button>
-                  <button
-                    type="button"
-                    (click)="ouvrirFormulaireDelai(degradation.id)"
-                    class="btn btn-secondary btn-sm"
-                    title="Afficher sur la carte"
-                  >
-                    <span class="d-none d-md-inline">Prolonger/Transférez</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+  <div *ngIf="degradations.length > 0" style="overflow-x: auto">
+    <!-- Actions groupées -->
+    <div class="d-flex justify-content-between mb-3">
+      <button class="btn btn-danger" (click)="deleteSelected()" [disabled]="selectedDegradations.size === 0">
+        <i class="fa fa-trash"></i> Supprimer sélectionnés
+      </button>
     </div>
-  </ng-template>
+
+    <!-- Tableau -->
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Localité</th>
+          <th>Type</th>
+          <th>Priorité</th>
+          <th>Statut</th>
+          <th>Contact</th>
+          <th>Porteur</th>
+          <th>Actions</th>
+          <th class="text-center" style="min-width: 160px">Gestion</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let degradation of degradations; trackBy: trackId" data-cy="entityTable">
+          <!-- Infos -->
+          <td>
+            <a [routerLink]="['/degradation', degradation.id, 'view']">{{ degradation.id }}</a>
+          </td>
+          <td>{{ degradation.localite }}</td>
+          <td>{{ degradation.typeAnomalie }}</td>
+          <td>
+            {{ degradation.priorite }}
+            <span *ngIf="degradation.statut === 'EN_COURS'" class="badge bg-success ms-1">En cours</span>
+          </td>
+          <td>{{ degradation.statut }}</td>
+          <td>{{ degradation.contactTemoin }}</td>
+          <td>{{ degradation.porteur }}</td>
+
+          <!-- Résumé des actions -->
+          <td>
+            <small class="text-truncate d-inline-block" style="max-width: 220px">
+              {{ degradation.actionsEffectuees }}
+            </small>
+          </td>
+
+          <!-- Boutons de gestion -->
+          <td class="text-center">
+            <div class="btn-group" role="group">
+              <a [routerLink]="['/degradation', degradation.id, 'view']" class="btn btn-sm btn-info" title="Voir">
+                <fa-icon icon="eye"></fa-icon>
+              </a>
+
+              <a [routerLink]="['/degradation', degradation.id, 'edit']" class="btn btn-sm btn-primary" title="Éditer">
+                <fa-icon icon="pencil-alt"></fa-icon>
+              </a>
+
+              <!-- Historique -->
+              <button
+                type="button"
+                (click)="openHistoriqueModal(degradation.id)"
+                class="btn btn-sm btn-secondary"
+                title="Historique des délais"
+              >
+                <fa-icon icon="history"></fa-icon>
+              </button>
+
+              <button type="button" (click)="delete(degradation)" class="btn btn-sm btn-danger" title="Supprimer">
+                <fa-icon icon="times"></fa-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

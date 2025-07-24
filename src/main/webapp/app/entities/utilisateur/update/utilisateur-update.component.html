@@ -1,95 +1,75 @@
 <div class="container mt-3" *ngIf="editForm">
-  <h2 jhiTranslate="utilisateur.home.createOrEditLabel">Créer ou modifier un Utilisateur</h2>
+  <h2 class="mb-3">Créer ou modifier un utilisateur</h2>
 
-  <!-- ✅ Gestion des erreurs -->
   <jhi-alert-error></jhi-alert-error>
 
-  <!-- ✅ Formulaire principal -->
-  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-    <!-- Champ Nom -->
-    <div class="form-group mb-3">
-      <label for="field_nom" jhiTranslate="utilisateur.nom">Nom</label>
-      <input type="text" id="field_nom" class="form-control" formControlName="nom" placeholder="Entrez le nom" />
-      <div *ngIf="editForm.get('nom')?.invalid && (editForm.get('nom')?.dirty || editForm.get('nom')?.touched)" class="text-danger">
-        Le nom est requis.
+  <form [formGroup]="editForm" (ngSubmit)="save()" novalidate>
+    <!-- Nom -->
+    <div class="mb-3">
+      <label for="field_nom" class="form-label">Nom *</label>
+      <input type="text" id="field_nom" class="form-control" formControlName="nom" placeholder="Dupont" />
+      <div *ngIf="editForm.get('nom')?.touched && editForm.get('nom')?.invalid" class="text-danger">Le nom est requis.</div>
+    </div>
+
+    <!-- Prénom -->
+    <div class="mb-3">
+      <label for="field_prenom" class="form-label">Prénom *</label>
+      <input type="text" id="field_prenom" class="form-control" formControlName="prenom" placeholder="Jean" />
+      <div *ngIf="editForm.get('prenom')?.touched && editForm.get('prenom')?.invalid" class="text-danger">Le prénom est requis.</div>
+    </div>
+
+    <!-- Email -->
+    <div class="mb-3">
+      <label for="field_email" class="form-label">Email *</label>
+      <input type="email" id="field_email" class="form-control" formControlName="email" placeholder="jean.dupont@example.com" />
+      <div *ngIf="editForm.get('email')?.touched && editForm.get('email')?.invalid" class="text-danger">
+        <span *ngIf="editForm.get('email')?.errors?.['required']">L'email est requis.</span>
+        <span *ngIf="editForm.get('email')?.errors?.['email']">Format d'email invalide.</span>
       </div>
     </div>
 
-    <!-- Champ Prénom -->
-    <div class="form-group mb-3">
-      <label for="field_prenom" jhiTranslate="utilisateur.prenom">Prénom</label>
-      <input type="text" id="field_prenom" class="form-control" formControlName="prenom" placeholder="Entrez le prénom" />
-      <div
-        *ngIf="editForm.get('prenom')?.invalid && (editForm.get('prenom')?.dirty || editForm.get('prenom')?.touched)"
-        class="text-danger"
-      >
-        Le prénom est requis.
-      </div>
-    </div>
-
-    <!-- Champ Email -->
-    <div class="form-group mb-3">
-      <label for="field_email" jhiTranslate="utilisateur.email">Email</label>
-      <input type="email" id="field_email" class="form-control" formControlName="email" placeholder="exemple@mail.com" />
-      <div *ngIf="editForm.get('email')?.invalid && (editForm.get('email')?.dirty || editForm.get('email')?.touched)" class="text-danger">
-        Veuillez entrer un email valide.
-      </div>
-    </div>
-
-    <!-- Champ Mot de passe -->
-    <div class="form-group mb-3">
-      <label for="field_mdp" jhiTranslate="utilisateur.motDePasse">Mot de passe</label>
-      <input type="password" id="field_mdp" class="form-control" formControlName="motDePasse" placeholder="********" />
-      <div
-        *ngIf="editForm.get('motDePasse')?.invalid && (editForm.get('motDePasse')?.dirty || editForm.get('motDePasse')?.touched)"
-        class="text-danger"
-      >
+    <!-- Mot de passe -->
+    <div class="mb-3">
+      <label for="field_mdp" class="form-label">Mot de passe *</label>
+      <input type="password" id="field_mdp" class="form-control" formControlName="motDePasse" placeholder="••••••••" />
+      <div *ngIf="editForm.get('motDePasse')?.touched && editForm.get('motDePasse')?.invalid" class="text-danger">
         Le mot de passe est requis.
       </div>
     </div>
 
-    <!-- Sélection du Type d'utilisateur -->
-    <div class="form-group mb-3">
-      <label for="field_typeUtilisateur" jhiTranslate="utilisateur.typeUtilisateur">Type d'utilisateur</label>
+    <!-- Type d'utilisateur -->
+    <div class="mb-3">
+      <label for="field_typeUtilisateur" class="form-label">Type d'utilisateur *</label>
       <select id="field_typeUtilisateur" class="form-select" formControlName="typeUtilisateur" [compareWith]="compareTypeUtilisateur">
         <option [ngValue]="null">-- Sélectionnez un type --</option>
         <option *ngFor="let type of typeUtilisateursSharedCollection" [ngValue]="type">
           {{ type.nom }}
         </option>
       </select>
-      <div
-        *ngIf="
-          editForm.get('typeUtilisateur')?.invalid && (editForm.get('typeUtilisateur')?.dirty || editForm.get('typeUtilisateur')?.touched)
-        "
-        class="text-danger"
-      >
+      <div *ngIf="editForm.get('typeUtilisateur')?.touched && editForm.get('typeUtilisateur')?.invalid" class="text-danger">
         Le type d'utilisateur est requis.
       </div>
     </div>
 
-    <!-- Sélection des Rôles -->
-    <div class="form-group mb-3">
-      <label for="field_roles" jhiTranslate="utilisateur.roles">Rôles</label>
+    <!-- Rôles -->
+    <div class="mb-3">
+      <label for="field_roles" class="form-label">Rôles</label>
       <select id="field_roles" class="form-select" multiple formControlName="roles" [compareWith]="compareRole">
         <option *ngFor="let role of rolesSharedCollection" [ngValue]="role">
           {{ role.nom }}
         </option>
       </select>
-      <small class="form-text text-muted">Maintenez CTRL ou CMD pour sélectionner plusieurs rôles.</small>
+      <small class="form-text text-muted">
+        Maintenez <kbd>Ctrl</kbd> (Windows) ou <kbd>Cmd</kbd> (Mac) pour sélectionner plusieurs rôles.
+      </small>
     </div>
 
     <!-- Boutons d'action -->
-    <div class="mt-4">
-      <button type="button" class="btn btn-secondary" (click)="previousState()">
-        <fa-icon icon="ban"></fa-icon>
-        &nbsp;
-        <span jhiTranslate="entity.action.cancel">Annuler</span>
-      </button>
+    <div class="mt-4 d-flex gap-2">
+      <button type="button" class="btn btn-secondary" (click)="previousState()"><fa-icon icon="ban"></fa-icon>&nbsp;Annuler</button>
 
       <button type="submit" class="btn btn-primary" [disabled]="isSaving || editForm.invalid">
-        <fa-icon icon="save"></fa-icon>
-        &nbsp;
-        <span jhiTranslate="entity.action.save">Sauvegarder</span>
+        <fa-icon icon="save"></fa-icon>&nbsp;Sauvegarder
       </button>
     </div>
   </form>

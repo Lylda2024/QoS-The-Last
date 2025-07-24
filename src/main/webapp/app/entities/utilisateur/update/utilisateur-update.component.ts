@@ -84,7 +84,10 @@ export class UtilisateurUpdateComponent implements OnInit {
 
     saveObservable.pipe(finalize(() => (this.isSaving = false))).subscribe({
       next: () => this.previousState(),
-      error: () => console.error('❌ Erreur lors de la sauvegarde'),
+      error: error => {
+        console.error('❌ Erreur lors de la sauvegarde', error);
+        alert('Erreur lors de la sauvegarde. Veuillez vérifier les données et réessayer.');
+      },
     });
   }
 

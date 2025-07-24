@@ -3,11 +3,10 @@ package com.orange.qos.service;
 import com.orange.qos.domain.Degradation;
 import com.orange.qos.domain.enumeration.StatutDelai;
 import com.orange.qos.repository.DegradationRepository;
-import com.orange.qos.repository.DelaiInterventionRepository;
 import com.orange.qos.service.dto.DegradationDTO;
 import com.orange.qos.service.dto.DelaiInterventionDTO;
 import com.orange.qos.service.mapper.DegradationMapper;
-import com.orange.qos.service.mapper.DelaiInterventionMapper;
+import jakarta.validation.Valid;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -26,41 +25,30 @@ public class DegradationService {
 
     private final DegradationRepository degradationRepository;
     private final DegradationMapper degradationMapper;
-    private final DelaiInterventionRepository delaiInterventionRepository;
-    private final DelaiInterventionMapper delaiInterventionMapper;
     private final DelaiInterventionService delaiInterventionService;
 
     public DegradationService(
         DegradationRepository degradationRepository,
         DegradationMapper degradationMapper,
-        DelaiInterventionRepository delaiInterventionRepository,
-        DelaiInterventionMapper delaiInterventionMapper,
         DelaiInterventionService delaiInterventionService
     ) {
         this.degradationRepository = degradationRepository;
         this.degradationMapper = degradationMapper;
-        this.delaiInterventionRepository = delaiInterventionRepository;
-        this.delaiInterventionMapper = delaiInterventionMapper;
         this.delaiInterventionService = delaiInterventionService;
     }
 
+    /* -------------------  méthodes inchangées  ------------------- */
+
     public DegradationDTO save(DegradationDTO degradationDTO) {
         LOG.debug("Request to save Degradation : {}", degradationDTO);
-
-        // Sauvegarde de la dégradation
         Degradation degradation = degradationMapper.toEntity(degradationDTO);
         degradation = degradationRepository.save(degradation);
 
-        // Création du premier délai (DTO)
         DelaiInterventionDTO premierDelaiDTO = creerPremierDelai(degradation);
-
-        // Sauvegarde du délai via le service (DTO → DTO)
         DelaiInterventionDTO savedDelaiDTO = delaiInterventionService.save(premierDelaiDTO);
 
-        // Ajout au DTO de retour
         DegradationDTO result = degradationMapper.toDto(degradation);
         result.setDelais(List.of(savedDelaiDTO));
-
         return result;
     }
 
@@ -81,7 +69,6 @@ public class DegradationService {
         dto.setCommentaire("Délai initial généré automatiquement");
         dto.setResponsable(degradation.getPorteur());
         dto.setDegradationId(degradation.getId());
-
         return dto;
     }
 
@@ -111,13 +98,7 @@ public class DegradationService {
             .findById(id)
             .map(degradation -> {
                 DegradationDTO dto = degradationMapper.toDto(degradation);
-                dto.setDelais(
-                    delaiInterventionRepository
-                        .findByDegradationId(degradation.getId())
-                        .stream()
-                        .map(delaiInterventionMapper::toDtoWithEtatCouleur)
-                        .collect(Collectors.toList())
-                );
+                dto.setDelais(delaiInterventionService.findAllByDegradationId(degradation.getId()));
                 return dto;
             });
     }
@@ -133,15 +114,9 @@ public class DegradationService {
         return degradationRepository
             .findAll()
             .stream()
-            .map(degradation -> {
-                DegradationDTO dto = degradationMapper.toDto(degradation);
-                dto.setDelais(
-                    delaiInterventionRepository
-                        .findByDegradationId(degradation.getId())
-                        .stream()
-                        .map(delaiInterventionMapper::toDtoWithEtatCouleur)
-                        .collect(Collectors.toList())
-                );
+            .map(d -> {
+                DegradationDTO dto = degradationMapper.toDto(d);
+                dto.setDelais(delaiInterventionService.findAllByDegradationId(d.getId()));
                 return dto;
             })
             .collect(Collectors.toList());
@@ -156,10 +131,17 @@ public class DegradationService {
     @Transactional(readOnly = true)
     public List<DelaiInterventionDTO> findDelaisByDegradationId(Long degradationId) {
         LOG.debug("Request to get delays by degradation id : {}", degradationId);
-        return delaiInterventionRepository
-            .findByDegradationId(degradationId)
-            .stream()
-            .map(delaiInterventionMapper::toDtoWithEtatCouleur)
-            .collect(Collectors.toList());
+        return delaiInterventionService.findAllByDegradationId(degradationId);
+    }
+
+    public DelaiInterventionDTO updateDelai(Long degradationId, DelaiInterventionDTO dto) {
+        dto.setDegradationId(degradationId);
+        return delaiInterventionService.update(dto); // 1 arg only
+    }
+
+    public DelaiInterventionDTO addDelai(Long degradationId, @Valid DelaiInterventionDTO delaiDTO) {
+        LOG.debug("Request to add Delai to degradation {} : {}", degradationId, delaiDTO);
+        delaiDTO.setDegradationId(degradationId);
+        return delaiInterventionService.save(delaiDTO);
     }
 }

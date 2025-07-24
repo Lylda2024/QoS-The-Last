@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { IDegradation, NewDegradation } from '../degradation.model';
 
+import { IDelaiIntervention } from 'app/entities/delai-intervention/delai-intervention.model';
+
 export type PartialUpdateDegradation = Partial<IDegradation> & { id: number };
 
 export type EntityResponseType = HttpResponse<IDegradation>;
@@ -72,5 +74,8 @@ export class DegradationService {
    */
   getAllWithSite(): Observable<EntityArrayResponseType> {
     return this.http.get<IDegradation[]>(`${this.resourceUrl}/all-with-site`, { observe: 'response' });
+  }
+  updateDelai(degradationId: number, delai: IDelaiIntervention): Observable<IDegradation> {
+    return this.http.put<IDegradation>(`${this.resourceUrl}/${degradationId}/delais`, delai);
   }
 }

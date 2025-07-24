@@ -23,12 +23,16 @@ public abstract class DelaiInterventionMapper implements EntityMapper<DelaiInter
     @IterableMapping(qualifiedByName = "toDto", elementTargetType = DelaiInterventionDTO.class)
     public abstract List<DelaiInterventionDTO> toDto(List<DelaiIntervention> entityList);
 
-    // Pour la conversion inverse, map chaque DTO vers entité sans IterableMapping (optionnel)
     public abstract List<DelaiIntervention> toEntity(List<DelaiInterventionDTO> dtoList);
 
     @Mapping(target = "degradation", ignore = true) // à gérer dans le service si besoin
     @Mapping(target = "utilisateur", ignore = true) // idem
     public abstract DelaiIntervention toEntity(DelaiInterventionDTO dto);
+
+    // partialUpdate corrigé : uniquement propriétés existantes dans DelaiIntervention
+    @Mapping(target = "degradation", ignore = true)
+    @Mapping(target = "utilisateur", ignore = true)
+    public abstract void partialUpdate(@MappingTarget DelaiIntervention entity, DelaiInterventionDTO dto);
 
     @Named("degradationId")
     @BeanMapping(ignoreByDefault = true)
@@ -78,6 +82,6 @@ public abstract class DelaiInterventionMapper implements EntityMapper<DelaiInter
     }
 
     public DelaiInterventionDTO toDtoWithEtatCouleur(DelaiIntervention delai) {
-        return toDto(delai); // déclenche aussi @AfterMapping -> setEtatCouleur()
+        return toDto(delai);
     }
 }
